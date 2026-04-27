@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Applyr Exporter",
+  "version": "1.0",
+  "description": "Extract job offers and add them to your Applyr account.",
+  "permissions": ["activeTab"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon.svg",
+      "32": "icons/icon.svg",
+      "48": "icons/icon.svg",
+      "128": "icons/icon.svg"
+    }
+  },
+  "icons": {
+    "16": "icons/icon.svg",
+    "32": "icons/icon.svg",
+    "48": "icons/icon.svg",
+    "128": "icons/icon.svg"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "exporter@applyr.com"
+    }
+  }
+}

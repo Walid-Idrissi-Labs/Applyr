@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="popup.css">
+    <title>Applyr Exporter</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Applyr Exporter</h1>
+        </header>
+        
+        <main>
+            <section class="offer-detected">
+                <h2>Offre détectée :</h2>
+                <div class="offer-card">
+                    <div class="role">Software Engineer</div>
+                    <div class="company">Stripe</div>
+                </div>
+            </section>
+
+            <section class="destination">
+                <label for="status">Statut de destination :</label>
+                <div class="select-wrapper">
+                    <select id="status">
+                        <option value="wishlist">Wishlist</option>
+                        <option value="applied">Applied</option>
+                        <option value="interview">Interview</option>
+                    </select>
+                </div>
+            </section>
+
+            <button class="btn-submit">
+                <span class="sparkle">✨</span> Extraire & Envoyer
+            </button>
+        </main>
+
+        <footer>
+            <p>Connecté en tant que <strong>John Doe</strong></p>
+        </footer>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

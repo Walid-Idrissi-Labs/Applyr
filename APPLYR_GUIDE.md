@@ -75,6 +75,7 @@ How can a user centralize all job applications, track their evolution through su
 - Manage name and email.
 - Change password.
 - Theme toggle (Light/Dark mode) - *Reference: js/state.js `theme`*.
+- **Authentication:** Standard email/password registration with "Remember Me" and "Forgot Password" functionality.
 
 ---
 
@@ -106,11 +107,11 @@ How can a user centralize all job applications, track their evolution through su
 - **Editable UI:** The extension displays a form with the results. User edits `name` or `description` if needed, then saves.
 
 ### 6.2 Iterative Resume Generation
-- User chooses an application + language.
-- AI generates a tailored resume draft.
-- **Review Mode:** User views the draft and can type a "Refinement Prompt" (e.g., "Make it more professional").
-- AI updates the draft based on the prompt.
-- **Finalize:** Export to PDF.
+- **Strategy:** Persistent storage of user data.
+    - **Global/Base Resume:** Each user maintains a "master" profile (experience, skills, projects) which serves as the base context for AI generation.
+    - **Targeted Resumes:** Users generate specific versions of their resume for each job application, localized by language and optimized based on the job description.
+- **Workflow:** 
+    - Generate (Draft) -> Review -> Refine (via prompt) -> Finalize -> Export (PDF).
 
 ---
 
@@ -122,7 +123,8 @@ How can a user centralize all job applications, track their evolution through su
 
 ### B. Styling
 - Use **Tailwind CSS**.
-- Follow the "Neubrutalism" or "Clean Modern" style seen in mockups (heavy borders, sharp shadows, bold typography).
+- **Theming:** Themes must be modular and modifiable directly in the source code to allow for easy implementation of future themes.
+- **Current Aesthetic:** Follow the "Neubrutalism" or "Clean Modern" style seen in current mockups (heavy borders, sharp shadows, bold typography).
 
 ### C. Logic
 - **Reminders:** Scheduled task runs daily at 8:00 AM.

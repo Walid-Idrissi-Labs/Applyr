@@ -1,6 +1,6 @@
 # Applyr: SaaS Job Application Tracker - Comprehensive Project Specification
 
-Applyr is a centralized SaaS platform for tracking job applications, generating tailored resumes, and managing the career search lifecycle using **Laravel 11 (Blade)** and **Tailwind CSS**.
+Applyr is a centralized SaaS platform for tracking job applications, generating tailored resumes, and managing the career search lifecycle using a decoupled **React** frontend and **Laravel API** backend.
 
 ---
 
@@ -22,14 +22,15 @@ How can a user centralize all job applications, track their evolution through su
 
 ---
 
-## 2. Technical Stack
-- **Framework:** Laravel 11 (Standard MVC with Blade templates).
+## 2. Technical Stack & Architecture
+
+- **Frontend:** React (SPA) hosted on **Vercel**. Frontend implementation MUST be identical to the provided UI mockups in `app/`.
+- **Backend:** Laravel 12 (API only) hosted on **Render**. Code must be kept as simple and self-explanatory as possible, ideal for a school project.
+- **Database:** PostgreSQL hosted on **Render**.
 - **Styling:** Tailwind CSS.
-- **Database:** MySQL.
-- **Storage:** Local server storage (`storage/app/public`) for document management.
-- **AI Integration:** OpenRouter API (Model: `openai/gpt-oss-20b:free`) for extraction and generation.
+- **AI Integration:** OpenRouter API (`openai/gpt-oss-20b:free`) for extraction and generation.
 - **PDF Generation:** `dompdf` or `laravel-snappy`.
-- **Email:** SMTP (e.g., Resend for production, Mailtrap for dev).
+- **Email:** SMTP (Brevo for production and development).
 
 ---
 
@@ -62,19 +63,20 @@ How can a user centralize all job applications, track their evolution through su
 - **Rich Detail View:**
   - **Information Card:** Displays company, role, date applied, source, tags, and link.
   - **Status History:** A vertical timeline showing every stage the application has passed through.
-  - **Task Manager:** Add/edit/delete sub-tasks (e.g., "Prepare for HR interview").
+  - **Task Manager:** Simple checklists for sub-tasks (e.g., "Prepare for HR interview").
   - **Document Center:** Upload and view files (CVs, etc.) attached to the application.
   - **Notes:** A rich-text or plain-text area for interview notes and company info.
 
 ### 4.3 Notification Center
 - Bell icon in the header showing unread count.
 - List view of all notifications (Reminders, Extension imports, etc.).
+- **Multi-channel:** Notifications are triggered in-app and via email (using free SMTP relay services).
 - "Mark all as read" and "Delete" actions.
 
 ### 4.4 Profile & Settings
 - Manage name and email.
 - Change password.
-- Theme toggle (Light/Dark mode) - *Reference: js/state.js `theme`*.
+- Theme toggle (Light/Dark mode).
 - **Authentication:** Standard email/password registration with "Remember Me" and "Forgot Password" functionality.
 
 ---
@@ -100,11 +102,13 @@ How can a user centralize all job applications, track their evolution through su
 ## 6. AI & Extension Logic
 
 ### 6.1 Browser Extension (AI Extraction)
-- User triggers extraction on a job page.
-- HTML is sent to the **Laravel Server**.
-- Server calls **OpenRouter (`gpt-oss-20b:free`)**.
-- Resulting JSON (Company, Position, Desc, Language) is returned to the extension.
-- **Editable UI:** The extension displays a form with the results. User edits `name` or `description` if needed, then saves.
+- **Input Channels:** Strictly limited to manual entry by the user and via the Browser Extension.
+- **Process:**
+  - User triggers extraction on a job page.
+  - HTML is sent to the **Laravel API**.
+  - Server calls **OpenRouter (`gpt-oss-20b:free`)**.
+  - Resulting JSON (Company, Position, Desc, Language) is returned to the extension.
+  - **Editable UI:** The extension displays a form with the results. User edits `name` or `description` if needed, then saves.
 
 ### 6.2 Iterative Resume Generation
 - **Strategy:** Persistent storage of user data.
@@ -115,17 +119,18 @@ How can a user centralize all job applications, track their evolution through su
 
 ---
 
-## 7. Implementation Blueprint (Mockup-to-Blade)
+## 7. Implementation Blueprint (Architecture & Deployment)
 
-### A. Layout
-- Use a persistent **Sidebar** navigation component.
-- Use **Modals** for Adding/Editing applications to keep the user in context.
+### A. Hosting Strategy
+- **Frontend:** React SPA deployed to Vercel. Frontend implementation MUST be identical to the provided UI mockups in `app/`.
+- **Backend:** Laravel API deployed to Render. Code must be kept as simple and self-explanatory as possible, ideal for a school project.
+- **Database:** PostgreSQL managed service on Render.
 
 ### B. Styling
 - Use **Tailwind CSS**.
 - **Theming:** Themes must be modular and modifiable directly in the source code to allow for easy implementation of future themes.
-- **Current Aesthetic:** Follow the "Neubrutalism" or "Clean Modern" style seen in current mockups (heavy borders, sharp shadows, bold typography).
+- **Current Aesthetic:** Follow the "Neubrutalism" or "Clean Modern" style seen in current mockups (heavy borders, sharp shadows, bold typography). Frontend implementation MUST be identical to the provided UI mockups in `app/`.
 
 ### C. Logic
-- **Reminders:** Scheduled task runs daily at 8:00 AM.
-- **State:** No frontend state library; use standard Blade `@if`, `@foreach`, and partials. Use Alpine.js for small interactive bits (like dropdowns or mobile menus).
+- **Reminders:** Scheduled task (Laravel Task Scheduling) runs daily at 8:00 AM.
+- **State Management:** React Context API or similar state management library for the frontend.

@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #111;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #444;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.neu-btn {
+  @apply border-2 border-[#111] dark:border-gray-600 rounded-md bg-[#111] dark:bg-white text-white dark:text-[#111] p-2 font-bold transition-all shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px];
+}
+
+.neu-btn-outline {
+  @apply border-2 border-[#111] dark:border-gray-600 rounded-md bg-white dark:bg-[#1a1a1a] text-[#111] dark:text-white p-2 font-bold transition-all shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px];
+}
+
+.neu-btn-ghost {
+  @apply border-2 border-transparent rounded-md p-2 font-bold transition-all hover:border-[#111] dark:hover:border-gray-600;
+}
+
+.neu-card {
+  @apply bg-white dark:bg-[#111] rounded-xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] transition-colors;
+}
+
+.neu-input {
+  @apply w-full border-2 border-[#111] dark:border-gray-700 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#111] dark:focus:ring-gray-500 bg-white dark:bg-[#0a0a0a] dark:text-white text-[13px];
+}
+
+.neu-label {
+  @apply block font-bold mb-1 text-[12px] dark:text-gray-400;
+}
+
+.status-badge {
+  @apply text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider;
+}

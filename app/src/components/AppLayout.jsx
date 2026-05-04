@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { notificationsAPI } from '../api';
 import { Menu, Sun, Moon, Bell, User, LogOut } from 'lucide-react';
 
 const TABS = [
@@ -15,9 +16,76 @@ const TABS = [
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+  const hasUnread = unreadCount > 0;
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadUnreadCount = async () => {
+      try {
+        const res = await notificationsAPI.getUnreadCount();
+        const rawCount = res?.data?.count
+          ?? res?.data?.unread_count
+          ?? res?.data?.unreadCount
+          ?? res?.data?.unread
+          ?? res?.data
+          ?? 0;
+        const parsedCount = Number(rawCount);
+        if (isActive) {
+          setUnreadCount(Number.isFinite(parsedCount) ? parsedCount : 0);
+        }
+      } catch (error) {
+        if (isActive) {
+          setUnreadCount(0);
+        }
+      }
+    };
+
+    let refreshInterval;
+
+    const startPolling = () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+      refreshInterval = setInterval(loadUnreadCount, 60000);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (refreshInterval) {
+          clearInterval(refreshInterval);
+          refreshInterval = undefined;
+        }
+        return;
+      }
+
+      loadUnreadCount();
+      startPolling();
+    };
+
+    const handleNotificationsRefresh = () => {
+      loadUnreadCount();
+    };
+
+    loadUnreadCount();
+    startPolling();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('notifications:refresh', handleNotificationsRefresh);
+
+    return () => {
+      isActive = false;
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('notifications:refresh', handleNotificationsRefresh);
+    };
+  }, [user?.id, location.pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -90,7 +158,11 @@ export default function AppLayout() {
             <div className="flex items-center gap-4 relative">
               <button
                 onClick={() => navigate('/notifications')}
-                className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-600 rounded-md transition-all dark:text-white relative"
+                className={`hover:bg-gray-100 dark:hover:bg-gray-800 p-2 border-2 rounded-md transition-all dark:text-white relative ${
+                  hasUnread
+                    ? 'border-red-500 dark:border-red-400 hover:border-red-500 dark:hover:border-red-400'
+                    : 'border-transparent hover:border-[#111] dark:hover:border-gray-600'
+                }`}
               >
                 <Bell className="w-4 h-4" />
               </button>

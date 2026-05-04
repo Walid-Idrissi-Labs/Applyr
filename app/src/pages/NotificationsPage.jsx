@@ -6,6 +6,12 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const triggerUnreadRefresh = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('notifications:refresh'));
+    }
+  };
+
   useEffect(() => {
     loadNotifications();
   }, []);
@@ -27,11 +33,13 @@ export default function NotificationsPage() {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
     );
+    triggerUnreadRefresh();
   };
 
   const handleMarkAllAsRead = async () => {
     await notificationsAPI.markAllAsRead();
     setNotifications((prev) => prev.map((n) => ({ ...n, read_at: new Date().toISOString() })));
+    triggerUnreadRefresh();
   };
 
   const handleDelete = async (id) => {

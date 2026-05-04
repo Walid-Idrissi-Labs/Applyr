@@ -4,15 +4,24 @@ import { X } from 'lucide-react';
 const STATUSES = ['Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
 
 export default function ApplicationForm({ application, tags, onSave, onClose }) {
+  // Helper to format date to YYYY-MM-DD
+  const formatDate = (date) => {
+    if (!date) return '';
+    // Handles both Date objects and ISO strings
+    const d = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(d)) return '';
+    return d.toISOString().slice(0, 10);
+  };
+
   const [form, setForm] = useState({
     company_name: application?.company_name || '',
     position: application?.position || '',
     status: application?.status || 'wishlist',
-    applied_at: application?.applied_at || '',
+    applied_at: formatDate(application?.applied_at),
     link: application?.link || '',
     notes: application?.notes || '',
     source: application?.source || '',
-    reminder_date: application?.reminder_date || '',
+    reminder_date: formatDate(application?.reminder_date),
     posting_language: application?.posting_language || 'en',
     tag_ids: application?.tags?.map((t) => t.id) || [],
   });

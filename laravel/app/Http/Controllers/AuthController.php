@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -26,6 +28,15 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMail(
+                userName: $user->name,
+                appUrl: config('app.url') . '/login'
+            ));
+        } catch (\Exception $e) {
+            // Email failure should not break registration
+        }
 
         return response()->json([
             'user' => $user,

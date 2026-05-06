@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Application;
 use App\Models\Notification;
+use App\Mail\ReminderMail;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -16,6 +17,7 @@ class SendReminders extends Command
     public function handle(): int
     {
         $today = now()->toDateString();
+        $appUrl = config('app.url') . '/login';
 
         $applications = Application::with('user')
             ->whereNotNull('reminder_date')
@@ -32,22 +34,23 @@ class SendReminders extends Command
 
             if ($application->user->email) {
                 try {
-                    Mail::raw(
-                        "Don't forget to follow up on your application for {$application->position} at {$application->company_name}.",
-                        function ($message) use ($application) {
-                            $message->to($application->user->email)
-                                ->subject("Reminder: Follow up on {$application->position}");
-                        }
-                    );
+                    Mail::to($application->user->email)->send(new ReminderMail(
+                        userName: $application->user->name,
+                        companyName: $application->company_name,
+                        position: $application->position,
+                        appliedDate: $application->applied_at
+                            ? \Carbon\Carbon::parse($application->applied_at)->format('d/m/Y')
+                            : 'Not specified',
+                    ));
+
+                    $this->info("Email sent to {$application->user->email} for {$application->company_name}");
                 } catch (\Exception $e) {
                     $this->error("Failed to send email to {$application->user->email}: {$e->getMessage()}");
                 }
             }
-
-            $this->info("Reminder sent for {$application->company_name} - {$application->position}");
         }
 
-        $this->info("Done. Total reminders sent: {$applications->count()}");
+        $this->info("Done. Processed {$applications->count()} reminders.");
 
         return Command::SUCCESS;
     }

@@ -3,9 +3,9 @@ import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { notificationsAPI } from '../api';
-import { Menu, Sun, Moon, Bell, User, LogOut } from 'lucide-react';
+import { Menu, Sun, Moon, Bell, User, LogOut, ArrowRightLeft } from 'lucide-react';
 
-const TABS = [
+const USER_TABS = [
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Applications', path: '/applications' },
   { name: 'Resumes', path: '/resumes' },
@@ -13,15 +13,24 @@ const TABS = [
   { name: 'Profile', path: '/profile' },
 ];
 
+const ADMIN_TABS = [
+  { name: 'Admin Dashboard', path: '/admin/dashboard' },
+  { name: 'User Management', path: '/admin/users' },
+  { name: 'Profile', path: '/profile' },
+];
+
 export default function AppLayout() {
+  const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { user, logout } = useAuth();
+  const [adminViewMode, setAdminViewMode] = useState(user?.is_admin || false);
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const hasUnread = unreadCount > 0;
+
+  const currentTabs = user?.is_admin && adminViewMode ? ADMIN_TABS : USER_TABS;
 
   useEffect(() => {
     let isActive = true;
@@ -100,7 +109,7 @@ export default function AppLayout() {
             Applyr
           </div>
           <nav className="flex flex-col gap-1 flex-1">
-            {TABS.map((tab) => (
+            {currentTabs.map((tab) => (
               <NavLink
                 key={tab.path}
                 to={tab.path}
@@ -115,20 +124,6 @@ export default function AppLayout() {
                 <span>{tab.name}</span>
               </NavLink>
             ))}
-            {user?.is_admin && (
-              <NavLink
-                to="/admin"
-                className={({ isActive }) =>
-                  `text-left py-2 px-3 rounded-lg border-2 flex justify-between items-center transition-all text-[13px] font-bold ${
-                    isActive
-                      ? 'border-[#111] dark:border-gray-500 bg-white dark:bg-[#111] shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] dark:text-white'
-                      : 'border-transparent dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800'
-                  }`
-                }
-              >
-                <span>Admin</span>
-              </NavLink>
-            )}
           </nav>
 
           <button
@@ -175,7 +170,21 @@ export default function AppLayout() {
                   {user?.name}
                 </button>
                 {showUserMenu && (
-                  <div className="absolute right-0 top-full mt-2 bg-white dark:bg-[#1a1a1a] border-2 border-[#111] dark:border-gray-700 rounded-lg shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.05)] py-1 min-w-[140px] z-50">
+                  <div className="absolute right-0 top-full mt-2 bg-white dark:bg-[#1a1a1a] border-2 border-[#111] dark:border-gray-700 rounded-lg shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.05)] py-1 min-w-[180px] z-50">
+                    {user?.is_admin && (
+                      <button
+                        onClick={() => {
+                          const newMode = !adminViewMode;
+                          setAdminViewMode(newMode);
+                          setShowUserMenu(false);
+                          navigate(newMode ? '/admin/dashboard' : '/dashboard');
+                        }}
+                        className="w-full text-left px-4 py-2 text-[13px] hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white flex items-center gap-2 border-b border-gray-100 dark:border-gray-800"
+                      >
+                        <ArrowRightLeft className="w-3 h-3" />
+                        {adminViewMode ? 'Switch to User Mode' : 'Switch to Admin Mode'}
+                      </button>
+                    )}
                     <button
                       onClick={() => { setShowUserMenu(false); navigate('/profile'); }}
                       className="w-full text-left px-4 py-2 text-[13px] hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white"
@@ -193,6 +202,11 @@ export default function AppLayout() {
               </div>
             </div>
           </header>
+          {user?.is_admin && !adminViewMode && (
+            <div className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-500 text-[11px] font-bold text-center py-1.5 border-b-2 border-yellow-200 dark:border-yellow-800 shrink-0">
+              Viewing as User (Admin Mode disabled)
+            </div>
+          )}
           <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
             <Outlet />
           </div>

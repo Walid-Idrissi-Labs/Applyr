@@ -8,7 +8,8 @@ import ApplicationDetailPage from './pages/ApplicationDetailPage';
 import ResumesPage from './pages/ResumesPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
-import AdminPage from './pages/AdminPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import UserManagementPage from './pages/UserManagementPage';
 import AppLayout from './components/AppLayout';
 
 function ProtectedRoute({ children }) {
@@ -43,7 +44,12 @@ function AppRoutes() {
         <Route path="resumes" element={<ResumesPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="profile" element={<ProfilePage />} />
-        {user?.is_admin && <Route path="admin" element={<AdminPage />} />}
+        {user?.is_admin && (
+          <>
+            <Route path="admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="admin/users" element={<UserManagementPage />} />
+          </>
+        )}
       </Route>
     </Routes>
   );

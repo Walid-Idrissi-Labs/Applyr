@@ -77,6 +77,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/stats', [AdminController::class, 'stats']);
         Route::get('/users', [AdminController::class, 'users']);
+        Route::post('/users', [AdminController::class, 'store']);
+        Route::put('/users/{id}', [AdminController::class, 'update']);
         Route::patch('/users/{id}/deactivate', [AdminController::class, 'deactivate']);
         Route::patch('/users/{id}/activate', [AdminController::class, 'activate']);
         Route::patch('/users/{id}/grant-admin', [AdminController::class, 'grantAdmin']);

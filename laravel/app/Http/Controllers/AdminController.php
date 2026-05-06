@@ -8,9 +8,53 @@ use App\Models\AiLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use App\Mail\UserCreatedByAdmin;
 
 class AdminController extends Controller
 {
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'is_admin' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $plainPassword = Str::random(12);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($plainPassword),
+            'is_admin' => $validated['is_admin'] ?? false,
+            'is_active' => $validated['is_active'] ?? true,
+        ]);
+
+        try {
+            Mail::to($user->email)->send(new UserCreatedByAdmin($user, $plainPassword));
+        } catch (\Exception $e) {
+            // Ignore mail errors for local testing if mailer is not configured
+        }
+
+        return response()->json($user, 201);
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
+        ]);
+
+        $user->update($validated);
+
+        return response()->json($user);
+    }
     public function stats(): JsonResponse
     {
         $totalUsers = User::count();

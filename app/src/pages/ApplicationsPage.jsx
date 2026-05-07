@@ -129,7 +129,7 @@ export default function ApplicationsPage() {
             placeholder="Search company or position..."
             defaultValue={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="neu-input pl-9"
+            className="neu-input neu-input-icon"
           />
         </div>
 

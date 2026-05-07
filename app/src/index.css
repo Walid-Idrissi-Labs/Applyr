@@ -50,6 +50,10 @@
   @apply w-full border-2 border-[#111] dark:border-gray-700 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#111] dark:focus:ring-gray-500 bg-white dark:bg-[#0a0a0a] dark:text-white text-[13px];
 }
 
+.neu-input-icon {
+  @apply pl-10;
+}
+
 .neu-label {
   @apply block font-bold mb-1 text-[12px] dark:text-gray-400;
 }

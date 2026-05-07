@@ -23,7 +23,7 @@ const renderCandidatures = () => {
             placeholder="Search..." 
             value="${state.searchQuery}"
             oninput="handleSearch(event)"
-            class="w-full border-2 border-[#111] dark:border-gray-700 rounded-lg py-2 pl-9 pr-3 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#111] dark:focus:ring-gray-500 bg-white dark:bg-[#0a0a0a] dark:text-white"
+            class="w-full border-2 border-[#111] dark:border-gray-700 rounded-lg py-2 pl-10 pr-3 text-[12px] focus:outline-none focus:ring-2 focus:ring-[#111] dark:focus:ring-gray-500 bg-white dark:bg-[#0a0a0a] dark:text-white"
           />
         </div>
         <select 

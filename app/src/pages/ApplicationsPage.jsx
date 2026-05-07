@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { applicationsAPI, tagsAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import ApplicationForm from '../components/ApplicationForm';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { Search, LayoutList, LayoutGrid, Plus, X } from 'lucide-react';
 
 const STATUSES = ['All', 'Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
@@ -17,8 +18,25 @@ export default function ApplicationsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingApp, setEditingApp] = useState(null);
   const [showDetail, setShowDetail] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
   const searchRef = useRef('');
   const navigate = useNavigate();
+
+  const openConfirm = (options) => {
+    return new Promise((resolve) => {
+      setConfirmDialog({ isOpen: true, resolve, ...options });
+    });
+  };
+
+  const handleConfirmDialogConfirm = () => {
+    confirmDialog.resolve?.(true);
+    setConfirmDialog({ isOpen: false });
+  };
+
+  const handleConfirmDialogCancel = () => {
+    confirmDialog.resolve?.(false);
+    setConfirmDialog({ isOpen: false });
+  };
 
   useEffect(() => {
     loadApplications();
@@ -66,7 +84,13 @@ export default function ApplicationsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this application permanently?')) return;
+    const confirmed = await openConfirm({
+      title: 'Delete Application',
+      message: 'Are you sure you want to delete this application permanently? This action cannot be undone.',
+      confirmText: 'Delete',
+      variant: 'destructive',
+    });
+    if (!confirmed) return;
     await applicationsAPI.delete(id);
     setApplications((prev) => prev.filter((a) => a.id !== id));
     setShowDetail(null);
@@ -216,6 +240,17 @@ export default function ApplicationsPage() {
           onClose={() => { setShowForm(false); setEditingApp(null); }}
         />
       )}
+
+      <ConfirmationDialog
+        isOpen={confirmDialog.isOpen}
+        onConfirm={handleConfirmDialogConfirm}
+        onCancel={handleConfirmDialogCancel}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.confirmText}
+        cancelText={confirmDialog.cancelText}
+        variant={confirmDialog.variant}
+      />
     </div>
   );
 }

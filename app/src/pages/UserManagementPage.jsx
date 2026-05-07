@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../api';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { Users, Trash2, UserX, UserCheck, Crown, Search, Plus, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function UserManagementPage() {
@@ -16,6 +17,23 @@ export default function UserManagementPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ name: '', email: '', is_admin: false, is_active: true });
   const [formError, setFormError] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+
+  const openConfirm = (options) => {
+    return new Promise((resolve) => {
+      setConfirmDialog({ isOpen: true, resolve, ...options });
+    });
+  };
+
+  const handleConfirmDialogConfirm = () => {
+    confirmDialog.resolve?.(true);
+    setConfirmDialog({ isOpen: false });
+  };
+
+  const handleConfirmDialogCancel = () => {
+    confirmDialog.resolve?.(false);
+    setConfirmDialog({ isOpen: false });
+  };
 
   useEffect(() => {
     loadData();
@@ -55,7 +73,13 @@ export default function UserManagementPage() {
   };
 
   const handleDeleteUser = async (id) => {
-    if (!confirm('Permanently delete this user and ALL their data?')) return;
+    const confirmed = await openConfirm({
+      title: 'Delete User',
+      message: 'Permanently delete this user and ALL their data? This action cannot be undone.',
+      confirmText: 'Delete',
+      variant: 'destructive',
+    });
+    if (!confirmed) return;
     await adminAPI.deleteUser(id);
     loadData();
   };
@@ -291,6 +315,17 @@ export default function UserManagementPage() {
           </div>
         </div>
       )}
+
+      <ConfirmationDialog
+        isOpen={confirmDialog.isOpen}
+        onConfirm={handleConfirmDialogConfirm}
+        onCancel={handleConfirmDialogCancel}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.confirmText}
+        cancelText={confirmDialog.cancelText}
+        variant={confirmDialog.variant}
+      />
     </div>
   );
 }

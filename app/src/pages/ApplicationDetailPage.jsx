@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { applicationsAPI, tasksAPI, documentsAPI, resumesAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { ArrowLeft, Calendar, ExternalLink, FileText, Plus, Trash2, Upload, Check, Wand2 } from 'lucide-react';
 
 const STATUSES = ['Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
@@ -16,6 +17,23 @@ export default function ApplicationDetailPage() {
   const [fileType, setFileType] = useState('cv');
 
   const [generating, setGenerating] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+
+  const openConfirm = (options) => {
+    return new Promise((resolve) => {
+      setConfirmDialog({ isOpen: true, resolve, ...options });
+    });
+  };
+
+  const handleConfirmDialogConfirm = () => {
+    confirmDialog.resolve?.(true);
+    setConfirmDialog({ isOpen: false });
+  };
+
+  const handleConfirmDialogCancel = () => {
+    confirmDialog.resolve?.(false);
+    setConfirmDialog({ isOpen: false });
+  };
 
   useEffect(() => {
     loadApplication();
@@ -34,7 +52,13 @@ export default function ApplicationDetailPage() {
   };
 
   const handleGenerateCV = async () => {
-    if (!confirm('This will use your Global Base Resume to generate a tailored CV. Continue?')) return;
+    const confirmed = await openConfirm({
+      title: 'Generate Tailored CV',
+      message: 'This will use your Global Base Resume to generate a tailored CV. Continue?',
+      confirmText: 'Generate',
+      variant: 'warning',
+    });
+    if (!confirmed) return;
     setGenerating(true);
     try {
       const res = await resumesAPI.create({ 
@@ -84,7 +108,13 @@ export default function ApplicationDetailPage() {
   };
 
   const handleDeleteDocument = async (docId) => {
-    if (!confirm('Delete this document?')) return;
+    const confirmed = await openConfirm({
+      title: 'Delete Document',
+      message: 'Are you sure you want to delete this document? This action cannot be undone.',
+      confirmText: 'Delete',
+      variant: 'destructive',
+    });
+    if (!confirmed) return;
     await documentsAPI.delete(id, docId);
     loadApplication();
   };
@@ -275,6 +305,17 @@ export default function ApplicationDetailPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmationDialog
+        isOpen={confirmDialog.isOpen}
+        onConfirm={handleConfirmDialogConfirm}
+        onCancel={handleConfirmDialogCancel}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.confirmText}
+        cancelText={confirmDialog.cancelText}
+        variant={confirmDialog.variant}
+      />
     </div>
   );
 }

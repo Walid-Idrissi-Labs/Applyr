@@ -1,10 +1,28 @@
 import { useState, useEffect } from 'react';
 import { notificationsAPI } from '../api';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { Bell, Trash2, Check, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+
+  const openConfirm = (options) => {
+    return new Promise((resolve) => {
+      setConfirmDialog({ isOpen: true, resolve, ...options });
+    });
+  };
+
+  const handleConfirmDialogConfirm = () => {
+    confirmDialog.resolve?.(true);
+    setConfirmDialog({ isOpen: false });
+  };
+
+  const handleConfirmDialogCancel = () => {
+    confirmDialog.resolve?.(false);
+    setConfirmDialog({ isOpen: false });
+  };
 
   const triggerUnreadRefresh = () => {
     if (typeof window !== 'undefined') {
@@ -48,7 +66,13 @@ export default function NotificationsPage() {
   };
 
   const handleDeleteAll = async () => {
-    if (!confirm('Delete all notifications?')) return;
+    const confirmed = await openConfirm({
+      title: 'Delete All Notifications',
+      message: 'Are you sure you want to delete all notifications? This action cannot be undone.',
+      confirmText: 'Delete All',
+      variant: 'destructive',
+    });
+    if (!confirmed) return;
     await notificationsAPI.deleteAll();
     setNotifications([]);
   };
@@ -127,6 +151,16 @@ export default function NotificationsPage() {
           ))}
         </div>
       )}
+      <ConfirmationDialog
+        isOpen={confirmDialog.isOpen}
+        onConfirm={handleConfirmDialogConfirm}
+        onCancel={handleConfirmDialogCancel}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.confirmText}
+        cancelText={confirmDialog.cancelText}
+        variant={confirmDialog.variant}
+      />
     </div>
   );
 }

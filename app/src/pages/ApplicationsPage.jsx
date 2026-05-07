@@ -6,14 +6,23 @@ import ApplicationForm from '../components/ApplicationForm';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import { Search, LayoutList, LayoutGrid, Plus, X } from 'lucide-react';
 
-const STATUSES = ['All', 'Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
+const STATUS_OPTIONS = [
+  { label: 'All', value: 'all' },
+  { label: 'Wishlist', value: 'wishlist' },
+  { label: 'Applied', value: 'applied' },
+  { label: 'Interview', value: 'interview' },
+  { label: 'Technical Test', value: 'technical test' },
+  { label: 'Offer', value: 'offer' },
+  { label: 'Accepted', value: 'accepted' },
+  { label: 'Rejected', value: 'rejected' },
+];
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState([]);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('list');
-  const [statusFilter, setStatusFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingApp, setEditingApp] = useState(null);
@@ -56,17 +65,18 @@ export default function ApplicationsPage() {
   };
 
   const handleSearch = (value) => {
+    setSearchQuery(value);
     searchRef.current = value;
     loadApplications({
-      ...(statusFilter !== 'All' && { status: statusFilter }),
+      ...(statusFilter !== 'all' && { status: statusFilter }),
       ...(value && { search: value }),
     });
   };
 
-  const handleFilter = (status) => {
-    setStatusFilter(status);
+  const handleFilter = (statusValue) => {
+    setStatusFilter(statusValue);
     loadApplications({
-      ...(status !== 'All' && { status }),
+      ...(statusValue !== 'all' && { status: statusValue }),
       ...(searchRef.current && { search: searchRef.current }),
     });
   };
@@ -127,7 +137,7 @@ export default function ApplicationsPage() {
           <input
             type="text"
             placeholder="Search company or position..."
-            defaultValue={searchQuery}
+            value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             className="neu-input neu-input-icon"
           />
@@ -150,17 +160,17 @@ export default function ApplicationsPage() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {STATUSES.map((s) => (
+        {STATUS_OPTIONS.map((s) => (
           <button
-            key={s}
-            onClick={() => handleFilter(s)}
+            key={s.value}
+            onClick={() => handleFilter(s.value)}
             className={`px-3 py-1 text-[11px] font-bold rounded-md border-2 transition-all ${
-              statusFilter === s
+              statusFilter === s.value
                 ? 'border-[#111] dark:border-gray-500 bg-[#111] dark:bg-white text-white dark:text-[#111]'
                 : 'border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:border-[#111] dark:hover:border-gray-600'
             }`}
           >
-            {s}
+            {s.label}
           </button>
         ))}
       </div>
@@ -256,23 +266,23 @@ export default function ApplicationsPage() {
 }
 
 function BoardView({ applications, onStatusChange, onEdit, onDelete, onRowClick }) {
-  const BOARD_COLUMNS = ['Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
+  const BOARD_COLUMNS = STATUS_OPTIONS.filter((option) => option.value !== 'all');
 
   return (
     <div className="flex gap-3 overflow-x-auto pb-2">
       {BOARD_COLUMNS.map((col) => {
-        const colApps = applications.filter((a) => a.status?.toLowerCase() === col.toLowerCase());
+        const colApps = applications.filter((a) => (a.status || '').toLowerCase() === col.value);
         return (
-          <div key={col} className="shrink-0 w-56">
+          <div key={col.value} className="shrink-0 w-56">
             <div className="font-bold text-[11px] uppercase tracking-wider mb-2 px-1 dark:text-gray-400">
-              {col} <span className="text-gray-400 dark:text-gray-600">({colApps.length})</span>
+              {col.label} <span className="text-gray-400 dark:text-gray-600">({colApps.length})</span>
             </div>
             <div
               className="space-y-2 min-h-[200px] rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-800 p-2"
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 const id = parseInt(e.dataTransfer.getData('appId'));
-                if (id) onStatusChange(id, col);
+                if (id) onStatusChange(id, col.value);
               }}
             >
               {colApps.map((app) => (

@@ -15,8 +15,10 @@ class ApplicationController extends Controller
     {
         $query = $request->user()->applications()->with('tags');
 
-        if ($request->has('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
+        $status = $request->has('status') ? $this->normalizeStatus($request->status) : null;
+
+        if ($status && $status !== 'all') {
+            $query->whereRaw('LOWER(status) = ?', [$status]);
         }
 
         if ($request->has('search')) {
@@ -62,6 +64,10 @@ class ApplicationController extends Controller
             'tag_ids' => ['nullable', 'array'],
             'tag_ids.*' => ['exists:tags,id'],
         ]);
+
+        if (isset($validated['status'])) {
+            $validated['status'] = $this->normalizeStatus($validated['status']);
+        }
 
         $validated['user_id'] = $request->user()->id;
 
@@ -118,13 +124,20 @@ class ApplicationController extends Controller
             'tag_ids.*' => ['exists:tags,id'],
         ]);
 
-        if (isset($validated['status']) && $validated['status'] !== $application->status) {
-            StatusHistory::create([
-                'application_id' => $application->id,
-                'old_status' => $application->status,
-                'new_status' => $validated['status'],
-                'changed_at' => now(),
-            ]);
+        if (isset($validated['status'])) {
+            $normalizedStatus = $this->normalizeStatus($validated['status']);
+            $currentStatus = $this->normalizeStatus($application->status);
+
+            if ($normalizedStatus !== $currentStatus) {
+                StatusHistory::create([
+                    'application_id' => $application->id,
+                    'old_status' => $currentStatus,
+                    'new_status' => $normalizedStatus,
+                    'changed_at' => now(),
+                ]);
+            }
+
+            $validated['status'] = $normalizedStatus;
         }
 
         $application->update($validated);
@@ -157,21 +170,22 @@ class ApplicationController extends Controller
             'status' => ['required', 'string'],
         ]);
 
-        $oldStatus = $application->status;
+        $oldStatus = $this->normalizeStatus($application->status);
+        $newStatus = $this->normalizeStatus($validated['status']);
 
-        $application->update(['status' => $validated['status']]);
+        $application->update(['status' => $newStatus]);
 
         StatusHistory::create([
             'application_id' => $application->id,
             'old_status' => $oldStatus,
-            'new_status' => $validated['status'],
+            'new_status' => $newStatus,
             'changed_at' => now(),
         ]);
 
         Notification::create([
             'user_id' => $request->user()->id,
             'type' => 'status_change',
-            'message' => "Application for {$application->company_name} moved from {$oldStatus} to {$validated['status']}",
+            'message' => "Application for {$application->company_name} moved from {$oldStatus} to {$newStatus}",
         ]);
 
         return response()->json($application->load('tags', 'statusHistories'));
@@ -184,19 +198,20 @@ class ApplicationController extends Controller
         $total = $user->applications()->count();
 
         $statusCounts = $user->applications()
-            ->selectRaw("status, COUNT(*) as count")
-            ->groupBy('status')
+            ->selectRaw('LOWER(status) as status, COUNT(*) as count')
+            ->groupByRaw('LOWER(status)')
             ->pluck('count', 'status');
 
         $wishlistCount = $statusCounts->get('wishlist', 0);
         $appliedCount = $statusCounts->get('applied', 0);
         $interviewCount = $statusCounts->get('interview', 0);
+        $technicalTestCount = $statusCounts->get('technical test', 0);
         $offerCount = $statusCounts->get('offer', 0);
         $rejectedCount = $statusCounts->get('rejected', 0);
         $acceptedCount = $statusCounts->get('accepted', 0);
 
         $responseRate = $total > 0
-            ? round((($total - $wishlistCount) / $total) * 100, 1)
+            ? round((($total - $wishlistCount - $appliedCount) / $total) * 100, 1)
             : 0;
 
         $successRate = $total > 0
@@ -217,6 +232,7 @@ class ApplicationController extends Controller
                 'wishlist' => $wishlistCount,
                 'applied' => $appliedCount,
                 'interview' => $interviewCount,
+                'technical test' => $technicalTestCount,
                 'offer' => $offerCount,
                 'rejected' => $rejectedCount,
                 'accepted' => $acceptedCount,
@@ -225,5 +241,14 @@ class ApplicationController extends Controller
             'success_rate' => $successRate,
             'recent_activity' => $recentActivity,
         ]);
+    }
+
+    private function normalizeStatus(?string $status): ?string
+    {
+        if ($status === null) {
+            return null;
+        }
+
+        return strtolower(trim($status));
     }
 }

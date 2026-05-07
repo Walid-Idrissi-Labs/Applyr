@@ -106,12 +106,7 @@ class ResumeController extends Controller
         $baseResume = $user->resumes()->whereNull('application_id')->latest()->first();
         $baseContent = $baseResume ? $baseResume->content : 'No base resume provided.';
 
-        $systemPrompt = "You are an expert career coach and professional resume writer. " .
-            "Your task is to tailor the provided base resume to perfectly match the provided job description. " .
-            "You must naturally integrate relevant keywords from the job description, move the most relevant " .
-            "experience to the top, and trim irrelevant information to keep the resume concise and impactful.\n\n" .
-            "Output strictly the tailored resume in clean Markdown format with no conversational filler. " .
-            "Do not include any explanations, greetings, or sign-offs.";
+        $systemPrompt = "You are an expert career coach and professional resume writer. Your task is to tailor the provided base resume to perfectly match the provided job description. You must naturally integrate relevant keywords from the job description, move the most relevant experience to the top, and trim irrelevant information to keep the resume concise and impactful.\n\n CRITICAL CONSTRAINT: You may ONLY use information explicitly present in the base resume. Do NOT invent, infer, or add any content that is not already there — this includes certifications, skills, tools, projects, degrees, job titles, responsibilities, or achievements. If the base resume does not mention it, it does not exist. Your job is to reframe and reorganize what is already there, not to fabricate what is not.\n\n Output strictly the tailored resume in clean Markdown format with no conversational filler. Do not include any explanations, greetings, or sign-offs.";
 
         $resumeJson = json_encode([
             'content' => $baseContent,

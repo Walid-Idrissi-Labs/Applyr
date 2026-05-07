@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { applicationsAPI, tasksAPI, documentsAPI } from '../api';
+import { applicationsAPI, tasksAPI, documentsAPI, resumesAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
-import { ArrowLeft, Calendar, ExternalLink, FileText, Plus, Trash2, Upload, Check } from 'lucide-react';
+import { ArrowLeft, Calendar, ExternalLink, FileText, Plus, Trash2, Upload, Check, Wand2 } from 'lucide-react';
 
 const STATUSES = ['Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
 
@@ -14,6 +14,8 @@ export default function ApplicationDetailPage() {
   const [newTask, setNewTask] = useState('');
   const [error, setError] = useState('');
   const [fileType, setFileType] = useState('cv');
+
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     loadApplication();
@@ -28,6 +30,24 @@ export default function ApplicationDetailPage() {
       setError('Application not found');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateCV = async () => {
+    if (!confirm('This will use your Global Base Resume to generate a tailored CV. Continue?')) return;
+    setGenerating(true);
+    try {
+      const res = await resumesAPI.create({ 
+        content: 'Generating...', 
+        language: app.posting_language || 'en', 
+        application_id: id 
+      });
+      await resumesAPI.generateWithAi(res.data.id);
+      alert('Tailored CV generated successfully! Check the Resumes page.');
+    } catch (e) {
+      alert('Failed to generate CV. Make sure you have a Global Base Resume saved.');
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -244,6 +264,13 @@ export default function ApplicationDetailPage() {
                 <Upload className="w-3 h-3" /> Upload
                 <input type="file" className="hidden" onChange={handleFileUpload} />
               </label>
+              <button 
+                onClick={handleGenerateCV} 
+                disabled={generating}
+                className="neu-btn flex items-center gap-1 text-[11px] !bg-purple-50 dark:!bg-purple-900/20 !text-purple-700 dark:!text-purple-400 !border-purple-200 dark:!border-purple-800 disabled:opacity-50"
+              >
+                <Wand2 className="w-3 h-3" /> {generating ? 'Generating...' : 'Auto-Tailor CV'}
+              </button>
             </div>
           </div>
         </div>

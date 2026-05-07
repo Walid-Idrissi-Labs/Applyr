@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import ApplicationDetailPage from './pages/ApplicationDetailPage';
 import ResumesPage from './pages/ResumesPage';
+import ResumePreviewPage from './pages/ResumePreviewPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
@@ -36,6 +37,11 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      
+      {/* Protected Routes Without Layout */}
+      <Route path="/resumes/:id/preview" element={<ProtectedRoute><ResumePreviewPage /></ProtectedRoute>} />
+
+      {/* Protected Routes With Layout */}
       <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />

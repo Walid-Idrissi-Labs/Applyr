@@ -41,7 +41,7 @@ class ResumeController extends Controller
 
     public function show(Request $request, int $id): JsonResponse
     {
-        $resume = $request->user()->resumes()->findOrFail($id);
+        $resume = $request->user()->resumes()->with('application')->findOrFail($id);
 
         return response()->json($resume);
     }
@@ -102,19 +102,37 @@ class ResumeController extends Controller
         $application = $resume->application;
         $user = $request->user();
 
-        $prompt = "Generate a tailored resume for the following job application:\n\n";
-        $prompt .= "Company: {$application->company_name}\n";
-        $prompt .= "Position: {$application->position}\n";
-        $prompt .= "Job Description/Notes: {$application->notes}\n\n";
-        $prompt .= "User Profile (Base Resume):\n{$resume->content}\n\n";
-        $prompt .= "Generate an optimized resume in {$resume->language} language. Return only the resume content.";
+        // Get the global base resume
+        $baseResume = $user->resumes()->whereNull('application_id')->latest()->first();
+        $baseContent = $baseResume ? $baseResume->content : 'No base resume provided.';
+
+        $systemPrompt = "You are an expert career coach and professional resume writer. " .
+            "Your task is to tailor the provided base resume to perfectly match the provided job description. " .
+            "You must naturally integrate relevant keywords from the job description, move the most relevant " .
+            "experience to the top, and trim irrelevant information to keep the resume concise and impactful.\n\n" .
+            "Output strictly the tailored resume in clean Markdown format with no conversational filler. " .
+            "Do not include any explanations, greetings, or sign-offs.";
+
+        $resumeJson = json_encode([
+            'content' => $baseContent,
+            'language' => $resume->language ?? 'en',
+        ]);
+
+        $jobJson = json_encode([
+            'company' => $application ? $application->company_name : 'Unknown',
+            'position' => $application ? $application->position : 'Unknown',
+            'description' => $application ? $application->notes : '',
+        ]);
+
+        $userPrompt = "Base Resume (JSON):\n{$resumeJson}\n\nJob Description (JSON):\n{$jobJson}";
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")
                 ->post('https://openrouter.ai/api/v1/chat/completions', [
                     'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
                     'messages' => [
-                        ['role' => 'user', 'content' => $prompt],
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => $userPrompt],
                     ],
                 ]);
 
@@ -133,7 +151,7 @@ class ResumeController extends Controller
                 'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
                 'tokens_used' => $tokensUsed,
                 'purpose' => 'resume_generation',
-                'prompt' => $prompt,
+                'prompt' => $systemPrompt . "\n\n" . $userPrompt,
                 'response' => $generatedContent,
                 'created_at' => now(),
             ]);

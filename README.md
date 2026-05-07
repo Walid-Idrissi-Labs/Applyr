@@ -11,7 +11,7 @@ By combining a robust backend, a responsive Single Page Application (SPA), and i
 ### For Users
 - **Application Tracking:** Monitor the status of your job applications from initial submission to final offer. Manage metadata such as company, position, salary range, and URLs.
 - **Task Management:** Create, manage, and check off to-do items linked to specific job applications (e.g., "Send follow-up email", "Prepare for technical interview").
-- **Document & Resume Storage:** Securely upload, store, and manage resumes tailored for different roles. Support for generating resumes using AI and exporting them as PDFs.
+- **Document & Resume Storage:** Securely upload, store, and manage resumes tailored for different roles. Support for generating hyper-tailored resumes using OpenRouter AI based on your global base resume and specific job descriptions, and exporting them cleanly as PDFs using browser-native printing.
 - **AI Job Extraction:** Automatically pull job descriptions, requirements, and metadata from supported job boards using our dedicated Chrome/Firefox browser extensions.
 - **Smart Notifications:** Stay on top of your application pipeline with an integrated notification center.
 - **Dark Mode Support:** A sleek, fully responsive "neu-card" design system that supports both light and dark themes.
@@ -40,6 +40,7 @@ Applyr is structured as a monorepo consisting of three main environments:
 - **Styling:** Tailwind CSS (Utility-first CSS with custom "neu-card" component classes)
 - **State Management:** React Context API
 - **HTTP Client:** Axios (with automatic token interception)
+- **Markdown Rendering:** react-markdown (for precise AI output formatting)
 - **Charts:** Chart.js / react-chartjs-2
 
 **Browser Extensions**

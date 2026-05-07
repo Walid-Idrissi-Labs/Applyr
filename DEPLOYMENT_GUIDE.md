@@ -44,6 +44,8 @@ sudo chmod -R 775 storage bootstrap/cache
 ---
 
 ## 4. Frontend Setup
+> **Note:** The `node_modules` directory is intentionally excluded from the repository. You must install the JavaScript dependencies before building.
+
 ```
 cd ../app
 npm install

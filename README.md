@@ -86,6 +86,8 @@ php artisan serve
 The backend API will typically run on `http://localhost:8000`.
 
 ### 2. Frontend Setup (React)
+> **Note:** The `node_modules` directory is intentionally not committed to version control. You must install the JavaScript dependencies locally for the application to work.
+
 Open a new terminal window and navigate to the `/app` directory:
 
 ```bash

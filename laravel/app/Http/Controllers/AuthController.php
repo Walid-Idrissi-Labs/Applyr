@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Mail\WelcomeMail;
+use App\Mail\PasswordResetMail;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
@@ -21,20 +24,29 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        $result = DB::transaction(function () use ($validated) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return [
+                'user' => $user,
+                'token' => $token,
+            ];
+        });
+
+        $user = $result['user'];
+        $token = $result['token'];
 
         try {
             Mail::to($user->email)->send(new WelcomeMail(
                 userName: $user->name,
-                appUrl: config('app.url') . '/login'
             ));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Email failure should not break registration
         }
 
@@ -125,10 +137,24 @@ class AuthController extends Controller
 
         if ($user) {
             $token = \Str::random(64);
-            \DB::table('password_reset_tokens')->updateOrInsert(
+            DB::table('password_reset_tokens')->updateOrInsert(
                 ['email' => $validated['email']],
                 ['token' => Hash::make($token), 'created_at' => now()]
             );
+
+            $frontendUrl = rtrim(config('app.frontend_url'), '/');
+            $resetUrl = $frontendUrl . '/reset-password?token=' . urlencode($token) . '&email=' . urlencode($validated['email']);
+            $expireMinutes = (int) config('auth.passwords.users.expire', 60);
+
+            try {
+                Mail::to($user->email)->send(new PasswordResetMail(
+                    userName: $user->name,
+                    resetUrl: $resetUrl,
+                    expireMinutes: $expireMinutes,
+                ));
+            } catch (\Throwable $e) {
+                // Email failure should not reveal account status
+            }
         }
 
         return response()->json(['message' => 'If an account exists, a reset link has been sent.']);
@@ -142,7 +168,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $record = \DB::table('password_reset_tokens')->where('email', $validated['email'])->first();
+        $record = DB::table('password_reset_tokens')->where('email', $validated['email'])->first();
 
         if (!$record || !Hash::check($validated['token'], $record->token)) {
             throw ValidationException::withMessages([
@@ -150,10 +176,25 @@ class AuthController extends Controller
             ]);
         }
 
+        $expireMinutes = (int) config('auth.passwords.users.expire', 60);
+        $expiresAt = now()->subMinutes($expireMinutes);
+
+        if (!$record->created_at || Carbon::parse($record->created_at)->lt($expiresAt)) {
+            DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
+            throw ValidationException::withMessages([
+                'token' => ['The reset token has expired.'],
+            ]);
+        }
+
         $user = User::where('email', $validated['email'])->first();
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['No account found for this email.'],
+            ]);
+        }
         $user->update(['password' => Hash::make($validated['password'])]);
 
-        \DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
+        DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
 
         return response()->json(['message' => 'Password reset successfully']);
     }

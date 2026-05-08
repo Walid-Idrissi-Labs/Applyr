@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 
 const STATUSES = ['Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
+const CREATE_STATUSES = STATUSES.filter((status) => status !== 'Rejected');
 
 export default function ApplicationForm({ application, tags, onSave, onClose }) {
   // Helper to format date to YYYY-MM-DD
@@ -75,7 +76,9 @@ export default function ApplicationForm({ application, tags, onSave, onClose }) 
             <div>
               <label className="neu-label">Status</label>
               <select value={form.status} onChange={setField('status')} className="neu-input">
-                {STATUSES.map((s) => <option key={s} value={s.toLowerCase()}>{s}</option>)}
+                {(application ? STATUSES : CREATE_STATUSES).map((s) => (
+                  <option key={s} value={s.toLowerCase()}>{s}</option>
+                ))}
               </select>
             </div>
             <div>

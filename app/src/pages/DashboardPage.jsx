@@ -5,6 +5,7 @@ import { Pie } from 'react-chartjs-2';
 import { applicationsAPI } from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
+import { LayoutDashboard } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -249,11 +250,12 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto w-full h-full flex flex-col transition-colors duration-300 space-y-6">
+      <h1 className="font-bold text-[20px] flex items-center gap-2 dark:text-white tracking-widest"><LayoutDashboard className="w-5 h-5" /> Dashboard</h1>
       <div className="space-y-1">
-        <h1 className="font-bold text-[22px] tracking-widest dark:text-white">
+        <h2 className="font-bold text-[18px] dark:text-gray-200">
           {greeting}, <span className="font-bold">{user?.name}</span>
-        </h1>
+        </h2>
         <p className="text-[11px] text-gray-500 dark:text-gray-400">
           Great Job on your Recent Activity.
         </p>

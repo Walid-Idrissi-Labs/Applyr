@@ -133,7 +133,7 @@ export default function ApplicationDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl w-full mx-auto h-full flex flex-col space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate('/applications')} className="p-2 border-2 border-[#111] dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
           <ArrowLeft className="w-4 h-4 dark:text-white" />

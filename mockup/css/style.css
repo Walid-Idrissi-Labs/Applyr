@@ -1,0 +1,39 @@
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #111;
+  border-radius: 4px;
+}
+.dark ::webkit-scrollbar-thumb {
+  background: #444;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+.dark ::webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom shadow for dark mode */
+.dark .shadow-\[8px_8px_0px_0px_rgba\(17\,17\,17\,1\)\] {
+    shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)];
+}
+
+/* Transitions */
+.transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}

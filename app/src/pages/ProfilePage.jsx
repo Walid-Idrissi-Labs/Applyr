@@ -51,8 +51,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-bold text-[20px] tracking-widest dark:text-white">Profile & Settings</h1>
+    <div className="max-w-5xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-6">
+      <h1 className="font-bold text-[20px] flex items-center gap-2 dark:text-white tracking-widest"><User className="w-5 h-5" /> My Profile</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <div className="neu-card p-6 space-y-4">

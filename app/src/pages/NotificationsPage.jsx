@@ -80,10 +80,10 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-5xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="font-bold text-[20px] tracking-widest dark:text-white">Notifications</h1>
+          <h1 className="font-bold text-[20px] flex items-center gap-2 dark:text-white tracking-widest"><Bell className="w-5 h-5" /> Notifications</h1>
           {unreadCount > 0 && (
             <span className="bg-[#111] dark:bg-white text-white dark:text-[#111] text-[10px] px-2 py-0.5 rounded font-bold">
               {unreadCount} unread

@@ -73,7 +73,7 @@ export default function ResumesPage() {
   const tailoredResumes = resumes.filter(r => r.application_id !== null);
 
   return (
-    <div className="max-w-5xl mx-auto h-full flex flex-col transition-colors duration-300">
+    <div className="max-w-5xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-6">
       <h2 className="text-[20px] mb-6 font-bold flex items-center gap-2 dark:text-white">
         <FileText className="w-5 h-5" /> My Resumes
       </h2>

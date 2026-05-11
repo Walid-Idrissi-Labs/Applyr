@@ -273,9 +273,11 @@ export default function DashboardPage() {
         <h2 className="font-bold text-[18px] dark:text-gray-200">
           {greeting}, <span className="font-bold">{user?.name}</span>
         </h2>
-        <p className="text-[11px] text-gray-500 dark:text-gray-400">
-          Great Job on your Recent Activity.
-        </p>
+        {total > 0 && (
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+            Great Job on your Recent Activity.
+          </p>
+        )}
       </div>
 
       {!user?.email_verified_at && (

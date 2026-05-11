@@ -61,7 +61,7 @@ export default function ApplicationForm({ application, tags, onSave, onClose }) 
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="neu-label">Company *</label>
               <input required value={form.company_name} onChange={setField('company_name')} className="neu-input" placeholder="Google" />
@@ -72,7 +72,7 @@ export default function ApplicationForm({ application, tags, onSave, onClose }) 
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="neu-label">Status</label>
               <select value={form.status} onChange={setField('status')} className="neu-input">
@@ -87,7 +87,7 @@ export default function ApplicationForm({ application, tags, onSave, onClose }) 
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="neu-label">Link</label>
               <input value={form.link} onChange={setField('link')} className="neu-input" placeholder="https://..." />

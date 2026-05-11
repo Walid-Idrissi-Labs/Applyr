@@ -121,11 +121,11 @@ export default function ApplicationsPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-bold text-[20px] flex items-center gap-2 tracking-widest dark:text-white"><Briefcase className="w-5 h-5" /> My Applications</h1>
         <button
           onClick={() => { setEditingApp(null); setShowForm(true); }}
-          className="neu-btn flex items-center gap-2 text-[12px]"
+          className="neu-btn flex items-center justify-center gap-2 text-[12px] w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" /> New Application
         </button>
@@ -187,8 +187,64 @@ export default function ApplicationsPage() {
           </button>
         </div>
       ) : viewMode === 'list' ? (
-        <div className="neu-card overflow-hidden">
-          <table className="w-full text-[12px]">
+        <>
+          <div className="space-y-3 md:hidden">
+            {filteredApps.map((app) => (
+              <div key={app.id} className="neu-card p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/applications/${app.id}`)}
+                    className="text-left min-w-0"
+                  >
+                    <div className="font-bold text-[13px] dark:text-white truncate">{app.company_name}</div>
+                    <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{app.position}</div>
+                  </button>
+                  <StatusBadge status={app.status} />
+                </div>
+                <div className="mt-2 text-[10px] text-gray-500 dark:text-gray-400">
+                  Applied {app.applied_at ? new Date(app.applied_at).toLocaleDateString() : '—'}
+                </div>
+                {(app.tags || []).length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {(app.tags || []).map((tag) => (
+                      <span key={tag.id} className="bg-gray-100 dark:bg-gray-800 text-[10px] px-1.5 py-0.5 rounded font-bold dark:text-gray-300">
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-3 flex justify-end gap-2">
+                  <button
+                    onClick={() => setShowDetail(app)}
+                    className="p-1.5 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-500 rounded-md transition-colors dark:text-gray-400 hover:text-[#111] dark:hover:text-white"
+                    title="Quick View"
+                    type="button"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openEdit(app)}
+                    className="p-1.5 border-2 border-transparent hover:border-blue-600 text-blue-600 rounded-md transition-colors"
+                    title="Edit"
+                    type="button"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(app.id)}
+                    className="p-1.5 border-2 border-transparent hover:border-red-600 text-red-600 rounded-md transition-colors"
+                    title="Delete"
+                    type="button"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="hidden md:block neu-card overflow-x-auto">
+            <table className="w-full min-w-[720px] text-[12px]">
             <thead>
               <tr className="border-b-2 border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a]">
                 <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Company</th>
@@ -230,8 +286,9 @@ export default function ApplicationsPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+            </table>
+          </div>
+        </>
       ) : (
         <BoardView
           applications={filteredApps}
@@ -266,10 +323,10 @@ export default function ApplicationsPage() {
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 z-50 flex items-center justify-center p-4 overflow-y-auto backdrop-blur-sm transition-colors duration-300">
           <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-2xl w-full max-w-4xl m-auto shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col max-h-[90vh]">
             
-            <div className="p-5 border-b-2 border-[#111] dark:border-gray-800 flex justify-between items-start bg-gray-50 dark:bg-[#1a1a1a] rounded-t-2xl shrink-0">
+            <div className="p-5 border-b-2 border-[#111] dark:border-gray-800 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start bg-gray-50 dark:bg-[#1a1a1a] rounded-t-2xl shrink-0">
               <div>
                 <button onClick={() => setShowDetail(null)} className="text-[11px] font-bold text-gray-500 hover:text-[#111] dark:hover:text-white mb-2 uppercase tracking-wider flex items-center gap-1 transition-colors">Back</button>
-                <div className="flex items-center gap-4 mt-1">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center mt-1">
                   <h2 className="font-bold text-[22px] m-0 leading-none dark:text-white">{showDetail.company_name} <span className="text-gray-400 font-normal">—</span> {showDetail.position}</h2>
                   <span className="border-2 border-[#111] dark:border-gray-600 rounded-md px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase bg-white dark:bg-[#0a0a0a] shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] dark:text-gray-300">
                     {showDetail.status}
@@ -282,7 +339,7 @@ export default function ApplicationsPage() {
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 overflow-y-auto flex-1 text-[13px]">
               {/* Left Column */}
               <div className="space-y-6">
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <button onClick={() => { setShowDetail(null); openEdit(showDetail); }} className="border-2 border-[#111] dark:border-gray-700 rounded-md bg-white dark:bg-[#0a0a0a] px-4 py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 flex-1 text-center flex justify-center items-center gap-2 transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] dark:text-gray-300 hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]"><Edit2 className="w-4 h-4" /> Edit</button>
                   <button onClick={() => { setShowDetail(null); handleDelete(showDetail.id); }} className="border-2 border-red-200 dark:border-red-900 text-red-600 dark:text-red-500 bg-white dark:bg-transparent px-4 py-2 rounded-md font-bold hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-600 flex-1 text-center flex justify-center items-center gap-2 transition-colors"><Trash2 className="w-4 h-4" /> Delete</button>
                   <button onClick={() => { setShowDetail(null); navigate(`/applications/${showDetail.id}`); }} className="border-2 border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-500 bg-white dark:bg-transparent px-4 py-2 rounded-md font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-600 flex-1 text-center flex justify-center items-center gap-2 transition-colors"><ExternalLink className="w-4 h-4" /> Full Page</button>

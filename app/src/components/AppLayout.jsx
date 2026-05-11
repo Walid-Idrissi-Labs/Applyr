@@ -22,6 +22,7 @@ const ADMIN_TABS = [
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [adminViewMode, setAdminViewMode] = useState(user?.is_admin || false);
@@ -31,6 +32,27 @@ export default function AppLayout() {
   const hasUnread = unreadCount > 0;
 
   const currentTabs = user?.is_admin && adminViewMode ? ADMIN_TABS : USER_TABS;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const media = window.matchMedia('(max-width: 767px)');
+    const handleChange = (event) => {
+      const matches = event?.matches ?? media.matches;
+      setIsMobile(matches);
+      if (matches) {
+        setSidebarOpen(false);
+      }
+    };
+    handleChange(media);
+    media.addEventListener('change', handleChange);
+    return () => media.removeEventListener('change', handleChange);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
 
   useEffect(() => {
     let isActive = true;
@@ -103,8 +125,17 @@ export default function AppLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
-      <aside className={`${sidebarOpen ? 'w-48' : 'w-0'} shrink-0 flex flex-col transition-all duration-300 bg-transparent overflow-hidden whitespace-nowrap z-20`}>
-        <div className="p-2 md:p-3 flex flex-col h-full w-48">
+      {isMobile && sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-10"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside
+        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} ${sidebarOpen ? 'md:w-48' : 'md:w-0'} fixed inset-y-0 left-0 w-64 md:static md:translate-x-0 shrink-0 flex flex-col transition-all duration-300 bg-white dark:bg-[#111] md:bg-transparent border-r-2 border-[#111] dark:border-gray-800 md:border-0 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] md:shadow-none overflow-hidden whitespace-nowrap z-20`}
+      >
+        <div className="p-2 md:p-3 flex flex-col h-full w-full">
           <div className="font-bold text-[18px] tracking-widest mb-6 px-2 mt-2 dark:text-white">
             Applyr
           </div>
@@ -113,6 +144,9 @@ export default function AppLayout() {
               <NavLink
                 key={tab.path}
                 to={tab.path}
+                onClick={() => {
+                  if (isMobile) setSidebarOpen(false);
+                }}
                 className={({ isActive }) =>
                   `text-left py-2 px-3 rounded-lg border-2 flex justify-between items-center transition-all text-[13px] font-bold ${
                     isActive

@@ -85,11 +85,11 @@ export default function ResumesPage() {
           
           {/* Global Base Resume */}
           <div className="border-2 border-[#111] dark:border-gray-800 rounded-xl bg-white dark:bg-[#111] p-6 shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.05)] flex flex-col">
-            <div className="flex justify-between items-center border-b-2 border-gray-100 dark:border-gray-800 pb-3 mb-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center border-b-2 border-gray-100 dark:border-gray-800 pb-3 mb-4">
               <h3 className="font-bold text-[16px] dark:text-white">Global Base Resume</h3>
               <button 
                 onClick={() => document.getElementById('global-pdf-upload').click()} 
-                className="text-[11px] font-bold border-2 border-[#111] dark:border-gray-700 rounded-md px-3 py-1.5 bg-gray-50 dark:bg-gray-800 hover:bg-[#111] dark:hover:bg-white hover:text-white dark:hover:text-[#111] transition-colors flex items-center gap-1.5 dark:text-gray-300"
+                className="text-[11px] font-bold border-2 border-[#111] dark:border-gray-700 rounded-md px-3 py-1.5 bg-gray-50 dark:bg-gray-800 hover:bg-[#111] dark:hover:bg-white hover:text-white dark:hover:text-[#111] transition-colors flex items-center justify-center gap-1.5 dark:text-gray-300 w-full sm:w-auto"
               >
                 <Upload className="w-3 h-3" /> Upload PDF
               </button>
@@ -127,8 +127,8 @@ export default function ResumesPage() {
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
               {tailoredResumes.length > 0 ? (
                 tailoredResumes.map(cv => (
-                  <div key={cv.id} className="flex justify-between items-center bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-lg p-4 shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] transition-all">
-                    <div>
+                  <div key={cv.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-lg p-4 shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] transition-all">
+                    <div className="min-w-0">
                       <div className="font-bold text-[14px] flex items-center gap-2 dark:text-white">
                         <FileCheck2 className="w-4 h-4 text-green-600" /> {cv.application?.company_name || 'Unknown'} Application
                       </div>
@@ -136,7 +136,7 @@ export default function ResumesPage() {
                         Tailored CV • Generated {new Date(cv.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 sm:self-auto self-start">
                       <button onClick={() => handleExport(cv.id)} className="p-1.5 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-600 rounded-md transition-all text-blue-600 bg-blue-50 dark:bg-blue-900/20" title="Download">
                         <Download className="w-4 h-4" />
                       </button>

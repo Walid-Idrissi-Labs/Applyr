@@ -154,7 +154,7 @@ export default function DashboardPage() {
   );
 
   const statsSection = (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       {[
         { label: 'Total', value: total, color: 'border-[#111] dark:border-gray-600' },
         { label: 'In Progress', value: inProgress, color: 'border-blue-400' },
@@ -250,7 +250,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto w-full h-full flex flex-col transition-colors duration-300 space-y-6">
+    <div className="max-w-5xl mx-auto w-full min-h-full pb-8 flex flex-col transition-colors duration-300 space-y-6">
       <h1 className="font-bold text-[20px] flex items-center gap-2 dark:text-white tracking-widest"><LayoutDashboard className="w-5 h-5" /> Dashboard</h1>
       <div className="space-y-1">
         <h2 className="font-bold text-[18px] dark:text-gray-200">

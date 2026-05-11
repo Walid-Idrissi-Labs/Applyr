@@ -134,11 +134,11 @@ export default function ApplicationDetailPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto h-full flex flex-col space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <button onClick={() => navigate('/applications')} className="p-2 border-2 border-[#111] dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
           <ArrowLeft className="w-4 h-4 dark:text-white" />
         </button>
-        <h1 className="font-bold text-[20px] tracking-widest dark:text-white">
+        <h1 className="font-bold text-[20px] tracking-widest dark:text-white break-words">
           {app.company_name} — {app.position}
         </h1>
       </div>
@@ -147,7 +147,7 @@ export default function ApplicationDetailPage() {
         <div className="neu-card p-4 lg:col-span-2 space-y-6">
           <div>
             <h2 className="font-bold text-[14px] mb-3 dark:text-white">Information</h2>
-            <div className="grid grid-cols-2 gap-3 text-[12px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
               <div className="space-y-3">
                 <div>
                   <span className="font-bold text-gray-500 dark:text-gray-400">Status: </span>

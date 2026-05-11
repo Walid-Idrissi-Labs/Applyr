@@ -64,13 +64,13 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl w-full mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Shield className="w-5 h-5 dark:text-white" />
         <h1 className="font-bold text-[20px] tracking-widest dark:text-white">Admin Dashboard</h1>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {[
           { label: 'Total Users', value: stats?.total_users || 0 },
           { label: 'Total Applications', value: stats?.total_applications || 0 },
@@ -99,28 +99,30 @@ export default function AdminDashboardPage() {
         {aiLogs.length === 0 ? (
           <div className="text-center py-8 text-gray-400 dark:text-gray-600">No AI logs yet</div>
         ) : (
-          <table className="w-full text-[12px]">
-            <thead>
-              <tr className="border-b-2 border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a]">
-                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">User</th>
-                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Model</th>
-                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Purpose</th>
-                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Tokens</th>
-                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {aiLogs.map((log) => (
-                <tr key={log.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
-                  <td className="p-3 font-bold dark:text-white">{log.user?.name || 'Unknown'}</td>
-                  <td className="p-3 text-gray-500 dark:text-gray-400 text-[11px]">{log.model}</td>
-                  <td className="p-3 dark:text-gray-300">{log.purpose}</td>
-                  <td className="p-3 dark:text-gray-300">{log.tokens_used}</td>
-                  <td className="p-3 text-gray-500 dark:text-gray-400">{new Date(log.created_at).toLocaleString()}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-[12px]">
+              <thead>
+                <tr className="border-b-2 border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a]">
+                  <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">User</th>
+                  <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Model</th>
+                  <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Purpose</th>
+                  <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Tokens</th>
+                  <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {aiLogs.map((log) => (
+                  <tr key={log.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+                    <td className="p-3 font-bold dark:text-white">{log.user?.name || 'Unknown'}</td>
+                    <td className="p-3 text-gray-500 dark:text-gray-400 text-[11px]">{log.model}</td>
+                    <td className="p-3 dark:text-gray-300">{log.purpose}</td>
+                    <td className="p-3 dark:text-gray-300">{log.tokens_used}</td>
+                    <td className="p-3 text-gray-500 dark:text-gray-400">{new Date(log.created_at).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

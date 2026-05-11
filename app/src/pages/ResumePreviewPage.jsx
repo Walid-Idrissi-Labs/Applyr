@@ -72,17 +72,17 @@ export default function ResumePreviewPage() {
 
       {/* Action Bar - Hidden during print */}
       {!isAutoPrint && (
-        <div className="print:hidden sticky top-0 z-10 bg-white dark:bg-[#111] border-b-2 border-[#111] dark:border-gray-800 shadow-[0_4px_0_0_rgba(17,17,17,1)] dark:shadow-none px-6 py-3 flex items-center justify-between">
+        <div className="print:hidden sticky top-0 z-10 bg-white dark:bg-[#111] border-b-2 border-[#111] dark:border-gray-800 shadow-[0_4px_0_0_rgba(17,17,17,1)] dark:shadow-none px-4 sm:px-6 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button 
             onClick={() => navigate(-1)} 
-            className="flex items-center gap-2 px-3 py-1.5 text-[12px] font-bold text-[#111] dark:text-white bg-gray-50 dark:bg-gray-800 border-2 border-[#111] dark:border-gray-700 rounded-md hover:bg-[#111] dark:hover:bg-white hover:text-white dark:hover:text-[#111] transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-1.5 text-[12px] font-bold text-[#111] dark:text-white bg-gray-50 dark:bg-gray-800 border-2 border-[#111] dark:border-gray-700 rounded-md hover:bg-[#111] dark:hover:bg-white hover:text-white dark:hover:text-[#111] transition-colors w-full sm:w-auto"
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
           
           <button 
             onClick={() => window.print()}
-            className="flex items-center gap-2 px-4 py-2 text-[12px] font-bold text-white bg-[#111] dark:bg-white dark:text-[#111] border-2 border-[#111] dark:border-gray-700 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]"
+            className="flex items-center justify-center gap-2 px-4 py-2 text-[12px] font-bold text-white bg-[#111] dark:bg-white dark:text-[#111] border-2 border-[#111] dark:border-gray-700 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] w-full sm:w-auto"
           >
             <Printer className="w-4 h-4" /> Save as PDF
           </button>

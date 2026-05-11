@@ -81,8 +81,8 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-5xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3 flex-wrap">
           <h1 className="font-bold text-[20px] flex items-center gap-2 dark:text-white tracking-widest"><Bell className="w-5 h-5" /> Notifications</h1>
           {unreadCount > 0 && (
             <span className="bg-[#111] dark:bg-white text-white dark:text-[#111] text-[10px] px-2 py-0.5 rounded font-bold">
@@ -90,7 +90,7 @@ export default function NotificationsPage() {
             </span>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           {unreadCount > 0 && (
             <button onClick={handleMarkAllAsRead} className="neu-btn-outline flex items-center gap-1 text-[11px]">
               <CheckCheck className="w-3 h-3" /> Mark all read
@@ -116,7 +116,7 @@ export default function NotificationsPage() {
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className={`flex items-start justify-between p-4 border-b border-gray-100 dark:border-gray-800 last:border-0 transition-colors ${
+              className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between p-4 border-b border-gray-100 dark:border-gray-800 last:border-0 transition-colors ${
                 !notif.read_at ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''
               }`}
             >
@@ -129,7 +129,7 @@ export default function NotificationsPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-1 ml-3">
+              <div className="flex gap-1 sm:ml-3">
                 {!notif.read_at && (
                   <button
                     onClick={() => handleMarkAsRead(notif.id)}

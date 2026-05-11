@@ -119,15 +119,15 @@ export default function UserManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl w-full mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Users className="w-5 h-5 dark:text-white" />
         <h1 className="font-bold text-[20px] tracking-widest dark:text-white">User Management</h1>
       </div>
 
       <div className="neu-card overflow-hidden">
-        <div className="p-3 border-b-2 border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a] flex justify-between items-center">
-          <div className="relative w-64">
+        <div className="p-3 border-b-2 border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a] flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
+          <div className="relative w-full md:w-64">
             <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-gray-400" />
             <input 
               type="text" 
@@ -140,7 +140,7 @@ export default function UserManagementPage() {
               className="w-full pl-9 pr-3 py-2 text-[12px] rounded-md border-2 border-[#111] dark:border-gray-700 bg-white dark:bg-[#0a0a0a] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#111] dark:focus:ring-gray-500"
             />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <div className="flex items-center gap-2 text-[12px] dark:text-white">
               <button 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
@@ -158,68 +158,70 @@ export default function UserManagementPage() {
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-            <button onClick={openAddUserModal} className="flex items-center gap-2 px-3 py-1.5 bg-[#111] text-white dark:bg-white dark:text-[#111] text-[12px] font-bold rounded-md hover:opacity-90 transition-opacity">
+            <button onClick={openAddUserModal} className="flex items-center justify-center gap-2 px-3 py-1.5 bg-[#111] text-white dark:bg-white dark:text-[#111] text-[12px] font-bold rounded-md hover:opacity-90 transition-opacity w-full md:w-auto">
               <Plus className="w-4 h-4" /> Add User
             </button>
           </div>
         </div>
-        <table className="w-full text-[12px]">
-          <thead>
-            <tr className="border-b border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a]">
-              <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">User</th>
-              <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Role</th>
-              <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Status</th>
-              <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Applications</th>
-              <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Joined</th>
-              <th className="text-right p-3 font-bold text-gray-500 dark:text-gray-400">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
-                <td className="p-3">
-                  <div className="font-bold dark:text-white">{u.name}</div>
-                  <div className="text-[11px] text-gray-400">{u.email}</div>
-                </td>
-                <td className="p-3">
-                  {u.is_admin ? (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">Admin</span>
-                  ) : (
-                    <span className="text-[10px] text-gray-400">User</span>
-                  )}
-                </td>
-                <td className="p-3">
-                  {u.is_active ? (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-800">Active</span>
-                  ) : (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800">Inactive</span>
-                  )}
-                </td>
-                <td className="p-3 text-center dark:text-gray-300">{u.applications_count || 0}</td>
-                <td className="p-3 text-gray-500 dark:text-gray-400">{new Date(u.created_at).toLocaleDateString()}</td>
-                <td className="p-3">
-                  <div className="flex justify-end gap-2 flex-wrap">
-                    <button onClick={() => openEditUserModal(u)} className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1"><Edit className="w-3 h-3" /> Edit</button>
-                    {u.is_admin
-                      ? <button onClick={() => handleRevokeAdmin(u.id)} className="text-[11px] font-bold text-yellow-600 hover:underline flex items-center gap-1"><Crown className="w-3 h-3" /> Revoke</button>
-                      : <button onClick={() => handleGrantAdmin(u.id)} className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1"><Crown className="w-3 h-3" /> Grant</button>
-                    }
-                    {u.is_active
-                      ? <button onClick={() => handleDeactivate(u.id)} className="text-[11px] font-bold text-orange-600 hover:underline flex items-center gap-1"><UserX className="w-3 h-3" /> Deactivate</button>
-                      : <button onClick={() => handleActivate(u.id)} className="text-[11px] font-bold text-green-600 hover:underline flex items-center gap-1"><UserCheck className="w-3 h-3" /> Activate</button>
-                    }
-                    <button onClick={() => handleDeleteUser(u.id)} className="text-[11px] font-bold text-red-600 hover:underline flex items-center gap-1"><Trash2 className="w-3 h-3" /> Delete</button>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] text-[12px]">
+            <thead>
+              <tr className="border-b border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a]">
+                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">User</th>
+                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Role</th>
+                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Status</th>
+                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Applications</th>
+                <th className="text-left p-3 font-bold text-gray-500 dark:text-gray-400">Joined</th>
+                <th className="text-right p-3 font-bold text-gray-500 dark:text-gray-400">Actions</th>
               </tr>
-            ))}
-            {users.length === 0 && (
-              <tr>
-                <td colSpan="6" className="p-8 text-center text-gray-400 dark:text-gray-600">No users found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+                  <td className="p-3">
+                    <div className="font-bold dark:text-white">{u.name}</div>
+                    <div className="text-[11px] text-gray-400">{u.email}</div>
+                  </td>
+                  <td className="p-3">
+                    {u.is_admin ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">Admin</span>
+                    ) : (
+                      <span className="text-[10px] text-gray-400">User</span>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    {u.is_active ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-800">Active</span>
+                    ) : (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800">Inactive</span>
+                    )}
+                  </td>
+                  <td className="p-3 text-center dark:text-gray-300">{u.applications_count || 0}</td>
+                  <td className="p-3 text-gray-500 dark:text-gray-400">{new Date(u.created_at).toLocaleDateString()}</td>
+                  <td className="p-3">
+                    <div className="flex justify-end gap-2 flex-wrap">
+                      <button onClick={() => openEditUserModal(u)} className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1"><Edit className="w-3 h-3" /> Edit</button>
+                      {u.is_admin
+                        ? <button onClick={() => handleRevokeAdmin(u.id)} className="text-[11px] font-bold text-yellow-600 hover:underline flex items-center gap-1"><Crown className="w-3 h-3" /> Revoke</button>
+                        : <button onClick={() => handleGrantAdmin(u.id)} className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1"><Crown className="w-3 h-3" /> Grant</button>
+                      }
+                      {u.is_active
+                        ? <button onClick={() => handleDeactivate(u.id)} className="text-[11px] font-bold text-orange-600 hover:underline flex items-center gap-1"><UserX className="w-3 h-3" /> Deactivate</button>
+                        : <button onClick={() => handleActivate(u.id)} className="text-[11px] font-bold text-green-600 hover:underline flex items-center gap-1"><UserCheck className="w-3 h-3" /> Activate</button>
+                      }
+                      <button onClick={() => handleDeleteUser(u.id)} className="text-[11px] font-bold text-red-600 hover:underline flex items-center gap-1"><Trash2 className="w-3 h-3" /> Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="p-8 text-center text-gray-400 dark:text-gray-600">No users found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* User Modal */}
@@ -296,7 +298,7 @@ export default function UserManagementPage() {
                 </label>
               </div>
 
-              <div className="mt-4 flex gap-2 justify-end">
+              <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button 
                   type="button" 
                   onClick={() => setShowModal(false)}

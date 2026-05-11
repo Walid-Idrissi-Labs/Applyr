@@ -17,6 +17,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
 
 // AI extraction (public for browser extension)
 Route::post('/ai/extract-job', [AiController::class, 'extractJob']);
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::put('/password', [AuthController::class, 'changePassword']);
+    Route::post('/email/verification', [AuthController::class, 'sendEmailVerification']);
 
     // Applications
     Route::get('/applications', [ApplicationController::class, 'index']);

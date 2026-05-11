@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Mail\WelcomeMail;
 use App\Mail\PasswordResetMail;
+use App\Mail\EmailVerificationMail;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -50,6 +52,8 @@ class AuthController extends Controller
             // Email failure should not break registration
         }
 
+        $this->dispatchEmailVerification($user);
+
         return response()->json([
             'user' => $user,
             'token' => $token,
@@ -85,6 +89,68 @@ class AuthController extends Controller
         ]);
     }
 
+    public function sendEmailVerification(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email is already verified.']);
+        }
+
+        $this->dispatchEmailVerification($user);
+
+        return response()->json(['message' => 'Verification link sent.']);
+    }
+
+    public function verifyEmail(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email'],
+            'token' => ['required', 'string'],
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['No account found for this email.'],
+            ]);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json([
+                'message' => 'Email already verified.',
+                'user' => $user,
+            ]);
+        }
+
+        $record = DB::table('email_verification_tokens')->where('email', $validated['email'])->first();
+
+        if (!$record || !Hash::check($validated['token'], $record->token)) {
+            throw ValidationException::withMessages([
+                'token' => ['The verification token is invalid.'],
+            ]);
+        }
+
+        $expireMinutes = (int) config('auth.email_verification.expire', 60);
+        $expiresAt = now()->subMinutes($expireMinutes);
+
+        if (!$record->created_at || Carbon::parse($record->created_at)->lt($expiresAt)) {
+            DB::table('email_verification_tokens')->where('email', $validated['email'])->delete();
+            throw ValidationException::withMessages([
+                'token' => ['The verification token has expired.'],
+            ]);
+        }
+
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        DB::table('email_verification_tokens')->where('email', $validated['email'])->delete();
+
+        return response()->json([
+            'message' => 'Email verified successfully.',
+            'user' => $user,
+        ]);
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
@@ -104,9 +170,17 @@ class AuthController extends Controller
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
         ]);
 
-        $request->user()->update($validated);
+        $user = $request->user();
+        $originalEmail = $user->email;
 
-        return response()->json($request->user());
+        $user->update($validated);
+
+        if (array_key_exists('email', $validated) && $validated['email'] !== $originalEmail) {
+            $user->forceFill(['email_verified_at' => null])->save();
+            $this->dispatchEmailVerification($user);
+        }
+
+        return response()->json($user);
     }
 
     public function changePassword(Request $request): JsonResponse
@@ -197,5 +271,29 @@ class AuthController extends Controller
         DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
 
         return response()->json(['message' => 'Password reset successfully']);
+    }
+
+    private function dispatchEmailVerification(User $user): void
+    {
+        $token = Str::random(64);
+
+        DB::table('email_verification_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        $frontendUrl = rtrim(config('app.frontend_url') ?? config('app.url'), '/');
+        $verifyUrl = $frontendUrl . '/verify-email?token=' . urlencode($token) . '&email=' . urlencode($user->email);
+        $expireMinutes = (int) config('auth.email_verification.expire', 60);
+
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail(
+                userName: $user->name,
+                verifyUrl: $verifyUrl,
+                expireMinutes: $expireMinutes,
+            ));
+        } catch (\Throwable $e) {
+            // Email failure should not break verification flow
+        }
     }
 }

@@ -66,8 +66,22 @@ export function AuthProvider({ children }) {
     return authAPI.changePassword(data);
   };
 
+  const sendVerificationEmail = async () => {
+    return authAPI.sendVerificationEmail();
+  };
+
+  const verifyEmail = async (data) => {
+    const res = await authAPI.verifyEmail(data);
+    const token = localStorage.getItem('auth_token');
+    if (token && res.data?.user) {
+      setUser(res.data.user);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+    }
+    return res;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, changePassword }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Lock, Check } from 'lucide-react';
+import { User, Lock, Check, AlertTriangle } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user, updateProfile, changePassword } = useAuth();
+  const { user, updateProfile, changePassword, sendVerificationEmail } = useAuth();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState('');
+  const [verificationError, setVerificationError] = useState('');
+  const [verificationSending, setVerificationSending] = useState(false);
 
   const [passwordForm, setPasswordForm] = useState({
     current_password: '',
@@ -47,6 +50,20 @@ export default function ProfilePage() {
       setPasswordError(err.response?.data?.errors?.current_password?.[0] || 'Failed to change password');
     } finally {
       setPasswordSaving(false);
+    }
+  };
+
+  const handleSendVerification = async () => {
+    setVerificationError('');
+    setVerificationStatus('');
+    setVerificationSending(true);
+    try {
+      const res = await sendVerificationEmail();
+      setVerificationStatus(res.data?.message || 'Verification link sent.');
+    } catch (err) {
+      setVerificationError(err.response?.data?.message || 'Unable to send verification email');
+    } finally {
+      setVerificationSending(false);
     }
   };
 
@@ -93,6 +110,45 @@ export default function ProfilePage() {
                 className="neu-input"
                 required
               />
+            </div>
+            <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-2">
+                  {user?.email_verified_at ? (
+                    <Check className="w-4 h-4 text-green-600 mt-0.5" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
+                  )}
+                  <div>
+                    <div className="font-bold text-[12px] dark:text-gray-200">Email verification</div>
+                    <div className="text-[11px] text-gray-500 dark:text-gray-400">
+                      {user?.email_verified_at
+                        ? 'Your email is verified.'
+                        : 'Your email is not verified yet.'}
+                    </div>
+                  </div>
+                </div>
+                {!user?.email_verified_at && (
+                  <button
+                    type="button"
+                    onClick={handleSendVerification}
+                    disabled={verificationSending}
+                    className="neu-btn text-[11px] px-3 py-1.5"
+                  >
+                    {verificationSending ? 'Sending...' : 'Send link'}
+                  </button>
+                )}
+              </div>
+              {verificationStatus && (
+                <div className="mt-2 text-[11px] text-green-700 dark:text-green-300">
+                  {verificationStatus}
+                </div>
+              )}
+              {verificationError && (
+                <div className="mt-2 text-[11px] text-red-700 dark:text-red-300">
+                  {verificationError}
+                </div>
+              )}
             </div>
             <button type="submit" disabled={saving} className="neu-btn text-[12px]">
               {saving ? 'Saving...' : 'Save Changes'}

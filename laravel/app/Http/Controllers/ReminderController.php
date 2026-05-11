@@ -30,7 +30,7 @@ class ReminderController extends Controller
                 'message' => "Reminder: Follow up on {$application->position} at {$application->company_name}",
             ]);
 
-            if ($application->user->email) {
+            if ($application->user->email && $application->user->email_verified_at) {
                 try {
                     Mail::send([], [], function ($message) use ($application) {
                         $message->to($application->user->email)

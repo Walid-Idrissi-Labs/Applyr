@@ -32,7 +32,7 @@ class SendReminders extends Command
                 'message' => "Reminder: Follow up on {$application->position} at {$application->company_name}",
             ]);
 
-            if ($application->user->email) {
+            if ($application->user->email && $application->user->email_verified_at) {
                 try {
                     Mail::to($application->user->email)->send(new ReminderMail(
                         userName: $application->user->name,

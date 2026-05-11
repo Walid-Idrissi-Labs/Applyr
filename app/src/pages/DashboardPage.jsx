@@ -22,13 +22,16 @@ const STATUS_COLORS = {
 const IN_PROGRESS_STATUSES = ['wishlist', 'applied', 'interview', 'technical test', 'offer'];
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, sendVerificationEmail } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [inProgressApps, setInProgressApps] = useState([]);
   const [inProgressLoading, setInProgressLoading] = useState(true);
+  const [verificationStatus, setVerificationStatus] = useState('');
+  const [verificationError, setVerificationError] = useState('');
+  const [verificationSending, setVerificationSending] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -71,6 +74,20 @@ export default function DashboardPage() {
     const hour = new Date().getHours();
     return hour < 12 ? 'Good morning' : 'Good evening';
   }, []);
+
+  const handleSendVerification = async () => {
+    setVerificationError('');
+    setVerificationStatus('');
+    setVerificationSending(true);
+    try {
+      const res = await sendVerificationEmail();
+      setVerificationStatus(res.data?.message || 'Verification link sent.');
+    } catch (err) {
+      setVerificationError(err.response?.data?.message || 'Unable to send verification email');
+    } finally {
+      setVerificationSending(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -260,6 +277,35 @@ export default function DashboardPage() {
           Great Job on your Recent Activity.
         </p>
       </div>
+
+      {!user?.email_verified_at && (
+        <div className="neu-card p-4 border-2 border-yellow-300 bg-yellow-50 dark:bg-yellow-900/10 dark:border-yellow-700 space-y-3">
+          <div>
+            <div className="font-bold text-[13px] text-yellow-800 dark:text-yellow-200">Verify your email</div>
+            <div className="text-[11px] text-yellow-700 dark:text-yellow-300">
+              Confirm your email to receive reminders and updates.
+            </div>
+          </div>
+          {verificationStatus && (
+            <div className="text-[11px] text-green-700 dark:text-green-300">
+              {verificationStatus}
+            </div>
+          )}
+          {verificationError && (
+            <div className="text-[11px] text-red-700 dark:text-red-300">
+              {verificationError}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleSendVerification}
+            disabled={verificationSending}
+            className="neu-btn text-[11px] w-max"
+          >
+            {verificationSending ? 'Sending...' : 'Send verification link'}
+          </button>
+        </div>
+      )}
 
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -36,6 +36,8 @@ export const authAPI = {
   changePassword: (data) => api.put('/password', data),
   forgotPassword: (email) => api.post('/forgot-password', { email }),
   resetPassword: (data) => api.post('/reset-password', data),
+  sendVerificationEmail: () => api.post('/email/verification'),
+  verifyEmail: (data) => api.post('/email/verify', data),
 };
 
 export const applicationsAPI = {

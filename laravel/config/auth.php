@@ -101,6 +101,10 @@ return [
         ],
     ],
 
+    'email_verification' => [
+        'expire' => 60,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout

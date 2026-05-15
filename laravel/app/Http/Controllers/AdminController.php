@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Mail\UserCreatedByAdmin;
 
@@ -61,8 +62,15 @@ class AdminController extends Controller
         $totalApplications = Application::count();
         $totalAiTokens = AiLog::sum('tokens_used');
 
-        $monthlyUsers = User::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count")
-            ->groupBy('month')
+        $driver = DB::connection()->getDriverName();
+        $monthExpr = match ($driver) {
+            'sqlite' => "strftime('%Y-%m', created_at)",
+            'pgsql' => "to_char(created_at, 'YYYY-MM')",
+            default => "DATE_FORMAT(created_at, '%Y-%m')",
+        };
+
+        $monthlyUsers = User::selectRaw("{$monthExpr} as month, COUNT(*) as count")
+            ->groupByRaw($monthExpr)
             ->orderBy('month', 'desc')
             ->limit(12)
             ->get();

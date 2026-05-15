@@ -49,7 +49,7 @@ function AppRoutes() {
 
       {/* Protected Routes With Layout */}
       <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to={user?.is_admin ? "/admin/dashboard" : "/dashboard"} replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />

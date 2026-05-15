@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../api';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend } from 'chart.js';
 import { Shield } from 'lucide-react';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
@@ -47,7 +47,12 @@ export default function AdminDashboardPage() {
       {
         label: 'New Users',
         data: monthlyData.data.slice().reverse(),
-        backgroundColor: '#111',
+        borderColor: '#111',
+        backgroundColor: 'rgba(17, 17, 17, 0.12)',
+        pointBackgroundColor: '#111',
+        pointRadius: 3,
+        tension: 0.35,
+        fill: false,
       },
     ],
   };
@@ -87,7 +92,7 @@ export default function AdminDashboardPage() {
         <div className="neu-card p-4">
           <h2 className="font-bold text-[14px] mb-4 dark:text-white">User Growth</h2>
           <div className="h-64">
-            <Bar data={chartData} options={chartOptions} />
+            <Line data={chartData} options={chartOptions} />
           </div>
         </div>
       )}

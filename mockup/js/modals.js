@@ -204,9 +204,9 @@ const renderDetailModal = () => {
             <div class="border-2 border-[#111] dark:border-gray-800 rounded-xl p-5 bg-gray-50 dark:bg-[#0a0a0a]">
               <div class="flex justify-between items-center border-b-2 border-gray-200 dark:border-gray-800 pb-2 mb-4">
                 <h3 class="font-bold text-[14px] dark:text-white">Resources</h3>
-                <button onclick="generateTailoredCV(${app.id})" class="text-[11px] font-bold border-2 border-[#111] dark:border-gray-700 rounded-md px-2 py-1 bg-white dark:bg-[#1a1a1a] dark:text-white hover:bg-[#111] dark:hover:bg-white hover:text-white dark:hover:text-[#111] transition-colors flex items-center gap-1 shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]" id="btn-gen-cv-${app.id}">
-                  ✨ Auto-Tailor CV
-                </button>
+                <a href="ai-resume-prototype/index.html" class="text-[11px] font-bold border-2 border-[#111] dark:border-gray-700 rounded-md px-2 py-1 bg-white dark:bg-[#1a1a1a] dark:text-white hover:bg-[#111] dark:hover:bg-white hover:text-white dark:hover:text-[#111] transition-colors flex items-center gap-1 shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]">
+                  ✨ AI Resume Architect
+                </a>
               </div>
               
               ${app.tasks?.length > 0 ? `

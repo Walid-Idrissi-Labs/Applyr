@@ -90,7 +90,8 @@ export const resumesAPI = {
   update: (id, data) => api.put(`/resumes/${id}`, data),
   delete: (id) => api.delete(`/resumes/${id}`),
   exportPdf: (id) => api.get(`/resumes/${id}/export-pdf`),
-  generateWithAi: (id) => api.post(`/resumes/${id}/generate`),
+  extract: (data) => api.post('/resumes/extract', data),
+  generateWithAi: (id, data = {}) => api.post(`/resumes/${id}/generate`, data),
 };
 
 export const adminAPI = {

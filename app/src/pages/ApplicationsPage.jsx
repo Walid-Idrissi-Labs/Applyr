@@ -4,7 +4,7 @@ import { applicationsAPI, tagsAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import ApplicationForm from '../components/ApplicationForm';
 import ConfirmationDialog from '../components/ConfirmationDialog';
-import { Search, LayoutList, LayoutGrid, Plus, X, Briefcase, Eye, Edit2, Trash2, ExternalLink } from 'lucide-react';
+import { Search, LayoutList, LayoutGrid, Plus, X, Briefcase, Eye, Edit2, Trash2, ExternalLink, Check } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { label: 'All', value: 'all' },
@@ -259,10 +259,11 @@ export default function ApplicationsPage() {
               {filteredApps.map((app) => (
                 <tr
                   key={app.id}
-                  className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors"
+                  onClick={() => navigate(`/applications/${app.id}`)}
+                  className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors cursor-pointer group"
                 >
-                  <td className="p-3 font-bold dark:text-white cursor-pointer" onClick={() => navigate(`/applications/${app.id}`)}>{app.company_name}</td>
-                  <td className="p-3 dark:text-gray-300 cursor-pointer" onClick={() => navigate(`/applications/${app.id}`)}>{app.position}</td>
+                  <td className="p-3 font-bold dark:text-white">{app.company_name}</td>
+                  <td className="p-3 dark:text-gray-300">{app.position}</td>
                   <td className="p-3"><StatusBadge status={app.status} /></td>
                   <td className="p-3 text-gray-500 dark:text-gray-400">
                     {app.applied_at ? new Date(app.applied_at).toLocaleDateString() : '—'}
@@ -276,7 +277,7 @@ export default function ApplicationsPage() {
                       ))}
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end gap-2">
                       <button onClick={() => setShowDetail(app)} className="p-1.5 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-500 rounded-md transition-colors dark:text-gray-400 hover:text-[#111] dark:hover:text-white" title="Quick View"><Eye className="w-4 h-4" /></button>
                       <button onClick={() => openEdit(app)} className="p-1.5 border-2 border-transparent hover:border-blue-600 text-blue-600 rounded-md transition-colors" title="Edit"><Edit2 className="w-4 h-4" /></button>
@@ -331,18 +332,18 @@ export default function ApplicationsPage() {
                 </div>
                 <StatusBadge status={showDetail.status} />
               </div>
-              <button onClick={() => setShowDetail(null)} className="hover:bg-gray-200 dark:hover:bg-gray-800 p-1.5 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-600 rounded-md transition-all dark:text-white"><X className="h-5 w-5" /></button>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button onClick={() => { setShowDetail(null); openEdit(showDetail); }} className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors text-blue-600" title="Edit"><Edit2 className="w-5 h-5" /></button>
+                <button onClick={() => { setShowDetail(null); handleDelete(showDetail.id); }} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-red-600" title="Delete"><Trash2 className="w-5 h-5" /></button>
+                <button onClick={() => { setShowDetail(null); navigate(`/applications/${showDetail.id}`); }} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-500 dark:text-gray-400" title="Full Page"><ExternalLink className="w-5 h-5" /></button>
+                <div className="w-px h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
+                <button onClick={() => setShowDetail(null)} className="hover:bg-gray-200 dark:hover:bg-gray-800 p-1.5 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-600 rounded-md transition-all dark:text-white"><X className="h-6 w-6" /></button>
+              </div>
             </div>
 
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto flex-1 text-[13px]">
               {/* Left & Middle Column */}
               <div className="md:col-span-2 space-y-6">
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <button onClick={() => { setShowDetail(null); openEdit(showDetail); }} className="border-2 border-[#111] dark:border-gray-700 rounded-md bg-white dark:bg-[#0a0a0a] px-4 py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 flex-1 text-center flex justify-center items-center gap-2 transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] dark:text-gray-300 hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]"><Edit2 className="w-4 h-4" /> Edit</button>
-                  <button onClick={() => { setShowDetail(null); handleDelete(showDetail.id); }} className="border-2 border-red-200 dark:border-red-900 text-red-600 dark:text-red-500 bg-white dark:bg-transparent px-4 py-2 rounded-md font-bold hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-600 flex-1 text-center flex justify-center items-center gap-2 transition-colors"><Trash2 className="w-4 h-4" /> Delete</button>
-                  <button onClick={() => { setShowDetail(null); navigate(`/applications/${showDetail.id}`); }} className="border-2 border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-500 bg-white dark:bg-transparent px-4 py-2 rounded-md font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-600 flex-1 text-center flex justify-center items-center gap-2 transition-colors"><ExternalLink className="w-4 h-4" /> Full Page</button>
-                </div>
-
                 <div className="neu-card p-5">
                   <h3 className="font-bold border-b-2 border-gray-100 dark:border-gray-800 pb-2 mb-4 text-[14px] dark:text-white flex items-center gap-2">
                     <Briefcase className="w-4 h-4" /> Information
@@ -369,20 +370,34 @@ export default function ApplicationsPage() {
 
               {/* Right Column */}
               <div className="space-y-6">
-                <div className="neu-card p-5 bg-purple-50/30 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/50">
-                  <h3 className="font-bold text-[14px] mb-3 dark:text-white flex items-center gap-2">
-                    <ExternalLink className="w-4 h-4 text-purple-600" /> AI Quick Actions
+                <div className="neu-card p-5">
+                  <h3 className="font-bold text-[14px] mb-4 dark:text-white flex items-center gap-2 border-b-2 border-gray-100 dark:border-gray-800 pb-2">
+                    <Check className="w-4 h-4" /> Checklist
                   </h3>
-                  <p className="text-[11px] text-gray-500 mb-4 leading-tight">Generate a tailored resume for this role instantly.</p>
-                  <button onClick={() => navigate(`/applications/${showDetail.id}`)} className="w-full neu-btn py-2 text-[11px] !bg-purple-600 !text-white !border-[#111] font-bold">
-                    ✨ Go to Architect
+                  <div className="space-y-3">
+                    {(showDetail.tasks || []).map((task) => (
+                      <div key={task.id} className="flex items-start gap-3">
+                        <div className={`w-4 h-4 border-2 border-[#111] dark:border-gray-600 rounded flex items-center justify-center shrink-0 mt-0.5 ${task.is_done ? 'bg-green-500 border-green-500' : 'bg-white dark:bg-[#0a0a0a]'}`}>
+                          {task.is_done && <Check className="w-3 h-3 text-white" />}
+                        </div>
+                        <span className={`flex-1 text-[11px] dark:text-gray-300 leading-tight ${task.is_done ? 'line-through text-gray-400' : 'font-medium'}`}>
+                          {task.text}
+                        </span>
+                      </div>
+                    ))}
+                    {(!showDetail.tasks || showDetail.tasks.length === 0) && (
+                      <div className="text-center py-4 text-gray-400 text-[11px] italic">No tasks added.</div>
+                    )}
+                  </div>
+                  <button onClick={() => { setShowDetail(null); navigate(`/applications/${showDetail.id}`); }} className="w-full mt-4 neu-btn py-2 text-[11px] font-bold">
+                    View full details
                   </button>
                 </div>
 
                 <div className="neu-card p-5 bg-gray-50 dark:bg-[#0a0a0a]">
-                  <h3 className="font-bold text-[14px] mb-4 dark:text-white">Resources</h3>
-                  <div className="text-[11px] text-gray-500 dark:text-gray-600 italic p-3 border-2 border-dashed border-gray-300 dark:border-gray-800 rounded-md text-center">
-                    Full history, tasks and documents are available on the full detail page.
+                  <h3 className="font-bold text-[14px] mb-4 dark:text-white border-b-2 border-gray-200 dark:border-gray-800 pb-2">Resources</h3>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-600 italic p-3 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-md text-center">
+                    Full history and documents are available on the full detail page.
                   </div>
                 </div>
               </div>
@@ -424,16 +439,16 @@ function BoardView({ applications, onStatusChange, onEdit, onDelete, onRowClick 
                   }}
                   onDragEnd={(e) => { e.currentTarget.style.opacity = '1'; }}
                   onClick={() => onRowClick(app)}
-                  className="neu-card p-3 cursor-pointer"
+                  className="neu-card p-3 cursor-pointer group/card"
                 >
-                  <div className="font-bold text-[12px] mb-1 dark:text-white">{app.company_name}</div>
+                  <div className="font-bold text-[12px] mb-1 dark:text-white group-hover/card:text-blue-600 transition-colors">{app.company_name}</div>
                   <div className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">{app.position}</div>
                   <div className="flex justify-between items-center mt-2 pt-2 border-t-2 border-dashed border-gray-200 dark:border-gray-800">
                     <div className="flex gap-2 text-gray-500">
                       {/* Attachments / Tasks could go here later */}
                     </div>
-                    <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
-                      <button onClick={(e) => { e.stopPropagation(); /* Future quick view */ onRowClick(app); }} className="text-gray-400 hover:text-[#111] dark:hover:text-white" title="View"><Eye className="w-3 h-3" /></button>
+                    <div className="flex gap-1.5 opacity-0 group-hover/card:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                      <button onClick={(e) => { e.stopPropagation(); setShowDetail(app); }} className="text-gray-400 hover:text-[#111] dark:hover:text-white" title="Quick View"><Eye className="w-3 h-3" /></button>
                       <button onClick={(e) => { e.stopPropagation(); onEdit(app); }} className="text-blue-600 hover:text-blue-800" title="Edit"><Edit2 className="w-3 h-3" /></button>
                       <button onClick={(e) => { e.stopPropagation(); onDelete(app.id); }} className="text-red-600 hover:text-red-800" title="Delete"><Trash2 className="w-3 h-3" /></button>
                     </div>

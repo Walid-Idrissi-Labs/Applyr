@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/resumes/{id}', [ResumeController::class, 'update']);
     Route::delete('/resumes/{id}', [ResumeController::class, 'destroy']);
     Route::get('/resumes/{id}/export-pdf', [ResumeController::class, 'exportPdf']);
+    Route::post('/resumes/extract', [ResumeController::class, 'extract']);
     Route::post('/resumes/{id}/generate', [ResumeController::class, 'generateWithAi']);
 
     // Admin

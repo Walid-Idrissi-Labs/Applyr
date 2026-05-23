@@ -29,7 +29,42 @@ export default function ApplicationDetailPage() {
   const [savingEdit, setSavingEdit] = useState(false);
 
   const [generating, setGenerating] = useState(false);
+  const [showTailorModal, setShowTailorModal] = useState(false);
+  const [tailorForm, setTailorForm] = useState({ language: 'en', notes: '' });
+  const [tailorStep, setTailorFormStep] = useState('idle'); // 'idle', 'generating', 'success'
+  const [loadingMsg, setLoadingMsg] = useState('');
+  const [generatedResumeId, setGeneratedResumeId] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+
+  const QUIRKY_MSGS = [
+    "Polishing your experience...",
+    "Bribing the recruiters (with quality)...",
+    "Optimizing keywords for maximum impact...",
+    "Consulting the AI career coach...",
+    "Aligning your skills with the stars...",
+    "Refining the professional tone...",
+    "Deleting the boring parts...",
+    "Injecting just enough confidence...",
+    "Making your achievements shine...",
+    "Scanning for buzzword compliance...",
+    "Whispering sweet nothings to the ATS...",
+    "Organizing the chaos into bullet points...",
+    "Adding a dash of 'hire-me' energy...",
+  ];
+
+  useEffect(() => {
+    let interval;
+    if (tailorStep === 'generating') {
+      // Pick a random starting message
+      const getRandomMsg = () => QUIRKY_MSGS[Math.floor(Math.random() * QUIRKY_MSGS.length)];
+      setLoadingMsg(getRandomMsg());
+      
+      interval = setInterval(() => {
+        setLoadingMsg(getRandomMsg());
+      }, 2500);
+    }
+    return () => clearInterval(interval);
+  }, [tailorStep]);
 
   const openConfirm = (options) => {
     return new Promise((resolve) => {
@@ -114,25 +149,31 @@ export default function ApplicationDetailPage() {
     }
   };
 
-  const handleGenerateCV = async () => {
-    const confirmed = await openConfirm({
-      title: 'Generate Tailored CV',
-      message: 'This will use your Global Base Resume to generate a tailored CV. Continue?',
-      confirmText: 'Generate',
-      variant: 'warning',
+  const handleOpenTailorModal = () => {
+    setTailorForm({ 
+      language: app.posting_language || 'en', 
+      notes: '' 
     });
-    if (!confirmed) return;
+    setTailorFormStep('idle');
+    setShowTailorModal(true);
+  };
+
+  const handleGenerateCV = async () => {
+    setTailorFormStep('generating');
     setGenerating(true);
     try {
       const res = await resumesAPI.create({ 
         content: 'Generating...', 
-        language: app.posting_language || 'en', 
+        language: tailorForm.language, 
         application_id: id 
       });
       await resumesAPI.generateWithAi(res.data.id);
-      alert('Tailored CV generated successfully! Check the Resumes page.');
+      setGeneratedResumeId(res.data.id);
+      setTailorFormStep('success');
+      loadApplication(); // Refresh to show in AI Actions box
     } catch (e) {
-      alert('Failed to generate CV. Make sure you have a Global Base Resume saved.');
+      alert('Failed to generate resume. Make sure you have a Global Base Resume saved.');
+      setTailorFormStep('idle');
     } finally {
       setGenerating(false);
     }
@@ -422,12 +463,37 @@ export default function ApplicationDetailPage() {
               Use AI to optimize your application based on your global profile and the job description.
             </p>
             <button 
-              onClick={handleGenerateCV} 
+              onClick={handleOpenTailorModal} 
               disabled={generating}
               className="w-full neu-btn flex items-center justify-center gap-2 text-[12px] !bg-purple-600 !text-white !border-[#111] py-3 shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:opacity-50 transition-all font-bold"
             >
-              <Wand2 className="w-4 h-4" /> {generating ? 'Architecting...' : '✨ Auto-Tailor CV'}
+              <Wand2 className="w-4 h-4" /> {generating ? 'Architecting...' : 'Auto-Tailor Resume'}
             </button>
+
+            {/* Generated Resumes List in AI box */}
+            {app.resumes && app.resumes.length > 0 && (
+              <div className="mt-6 pt-4 border-t-2 border-dashed border-purple-200 dark:border-purple-800/50 space-y-3">
+                <h3 className="font-bold text-[11px] uppercase tracking-wider text-purple-700 dark:text-purple-400">Generated Versions</h3>
+                <div className="space-y-2">
+                  {app.resumes.map((r, i) => (
+                    <button 
+                      key={r.id}
+                      onClick={() => navigate(`/resumes`)} // For now, go to resumes page
+                      className="w-full text-left p-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#111] rounded-xl hover:translate-x-1 transition-transform flex items-center justify-between group shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)]"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                        <div className="truncate">
+                          <div className="text-[11px] font-bold dark:text-white">Version {app.resumes.length - i}</div>
+                          <div className="text-[9px] text-gray-400 font-bold uppercase">{r.language} • {new Date(r.created_at).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                      <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-purple-500 transition-colors" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="neu-card p-5">
@@ -516,6 +582,93 @@ export default function ApplicationDetailPage() {
           </div>
         </div>
       </div>
+
+      {showTailorModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-2xl w-full max-w-md shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] overflow-hidden">
+            <div className="p-4 border-b-2 border-[#111] dark:border-gray-800 flex justify-between items-center bg-purple-50 dark:bg-purple-900/10">
+              <h3 className="font-bold text-[16px] dark:text-white flex items-center gap-2">
+                <Wand2 className="w-4 h-4 text-purple-600" /> 
+                {tailorStep === 'generating' ? 'AI is Architecting...' : tailorStep === 'success' ? 'Generation Complete' : 'Auto-Tailor Resume'}
+              </h3>
+              {tailorStep !== 'generating' && (
+                <button onClick={() => setShowTailorModal(false)} className="p-1 hover:bg-white dark:hover:bg-gray-800 rounded-md transition-colors"><X className="w-5 h-5 dark:text-white" /></button>
+              )}
+            </div>
+
+            <div className="p-6">
+              {tailorStep === 'idle' && (
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-400 uppercase mb-2">Target Language</label>
+                    <select 
+                      value={tailorForm.language}
+                      onChange={(e) => setTailorForm({ ...tailorForm, language: e.target.value })}
+                      className="w-full border-2 border-[#111] dark:border-gray-700 rounded-lg px-3 py-2 bg-gray-50 dark:bg-[#1a1a1a] dark:text-white text-[12px] font-bold outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-400 uppercase mb-2">Additional Instructions (Optional)</label>
+                    <textarea 
+                      value={tailorForm.notes}
+                      onChange={(e) => setTailorForm({ ...tailorForm, notes: e.target.value })}
+                      placeholder="e.g. Focus on my backend experience, or keep it under one page..."
+                      className="w-full border-2 border-[#111] dark:border-gray-700 rounded-lg px-3 py-3 bg-gray-50 dark:bg-[#1a1a1a] dark:text-white text-[12px] h-28 resize-none outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button 
+                      onClick={handleGenerateCV}
+                      className="flex-1 neu-btn py-3 !bg-purple-600 !text-white !border-[#111] font-bold text-[12px] flex items-center justify-center gap-2"
+                    >
+                      <Wand2 className="w-4 h-4" /> Start Architecting
+                    </button>
+                    <button 
+                      onClick={() => setShowTailorModal(false)}
+                      className="flex-1 neu-btn-outline py-3 text-[12px] font-bold"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {tailorStep === 'generating' && (
+                <div className="py-10 flex flex-col items-center justify-center space-y-6 text-center">
+                  <div className="relative">
+                    <div className="w-16 h-16 border-4 border-purple-200 dark:border-purple-900 border-t-purple-600 rounded-full animate-spin"></div>
+                    <Wand2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-purple-600 animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-bold text-[16px] dark:text-white">Hang tight!</p>
+                    <p className="text-[12px] text-gray-500 dark:text-gray-400 italic animate-bounce">{loadingMsg}</p>
+                  </div>
+                </div>
+              )}
+
+              {tailorStep === 'success' && (
+                <div className="py-6 flex flex-col items-center justify-center space-y-6 text-center">
+                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center border-2 border-green-500">
+                    <Check className="w-8 h-8 text-green-600" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-bold text-[18px] dark:text-white">Generated Successfully!</p>
+                    <p className="text-[12px] text-gray-500 dark:text-gray-400">Your tailored resume is ready for review.</p>
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/resumes/${generatedResumeId}/preview`)}
+                    className="w-full neu-btn py-3 !bg-[#111] dark:!bg-white !text-white dark:!text-[#111] font-bold text-[12px] flex items-center justify-center gap-2"
+                  >
+                    View Tailored Resume <ArrowLeft className="w-4 h-4 rotate-180" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmationDialog
         isOpen={confirmDialog.isOpen}

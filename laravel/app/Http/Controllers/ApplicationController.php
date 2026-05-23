@@ -100,7 +100,7 @@ class ApplicationController extends Controller
     {
         $application = $request->user()
             ->applications()
-            ->with(['tags', 'statusHistories', 'tasks', 'documents', 'resume'])
+            ->with(['tags', 'statusHistories', 'tasks', 'documents', 'resumes'])
             ->findOrFail($id);
 
         return response()->json($application);

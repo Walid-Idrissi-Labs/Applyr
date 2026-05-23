@@ -455,87 +455,6 @@ export default function ApplicationDetailPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="neu-card p-5 bg-purple-50/30 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/50">
-            <h2 className="font-bold text-[15px] mb-4 dark:text-white flex items-center gap-2">
-              <Wand2 className="w-4 h-4 text-purple-600" /> AI Actions
-            </h2>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4 leading-snug">
-              Use AI to optimize your application based on your global profile and the job description.
-            </p>
-            <button 
-              onClick={handleOpenTailorModal} 
-              disabled={generating}
-              className="w-full neu-btn flex items-center justify-center gap-2 text-[12px] !bg-purple-600 !text-white !border-[#111] py-3 shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:opacity-50 transition-all font-bold"
-            >
-              <Wand2 className="w-4 h-4" /> {generating ? 'Architecting...' : 'Auto-Tailor Resume'}
-            </button>
-
-            {/* Generated Resumes List in AI box */}
-            {app.resumes && app.resumes.length > 0 && (
-              <div className="mt-6 pt-4 border-t-2 border-dashed border-purple-200 dark:border-purple-800/50 space-y-3">
-                <h3 className="font-bold text-[11px] uppercase tracking-wider text-purple-700 dark:text-purple-400">Generated Versions</h3>
-                <div className="space-y-2">
-                  {app.resumes.map((r, i) => (
-                    <button 
-                      key={r.id}
-                      onClick={() => navigate(`/resumes`)} // For now, go to resumes page
-                      className="w-full text-left p-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#111] rounded-xl hover:translate-x-1 transition-transform flex items-center justify-between group shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)]"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <FileText className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                        <div className="truncate">
-                          <div className="text-[11px] font-bold dark:text-white">Version {app.resumes.length - i}</div>
-                          <div className="text-[9px] text-gray-400 font-bold uppercase">{r.language} • {new Date(r.created_at).toLocaleDateString()}</div>
-                        </div>
-                      </div>
-                      <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-purple-500 transition-colors" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="neu-card p-5">
-            <h2 className="font-bold text-[15px] mb-4 dark:text-white flex items-center gap-2">
-              <Check className="w-4 h-4" /> Checklist
-            </h2>
-            <div className="space-y-3">
-              {(app.tasks || []).map((task) => (
-                <div key={task.id} className="flex items-start gap-3 group">
-                  <button
-                    onClick={() => handleToggleTask(task.id, task.is_done)}
-                    className={`w-5 h-5 border-2 border-[#111] dark:border-gray-600 rounded flex items-center justify-center shrink-0 transition-all mt-0.5 ${task.is_done ? 'bg-green-500 border-green-500' : 'bg-white dark:bg-[#0a0a0a]'}`}
-                  >
-                    {task.is_done && <Check className="w-3 h-3 text-white" />}
-                  </button>
-                  <span className={`flex-1 text-[12px] dark:text-gray-300 leading-tight ${task.is_done ? 'line-through text-gray-400' : 'font-medium'}`}>
-                    {task.text}
-                  </span>
-                  <button onClick={() => handleDeleteTask(task.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">
-                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                  </button>
-                </div>
-              ))}
-              {(!app.tasks || app.tasks.length === 0) && (
-                <div className="text-center py-4 text-gray-400 text-[11px] italic">No tasks added.</div>
-              )}
-            </div>
-            <div className="flex gap-2 mt-5">
-              <input
-                type="text"
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
-                placeholder="Next step..."
-                className="neu-input text-[12px] flex-1 py-1.5"
-              />
-              <button onClick={handleAddTask} className="neu-btn p-1.5 text-[12px]">
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
           <div className="neu-card p-5">
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-bold text-[15px] dark:text-white flex items-center gap-2">
@@ -579,6 +498,97 @@ export default function ApplicationDetailPage() {
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="neu-card p-5">
+            <h2 className="font-bold text-[15px] mb-4 dark:text-white flex items-center gap-2">
+              <Check className="w-4 h-4" /> Checklist
+            </h2>
+            <div className="space-y-3">
+              {(app.tasks || []).map((task) => (
+                <div key={task.id} className="flex items-start gap-3 group">
+                  <button
+                    onClick={() => handleToggleTask(task.id, task.is_done)}
+                    className={`w-5 h-5 border-2 border-[#111] dark:border-gray-600 rounded flex items-center justify-center shrink-0 transition-all mt-0.5 ${task.is_done ? 'bg-green-500 border-green-500' : 'bg-white dark:bg-[#0a0a0a]'}`}
+                  >
+                    {task.is_done && <Check className="w-3 h-3 text-white" />}
+                  </button>
+                  <span className={`flex-1 text-[12px] dark:text-gray-300 leading-tight ${task.is_done ? 'line-through text-gray-400' : 'font-medium'}`}>
+                    {task.text}
+                  </span>
+                  <button onClick={() => handleDeleteTask(task.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">
+                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                  </button>
+                </div>
+              ))}
+              {(!app.tasks || app.tasks.length === 0) && (
+                <div className="text-center py-4 text-gray-400 text-[11px] italic">No tasks added.</div>
+              )}
+            </div>
+            <div className="flex gap-2 mt-5">
+              <input
+                type="text"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
+                placeholder="Next step..."
+                className="neu-input text-[12px] flex-1 py-1.5"
+              />
+              <button onClick={handleAddTask} className="neu-btn p-1.5 text-[12px]">
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="neu-card p-5 bg-purple-50/30 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/50">
+            <h2 className="font-bold text-[15px] mb-4 dark:text-white flex items-center gap-2">
+              <Wand2 className="w-4 h-4 text-purple-600" /> AI Actions
+            </h2>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4 leading-snug">
+              Use AI to optimize your application based on your global profile and the job description.
+            </p>
+            <button 
+              onClick={handleOpenTailorModal} 
+              disabled={generating}
+              className="w-full neu-btn flex items-center justify-center gap-2 text-[12px] !bg-purple-600 !text-white !border-[#111] py-3 shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] disabled:opacity-50 transition-all font-bold"
+            >
+              <Wand2 className="w-4 h-4" /> {generating ? 'Architecting...' : 'Auto-Tailor Resume'}
+            </button>
+
+            {/* Generated Resumes List in AI box */}
+            {app.resumes && app.resumes.length > 0 && (
+              <div className="mt-6 pt-4 border-t-2 border-dashed border-purple-200 dark:border-purple-800/50 space-y-3">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-bold text-[11px] uppercase tracking-wider text-purple-700 dark:text-purple-400">Generated Versions</h3>
+                  <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-[9px] px-1.5 py-0.5 rounded-full font-bold">{app.resumes.length}</span>
+                </div>
+                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                  {[...app.resumes].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).map((r, i) => (
+                    <button 
+                      key={r.id}
+                      onClick={() => navigate(`/resumes/${r.id}/preview`)}
+                      className="w-full text-left p-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#111] rounded-xl hover:translate-x-1 hover:-translate-y-0.5 transition-all flex items-center justify-between group shadow-[3px_3px_0px_0px_rgba(17,17,17,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.05)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="p-1.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 rounded-lg">
+                          <FileText className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                        </div>
+                        <div className="truncate">
+                          <div className="text-[11px] font-bold dark:text-white flex items-center gap-1.5">
+                            Version {app.resumes.length - i}
+                            {r.is_finalized && <Check className="w-3 h-3 text-green-500" title="Finalized" />}
+                          </div>
+                          <div className="text-[9px] text-gray-400 font-bold uppercase">{LANGUAGES.find(l => l.value === r.language)?.label || r.language} • {new Date(r.created_at).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                      <div className="p-1 rounded-md group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
+                        <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-purple-500" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

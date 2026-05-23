@@ -58,8 +58,8 @@ class Application extends Model
         return $this->belongsToMany(Tag::class);
     }
 
-    public function resume(): BelongsTo
+    public function resumes(): HasMany
     {
-        return $this->belongsTo(Resume::class);
+        return $this->hasMany(Resume::class);
     }
 }

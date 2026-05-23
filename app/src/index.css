@@ -61,3 +61,7 @@
 .status-badge {
   @apply text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider;
 }
+
+select option {
+  @apply bg-white dark:bg-[#111] text-[#111] dark:text-white;
+}

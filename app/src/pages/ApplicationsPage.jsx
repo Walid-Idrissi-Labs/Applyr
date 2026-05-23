@@ -324,71 +324,65 @@ export default function ApplicationsPage() {
           <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-2xl w-full max-w-4xl m-auto shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col max-h-[90vh]">
             
             <div className="p-5 border-b-2 border-[#111] dark:border-gray-800 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start bg-gray-50 dark:bg-[#1a1a1a] rounded-t-2xl shrink-0">
-              <div>
-                <button onClick={() => setShowDetail(null)} className="text-[11px] font-bold text-gray-500 hover:text-[#111] dark:hover:text-white mb-2 uppercase tracking-wider flex items-center gap-1 transition-colors">Back</button>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center mt-1">
-                  <h2 className="font-bold text-[22px] m-0 leading-none dark:text-white">{showDetail.company_name} <span className="text-gray-400 font-normal">—</span> {showDetail.position}</h2>
-                  <span className="border-2 border-[#111] dark:border-gray-600 rounded-md px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase bg-white dark:bg-[#0a0a0a] shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] dark:text-gray-300">
-                    {showDetail.status}
-                  </span>
+              <div className="flex items-center gap-4">
+                <div className="min-w-0">
+                  <h2 className="font-bold text-[22px] m-0 leading-tight dark:text-white truncate">{showDetail.company_name}</h2>
+                  <p className="text-[14px] text-gray-500 dark:text-gray-400 truncate -mt-1 font-bold">{showDetail.position}</p>
                 </div>
+                <StatusBadge status={showDetail.status} />
               </div>
               <button onClick={() => setShowDetail(null)} className="hover:bg-gray-200 dark:hover:bg-gray-800 p-1.5 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-600 rounded-md transition-all dark:text-white"><X className="h-5 w-5" /></button>
             </div>
 
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 overflow-y-auto flex-1 text-[13px]">
-              {/* Left Column */}
-              <div className="space-y-6">
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto flex-1 text-[13px]">
+              {/* Left & Middle Column */}
+              <div className="md:col-span-2 space-y-6">
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button onClick={() => { setShowDetail(null); openEdit(showDetail); }} className="border-2 border-[#111] dark:border-gray-700 rounded-md bg-white dark:bg-[#0a0a0a] px-4 py-2 font-bold hover:bg-gray-50 dark:hover:bg-gray-800 flex-1 text-center flex justify-center items-center gap-2 transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] dark:text-gray-300 hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]"><Edit2 className="w-4 h-4" /> Edit</button>
                   <button onClick={() => { setShowDetail(null); handleDelete(showDetail.id); }} className="border-2 border-red-200 dark:border-red-900 text-red-600 dark:text-red-500 bg-white dark:bg-transparent px-4 py-2 rounded-md font-bold hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-600 flex-1 text-center flex justify-center items-center gap-2 transition-colors"><Trash2 className="w-4 h-4" /> Delete</button>
                   <button onClick={() => { setShowDetail(null); navigate(`/applications/${showDetail.id}`); }} className="border-2 border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-500 bg-white dark:bg-transparent px-4 py-2 rounded-md font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-600 flex-1 text-center flex justify-center items-center gap-2 transition-colors"><ExternalLink className="w-4 h-4" /> Full Page</button>
                 </div>
 
-                <div className="border-2 border-[#111] dark:border-gray-800 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.05)] bg-white dark:bg-[#1a1a1a]">
-                  <h3 className="font-bold border-b-2 border-gray-100 dark:border-gray-800 pb-2 mb-4 text-[14px] dark:text-white">Information</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-2"><span className="text-gray-500">Date Applied</span><span className="font-bold dark:text-gray-300">{showDetail.applied_at ? new Date(showDetail.applied_at).toLocaleDateString() : '—'}</span></div>
-                    <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-2"><span className="text-gray-500">Source</span><span className="font-bold bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md dark:text-gray-300">{showDetail.source || '—'}</span></div>
-                    <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-2"><span className="text-gray-500">Follow-up Date</span><span className="font-bold dark:text-gray-300">{showDetail.reminder_date ? new Date(showDetail.reminder_date).toLocaleDateString() : '—'}</span></div>
-                    <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-2"><span className="text-gray-500">Tags</span><span className="font-bold text-[11px] dark:text-gray-300">{(showDetail.tags || []).map(t => t.name).join(', ') || '—'}</span></div>
-                    <div className="flex justify-between items-center"><span className="text-gray-500">Job Link</span><span className="font-bold">{showDetail.job_url ? <a href={showDetail.job_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">External Link <ExternalLink className="w-3 h-3" /></a> : '—'}</span></div>
+                <div className="neu-card p-5">
+                  <h3 className="font-bold border-b-2 border-gray-100 dark:border-gray-800 pb-2 mb-4 text-[14px] dark:text-white flex items-center gap-2">
+                    <Briefcase className="w-4 h-4" /> Information
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="flex flex-col gap-0.5"><span className="text-[10px] uppercase font-bold text-gray-400">Date Applied</span><span className="font-bold dark:text-gray-300">{showDetail.applied_at ? new Date(showDetail.applied_at).toLocaleDateString() : '—'}</span></div>
+                      <div className="flex flex-col gap-0.5"><span className="text-[10px] uppercase font-bold text-gray-400">Source</span><span className="font-bold bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md dark:text-gray-300 w-fit">{showDetail.source || '—'}</span></div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex flex-col gap-0.5"><span className="text-[10px] uppercase font-bold text-gray-400">Follow-up Date</span><span className="font-bold dark:text-gray-300">{showDetail.reminder_date ? new Date(showDetail.reminder_date).toLocaleDateString() : '—'}</span></div>
+                      <div className="flex flex-col gap-0.5"><span className="text-[10px] uppercase font-bold text-gray-400">Job Link</span><span className="font-bold">{showDetail.link ? <a href={showDetail.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">Link <ExternalLink className="w-3 h-3" /></a> : '—'}</span></div>
+                    </div>
                   </div>
                 </div>
 
                 {showDetail.notes && (
-                  <div className="border-2 border-[#111] dark:border-gray-800 rounded-xl p-5 bg-yellow-50/50 dark:bg-yellow-900/10">
+                  <div className="neu-card p-5 bg-yellow-50/50 dark:bg-yellow-900/10">
                     <h3 className="font-bold border-b-2 border-yellow-200 dark:border-yellow-900/50 pb-2 mb-3 text-[14px] dark:text-yellow-200">Notes</h3>
-                    <p className="whitespace-pre-wrap font-medium text-gray-800 dark:text-gray-300 leading-relaxed">{showDetail.notes}</p>
+                    <p className="whitespace-pre-wrap font-medium text-gray-800 dark:text-gray-300 leading-relaxed truncate-3-lines">{showDetail.notes}</p>
                   </div>
                 )}
               </div>
 
               {/* Right Column */}
               <div className="space-y-6">
-                <div className="border-2 border-[#111] dark:border-gray-800 rounded-xl p-5 bg-white dark:bg-[#1a1a1a]">
-                  <h3 className="font-bold border-b-2 border-gray-100 dark:border-gray-800 pb-2 mb-5 text-[14px] dark:text-white">Status History</h3>
-                  <div className="relative pl-5 border-l-2 border-[#111] dark:border-gray-600 ml-3 space-y-6">
-                    {/* Simulated History for now, as we don't have a history array yet */}
-                    <div className="relative">
-                      <div className="absolute -left-[25px] top-1 w-3.5 h-3.5 bg-[#111] dark:bg-white border-2 border-[#111] dark:border-gray-800 rounded-full z-10"></div>
-                      <div className="font-bold text-[14px] leading-none mb-1 dark:text-white">{showDetail.status}</div>
-                      <div className="text-[11px] text-gray-500 font-bold">{showDetail.updated_at ? new Date(showDetail.updated_at).toLocaleDateString() : '—'}</div>
-                    </div>
-                    <div className="relative pt-1">
-                      <div className="absolute -left-[25px] top-1.5 w-3.5 h-3.5 bg-white dark:bg-[#0a0a0a] border-2 border-dashed border-gray-400 dark:border-gray-700 rounded-full z-10"></div>
-                      <div className="text-[12px] font-bold italic text-gray-400 dark:text-gray-600">Pending update...</div>
-                    </div>
-                  </div>
+                <div className="neu-card p-5 bg-purple-50/30 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/50">
+                  <h3 className="font-bold text-[14px] mb-3 dark:text-white flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4 text-purple-600" /> AI Quick Actions
+                  </h3>
+                  <p className="text-[11px] text-gray-500 mb-4 leading-tight">Generate a tailored resume for this role instantly.</p>
+                  <button onClick={() => navigate(`/applications/${showDetail.id}`)} className="w-full neu-btn py-2 text-[11px] !bg-purple-600 !text-white !border-[#111] font-bold">
+                    ✨ Go to Architect
+                  </button>
                 </div>
 
-                <div className="border-2 border-[#111] dark:border-gray-800 rounded-xl p-5 bg-gray-50 dark:bg-[#0a0a0a]">
-                  <div className="flex justify-between items-center border-b-2 border-gray-200 dark:border-gray-800 pb-2 mb-4">
-                    <h3 className="font-bold text-[14px] dark:text-white">Resources</h3>
-                  </div>
-                  
-                  <div className="text-[12px] text-gray-500 dark:text-gray-600 italic p-3 border-2 border-dashed border-gray-300 dark:border-gray-800 rounded-md text-center">
-                    Navigate to the full page to view tasks and attachments.
+                <div className="neu-card p-5 bg-gray-50 dark:bg-[#0a0a0a]">
+                  <h3 className="font-bold text-[14px] mb-4 dark:text-white">Resources</h3>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-600 italic p-3 border-2 border-dashed border-gray-300 dark:border-gray-800 rounded-md text-center">
+                    Full history, tasks and documents are available on the full detail page.
                   </div>
                 </div>
               </div>

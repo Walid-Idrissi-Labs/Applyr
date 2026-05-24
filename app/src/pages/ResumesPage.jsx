@@ -164,9 +164,9 @@ export default function ResumesPage() {
   return (
     <div className="max-w-6xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-6 md:space-y-8 pb-12 px-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-[20px] md:text-[22px] font-bold flex items-center gap-2 dark:text-white uppercase tracking-tighter">
-          <FileText className="w-5 h-5 md:w-6 md:h-6 text-purple-600" /> Resume Workspace
-        </h2>
+        <h1 className="font-bold text-[20px] md:text-[22px] flex items-center gap-2 dark:text-white tracking-widest">
+          <FileText className="w-5 h-5 md:w-6 md:h-6" /> Resume Workspace
+        </h1>
       </div>
       
       {loading ? (
@@ -184,7 +184,7 @@ export default function ResumesPage() {
               <div className="lg:w-1/3 space-y-4">
                 <div className="flex justify-between items-center border-b-2 border-gray-100 dark:border-gray-800 pb-3">
                   <h3 className="font-bold text-[15px] md:text-[16px] dark:text-white flex items-center gap-2">
-                    <FileText className="w-4 h-4 md:w-5 md:h-5 text-blue-500" /> Global Base Resume
+                    <FileText className="w-4 h-4 md:w-5 md:h-5" /> Global Base Resume
                   </h3>
                 </div>
                 <p className="text-[11px] md:text-[12px] text-gray-500 dark:text-gray-400 leading-relaxed">

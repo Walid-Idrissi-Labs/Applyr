@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -62,6 +64,146 @@
   @apply text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider;
 }
 
+<<<<<<< HEAD
 select option {
   @apply bg-white dark:bg-[#111] text-[#111] dark:text-white;
+=======
+.landing-root {
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #111;
+}
+
+.landing-display {
+  font-family: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+}
+
+.landing-bg {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(130deg, #f7f4ee 0%, #fbfaf6 45%, #f1f0ec 100%);
+}
+
+.landing-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(17, 17, 17, 0.08) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.landing-bg::after {
+  content: '';
+  position: absolute;
+  inset: -120px 0 0 0;
+  background: radial-gradient(circle at 12% 10%, rgba(15, 118, 110, 0.18), transparent 40%),
+    radial-gradient(circle at 88% 18%, rgba(245, 158, 11, 0.12), transparent 45%),
+    radial-gradient(circle at 50% 70%, rgba(17, 17, 17, 0.08), transparent 55%);
+  pointer-events: none;
+}
+
+.landing-shell {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.landing-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(17, 17, 17, 0.12);
+}
+
+.landing-soft {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 16px;
+}
+
+.landing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.landing-kicker {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  margin-bottom: 12px;
+}
+
+.landing-link {
+  color: #111;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.landing-link:hover {
+  color: #0f766e;
+}
+
+.landing-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landing-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(17, 17, 17, 0.25);
+}
+
+.landing-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid #111;
+  color: #111;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landing-btn-outline:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(17, 17, 17, 0.1);
+}
+
+@keyframes landing-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-rise {
+  animation: landing-rise 0.8s ease both;
+>>>>>>> eb0058f (feat : landing page initial design prototype)
 }

@@ -5,7 +5,7 @@ import { Pie } from 'react-chartjs-2';
 import { applicationsAPI } from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Plus } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -219,13 +219,22 @@ export default function DashboardPage() {
     <div className="neu-card p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-[14px] dark:text-white">In-Progress Applications</h2>
-        <button
-          onClick={() => navigate('/applications')}
-          className="neu-btn-outline text-[10px] px-3 py-1"
-          type="button"
-        >
-          View all
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/applications', { state: { openNew: true } })}
+            className="neu-btn text-[10px] px-3 py-1 flex items-center gap-3"
+            type="button"
+          >
+            <Plus className="w-3 h-3" /> New
+          </button>
+          <button
+            onClick={() => navigate('/applications')}
+            className="neu-btn-outline text-[10px] px-4 py-1"
+            type="button"
+          >
+            View all
+          </button>
+        </div>
       </div>
       {inProgressLoading ? (
         <div className="text-center py-6 text-gray-400 dark:text-gray-600">Loading in-progress applications...</div>

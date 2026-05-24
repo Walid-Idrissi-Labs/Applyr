@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { applicationsAPI, tagsAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import ApplicationForm from '../components/ApplicationForm';
@@ -30,6 +30,7 @@ export default function ApplicationsPage() {
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
   const searchRef = useRef('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const openConfirm = (options) => {
     return new Promise((resolve) => {
@@ -51,6 +52,12 @@ export default function ApplicationsPage() {
     loadApplications();
     tagsAPI.getAll().then((res) => setTags(res.data)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!location.state?.openNew) return;
+    setEditingApp(null);
+    setShowForm(true);
+  }, [location.state]);
 
   const loadApplications = async (params = {}) => {
     setLoading(true);

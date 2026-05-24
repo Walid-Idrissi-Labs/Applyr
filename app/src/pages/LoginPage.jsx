@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -9,9 +9,100 @@ export default function LoginPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const { login, register } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setCursor({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dots = [];
+    const spacing = 32;
+    const glowRadius = 500;
+
+    // Initialize dots
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    for (let x = 0; x <= width; x += spacing) {
+      for (let y = 0; y <= height; y += spacing) {
+        dots.push({
+          x,
+          y,
+          baseColor: theme === 'dark' ? '#222222' : '#bbbbbb',
+          glowColor: theme === 'dark' ? '#333333' : '#aaaaaa'
+        });
+      }
+    }
+
+    let animationFrame;
+
+    const draw = () => {
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw all dots with base color
+      dots.forEach(dot => {
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, 1, 0, Math.PI * 2);
+        ctx.fillStyle = dot.baseColor;
+        ctx.fill();
+      });
+
+      // Draw glowing dots near cursor
+      const radius = glowRadius;
+      dots.forEach(dot => {
+        const dx = dot.x - cursor.x;
+        const dy = dot.y - cursor.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < radius) {
+          // Calculate opacity based on distance (closer = more opaque)
+          const opacity = 1 - (distance / radius);
+          ctx.beginPath();
+          ctx.arc(dot.x, dot.y, 1.5, 0, Math.PI * 2);
+
+          if (opacity > 0.5) {
+            ctx.fillStyle = dot.glowColor;
+            ctx.globalAlpha = 1;
+          } else {
+            ctx.fillStyle = dot.baseColor;
+            ctx.globalAlpha = opacity;
+          }
+          ctx.fill();
+          ctx.globalAlpha = 1; // Reset
+        }
+      });
+
+      animationFrame = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [cursor, theme]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,8 +125,9 @@ export default function LoginPage() {
   const setField = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="w-full max-w-sm bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center p-4 transition-colors duration-300" style={{ position: 'relative', zIndex: 1 }}>
+      <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }} />
+      <div className="w-full max-w-sm bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 10 }}>
         <div className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#111] dark:border-gray-800 p-5 text-center shrink-0 flex justify-between items-center">
           <div className="w-8" />
           <h1 className="font-bold text-[22px] tracking-widest dark:text-white">Applyr</h1>

@@ -94,9 +94,31 @@ class ResumeController extends Controller
 
     public function extract(Request $request): JsonResponse
     {
+        $file = $request->file('file');
+        
+        // Debug: Log exhaustive request info safely
+        \Illuminate\Support\Facades\Log::info("Extraction debug info", [
+            'content_type' => $request->header('Content-Type'),
+            'has_file_method' => $request->hasFile('file'),
+            'file_details' => $file ? [
+                'name' => $file->getClientOriginalName(),
+                'error' => $file->getError(),
+                'valid' => $file->isValid(),
+            ] : 'no file object',
+        ]);
+
+        if ($file && !$file->isValid()) {
+            $error = $file->getError();
+            $msg = 'The file failed to upload.';
+            if ($error === UPLOAD_ERR_INI_SIZE) {
+                $msg = 'The file exceeds the server limit of 2MB (upload_max_filesize).';
+            }
+            return response()->json(['message' => $msg, 'error_code' => $error], 422);
+        }
+
         $validated = $request->validate([
             'text' => ['sometimes', 'string'],
-            'file' => ['sometimes', 'file', 'mimes:pdf', 'max:5120'],
+            'file' => ['sometimes', 'file', 'mimes:pdf', 'max:2048'], // Reverting to 2MB to match server
         ]);
 
         $apiKey = config('services.openrouter.api_key');
@@ -104,18 +126,54 @@ class ResumeController extends Controller
 
         $text = $request->input('text', '');
 
-        // If file provided, we would parse it here. For now, we'll assume text is passed or use a placeholder.
-        // In a real app, you'd use a PDF parser library.
-        
+        if ($file && $file->isValid()) {
+            $parser = new \Smalot\PdfParser\Parser();
+            
+            try {
+                $pdf = $parser->parseFile($file->getPathname());
+                $pages = $pdf->getPages();
+                
+                // Limit to 5 pages
+                if (count($pages) > 5) {
+                    return response()->json(['message' => 'PDF is too long. Please upload a maximum of 5 pages.'], 422);
+                }
+
+                $extractedText = $pdf->getText();
+                
+                // OCR Fallback if text is empty or too short (likely image-based)
+                if (strlen(trim($extractedText)) < 150) {
+                    try {
+                        $extractedText = $this->performOcr($file->getPathname());
+                    } catch (\Exception $ocrEx) {
+                        // Log OCR failure but don't crash, might have some text anyway
+                        \Illuminate\Support\Facades\Log::error("OCR failed: " . $ocrEx->getMessage());
+                    }
+                }
+
+                if (empty(trim($extractedText))) {
+                   return response()->json(['message' => 'No text could be extracted from this PDF. It might be password protected or purely image-based.'], 422);
+                }
+
+                $text = $extractedText;
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'PDF processing failed: ' . $e->getMessage()], 500);
+            }
+        }
+
+        if (empty(trim($text))) {
+            return response()->json(['message' => 'No text could be found to structure. Please upload a file or paste text.'], 422);
+        }
+
         $systemPrompt = "You are a professional resume architect. Your task is to take raw, messy career information and transform it into a clean, structured, and professional resume in Markdown format. \n\n CRITICAL: Do NOT invent information. Use ONLY what is provided. Organize it logically into: Professional Summary, Experience, Education, and Skills.\n\n Output strictly the Markdown resume.";
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")
+                ->timeout(120) // 2 minutes
                 ->post('https://openrouter.ai/api/v1/chat/completions', [
                     'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
                     'messages' => [
                         ['role' => 'system', 'content' => $systemPrompt],
-                        ['role' => 'user', 'content' => "RAW CAREER INFO:\n" . substr($text, 0, 10000)],
+                        ['role' => 'user', 'content' => "RAW CAREER INFO:\n" . substr($text, 0, 12000)],
                     ],
                 ]);
 
@@ -127,6 +185,33 @@ class ResumeController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'AI error: ' . $e->getMessage()], 500);
         }
+    }
+
+    private function performOcr(string $filePath): string
+    {
+        $tempDir = storage_path('app/temp_ocr_' . uniqid());
+        mkdir($tempDir, 0777, true);
+        
+        $outputBase = $tempDir . '/page';
+        
+        // Convert first 5 pages to images (300 DPI for better OCR)
+        shell_exec("pdftoppm -f 1 -l 5 -png -r 300 " . escapeshellarg($filePath) . " " . escapeshellarg($outputBase));
+        
+        $files = glob($tempDir . '/*.png');
+        $fullText = "";
+        
+        foreach ($files as $file) {
+            $outputFile = $file . '_text';
+            shell_exec("tesseract " . escapeshellarg($file) . " " . escapeshellarg($outputFile) . " -l eng+fra");
+            
+            if (file_exists($outputFile . '.txt')) {
+                $fullText .= file_get_contents($outputFile . '.txt') . "\n";
+            }
+        }
+        
+        shell_exec("rm -rf " . escapeshellarg($tempDir));
+        
+        return $fullText;
     }
 
     public function generateWithAi(Request $request, int $id): JsonResponse
@@ -155,7 +240,7 @@ class ResumeController extends Controller
             $instructions = "Tailor this resume to perfectly match the provided job description. Naturally integrate relevant keywords, move the most relevant experience to the top, and trim irrelevant information.";
         }
 
-        $systemPrompt = "You are an expert career coach and professional resume writer. Your task is to architect a perfect resume. \n\n CRITICAL CONSTRAINT: You may ONLY use information explicitly present in the provided source material. Do NOT invent, infer, or add any content that is not already there (certifications, skills, projects, etc.). Your job is to reframe and reorganize what is already there.\n\n Output strictly the tailored resume in clean Markdown format with no conversational filler.";
+        $systemPrompt = "You are an expert professional resume writer. Your task is to output a perfectly formatted resume in Markdown. \n\n CRITICAL RULES:\n 1. Output ONLY the resume content itself.\n 2. DO NOT include any introductory text, concluding remarks, or 'Notes' about the changes you made.\n 3. DO NOT include any commentary like 'This resume highlights...' or 'I have optimized...'.\n 4. You may ONLY use information explicitly present in the provided source material.\n 5. Output strictly valid Markdown.";
 
         $userPrompt = "SOURCE MATERIAL:\n{$baseContent}\n\n";
         
@@ -167,6 +252,7 @@ class ResumeController extends Controller
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")
+                ->timeout(120) // 2 minutes
                 ->post('https://openrouter.ai/api/v1/chat/completions', [
                     'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
                     'messages' => [

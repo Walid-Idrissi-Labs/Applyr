@@ -564,10 +564,10 @@ export default function ApplicationDetailPage() {
                 </div>
                 <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                   {[...app.resumes].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).map((r, i) => (
-                    <button 
+                    <div 
                       key={r.id}
                       onClick={() => navigate(`/resumes/${r.id}/preview`)}
-                      className="w-full text-left p-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#111] rounded-xl hover:translate-x-1 hover:-translate-y-0.5 transition-all flex items-center justify-between group shadow-[3px_3px_0px_0px_rgba(17,17,17,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.05)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+                      className="w-full text-left p-2.5 bg-white dark:bg-[#1a1a1a] border-2 border-[#111] rounded-xl hover:translate-x-1 hover:-translate-y-0.5 transition-all flex items-center justify-between group shadow-[3px_3px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] cursor-pointer"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <div className="p-1.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 rounded-lg">
@@ -581,10 +581,10 @@ export default function ApplicationDetailPage() {
                           <div className="text-[9px] text-gray-400 font-bold uppercase">{LANGUAGES.find(l => l.value === r.language)?.label || r.language} • {new Date(r.created_at).toLocaleDateString()}</div>
                         </div>
                       </div>
-                      <div className="p-1 rounded-md group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
+                      <div className="p-1 rounded-md group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors" onClick={(e) => e.stopPropagation()}>
                         <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-purple-500" />
                       </div>
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>

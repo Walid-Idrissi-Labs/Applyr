@@ -35,6 +35,7 @@ HTML Content:
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")
+                ->timeout(60)
                 ->post('https://openrouter.ai/api/v1/chat/completions', [
                     'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
                     'messages' => [

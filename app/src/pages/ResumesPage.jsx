@@ -21,6 +21,9 @@ export default function ResumesPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState('');
+  const [extractSuccess, setExtractSuccess] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(''); // 'idle', 'saving', 'saved', 'error'
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
   const navigate = useNavigate();
 
@@ -62,6 +65,7 @@ export default function ResumesPage() {
 
   const handleSaveGlobalCV = async () => {
     setSaving(true);
+    setSaveStatus('saving');
     try {
       const global = resumes.find(res => res.application_id === null);
       if (global) {
@@ -69,10 +73,12 @@ export default function ResumesPage() {
       } else {
         await resumesAPI.create({ content: globalContent, language: 'en', application_id: null });
       }
-      alert('Global Base Resume saved!');
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
       loadData();
     } catch (e) {
-      alert('Error saving global resume.');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
       setSaving(false);
     }
@@ -82,20 +88,26 @@ export default function ResumesPage() {
     const file = e.target.files[0];
     if (!file) return;
 
+    setExtractError('');
+    if (file.size > 2 * 1024 * 1024) {
+      setExtractError('File is too large. Maximum size is 2MB (server limit).');
+      return;
+    }
+
     setExtracting(true);
     const formData = new FormData();
     formData.append('file', file);
-    // Since we don't have a robust PDF parser on the backend yet, 
-    // we'll send a hint that we're uploading a file.
-    // For now, I'll pass some mock text to simulate extraction if file parsing fails.
     formData.append('text', "Uploaded file: " + file.name); 
 
     try {
       const res = await resumesAPI.extract(formData);
       setEditContent(res.data.content);
-      alert('AI has successfully extracted and structured your resume info!');
-    } catch (e) {
-      alert('AI extraction failed. Please paste your resume text manually.');
+      setExtractError('');
+      setExtractSuccess(true);
+      setTimeout(() => setExtractSuccess(false), 5000);
+    } catch (err) {
+      setExtractSuccess(false);
+      setExtractError(err.response?.data?.message || 'AI extraction failed. Please try again or paste text manually.');
     } finally {
       setExtracting(false);
     }
@@ -150,10 +162,10 @@ export default function ResumesPage() {
   const globalResume = resumes.find(r => r.application_id === null);
 
   return (
-    <div className="max-w-6xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-8 pb-12">
-      <div className="flex items-center justify-between">
-        <h2 className="text-[22px] font-bold flex items-center gap-2 dark:text-white uppercase tracking-tighter">
-          <FileText className="w-6 h-6 text-purple-600" /> Resume Workspace
+    <div className="max-w-6xl w-full mx-auto h-full flex flex-col transition-colors duration-300 space-y-6 md:space-y-8 pb-12 px-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-[20px] md:text-[22px] font-bold flex items-center gap-2 dark:text-white uppercase tracking-tighter">
+          <FileText className="w-5 h-5 md:w-6 md:h-6 text-purple-600" /> Resume Workspace
         </h2>
       </div>
       
@@ -167,28 +179,28 @@ export default function ResumesPage() {
       ) : (
         <>
           {/* TOP SECTION: Global Base Resume */}
-          <div className="neu-card p-6 bg-white dark:bg-[#111] overflow-hidden">
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="md:w-1/3 space-y-4">
+          <div className="neu-card p-4 md:p-6 bg-white dark:bg-[#111]">
+            <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+              <div className="lg:w-1/3 space-y-4">
                 <div className="flex justify-between items-center border-b-2 border-gray-100 dark:border-gray-800 pb-3">
-                  <h3 className="font-bold text-[16px] dark:text-white flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-500" /> Global Base Resume
+                  <h3 className="font-bold text-[15px] md:text-[16px] dark:text-white flex items-center gap-2">
+                    <FileText className="w-4 h-4 md:w-5 md:h-5 text-blue-500" /> Global Base Resume
                   </h3>
                 </div>
-                <p className="text-[12px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                <p className="text-[11px] md:text-[12px] text-gray-500 dark:text-gray-400 leading-relaxed">
                   This is your master profile. All tailored resumes are built using this content as the primary source. Keep it updated with your latest achievements.
                 </p>
-                <div className="space-y-3 pt-2">
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 pt-2">
                   <button 
                     onClick={() => { setEditContent(globalContent); setShowEditModal(true); }}
-                    className="w-full neu-btn py-3 !bg-[#111] dark:!bg-white !text-white dark:!text-[#111] font-bold text-[13px] flex items-center justify-center gap-2"
+                    className="neu-btn py-2.5 md:py-3 !bg-[#111] dark:!bg-white !text-white dark:!text-[#111] font-bold text-[12px] md:text-[13px] flex items-center justify-center gap-2 flex-1"
                   >
-                    <Edit2 className="w-4 h-4" /> Edit Master Profile
+                    <Edit2 className="w-4 h-4" /> Edit Profile
                   </button>
                   {globalResume && (
                     <button 
                       onClick={() => navigate(`/resumes/${globalResume.id}/preview`)}
-                      className="w-full neu-btn-outline py-3 font-bold text-[13px] flex items-center justify-center gap-2"
+                      className="neu-btn-outline py-2.5 md:py-3 font-bold text-[12px] md:text-[13px] flex items-center justify-center gap-2 flex-1"
                     >
                       <Eye className="w-4 h-4" /> Full Preview
                     </button>
@@ -196,11 +208,11 @@ export default function ResumesPage() {
                 </div>
               </div>
               
-              <div className="md:w-2/3 flex flex-col h-full min-h-[250px]">
+              <div className="lg:w-2/3 flex flex-col h-full min-h-[300px]">
                 <div className="flex justify-between items-center mb-2 px-1">
-                   <label className="font-bold text-[10px] uppercase text-gray-400 tracking-widest">Master Profile Preview</label>
+                   <label className="font-bold text-[9px] md:text-[10px] uppercase text-gray-400 tracking-widest">Master Profile Preview</label>
                 </div>
-                <div className="w-full h-64 border-2 border-[#111] dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-[#0a0a0a] overflow-y-auto custom-scrollbar prose dark:prose-invert prose-sm max-w-none shadow-inner">
+                <div className="w-full h-48 md:h-72 border-2 border-[#111] dark:border-gray-700 rounded-xl p-4 md:p-6 bg-gray-50 dark:bg-[#0a0a0a] overflow-y-auto custom-scrollbar prose dark:prose-invert prose-xs md:prose-sm max-w-none shadow-inner">
                   {globalContent ? (
                     <ReactMarkdown>{globalContent}</ReactMarkdown>
                   ) : (
@@ -213,25 +225,25 @@ export default function ResumesPage() {
 
           {/* BOTTOM SECTION: Tailored Resumes Grouped by Job */}
           <div className="space-y-6">
-            <h3 className="font-bold text-[14px] text-gray-500 dark:text-gray-400 uppercase tracking-[2px] px-1">Tailored Drafts by Application</h3>
+            <h3 className="font-bold text-[13px] md:text-[14px] text-gray-500 dark:text-gray-400 uppercase tracking-[2px] px-1">Tailored Drafts by Application</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {sortedGroups.map((group) => (
                 <div key={group.application.id} className="neu-card flex flex-col bg-white dark:bg-[#111] overflow-hidden group">
                   <div 
                     onClick={() => navigate(`/applications/${group.application.id}`)}
-                    className="p-4 border-b-2 border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a] flex justify-between items-center cursor-pointer group/header"
+                    className="p-3 md:p-4 border-b-2 border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a] flex justify-between items-center cursor-pointer group/header"
                   >
                     <div className="min-w-0">
-                      <div className="font-bold text-[14px] dark:text-white truncate uppercase tracking-tight group-hover/header:text-purple-600 transition-colors">{group.application.company_name}</div>
-                      <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate font-bold">{group.application.position}</div>
+                      <div className="font-bold text-[13px] md:text-[14px] dark:text-white truncate uppercase tracking-tight group-hover/header:text-purple-600 transition-colors">{group.application.company_name}</div>
+                      <div className="text-[10px] md:text-[11px] text-gray-500 dark:text-gray-400 truncate font-bold">{group.application.position}</div>
                     </div>
-                    <div className="p-1.5 rounded-md text-gray-400 group-hover/header:text-purple-600 transition-colors">
+                    <div className="p-1 md:p-1.5 rounded-md text-gray-400 group-hover/header:text-purple-600 transition-colors">
                       <Briefcase className="w-4 h-4" />
                     </div>
                   </div>
 
-                  <div className="flex-1 p-3 space-y-2 max-h-[280px] overflow-y-auto custom-scrollbar">
+                  <div className="flex-1 p-2 md:p-3 space-y-2 max-h-[250px] md:max-h-[280px] overflow-y-auto custom-scrollbar">
                     {group.resumes.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).map((r, i) => (
                       <div 
                         key={r.id} 
@@ -239,56 +251,56 @@ export default function ResumesPage() {
                         className="p-3 bg-white dark:bg-[#0a0a0a] border-2 border-gray-100 dark:border-gray-800 rounded-xl hover:border-purple-200 dark:hover:border-purple-900 transition-all flex items-center justify-between group/item shadow-sm cursor-pointer"
                       >
                         <div className="min-w-0 flex items-center gap-3">
-                          <div className="w-8 h-8 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center border border-purple-100 dark:border-purple-800 shrink-0">
-                            <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">V{group.resumes.length - i}</span>
+                          <div className="w-7 h-7 md:w-8 md:h-8 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center border border-purple-100 dark:border-purple-800 shrink-0">
+                            <span className="text-[9px] md:text-[10px] font-bold text-purple-600 dark:text-purple-400">V{group.resumes.length - i}</span>
                           </div>
                           <div className="truncate">
-                            <div className="text-[11px] font-bold dark:text-white flex items-center gap-2">
+                            <div className="text-[10px] md:text-[11px] font-bold dark:text-white flex items-center gap-2">
                               {LANGUAGES.find(l => l.value === r.language)?.label || r.language}
-                              {r.is_finalized && <div className="w-2 h-2 rounded-full bg-green-500" title="Finalized" />}
+                              {r.is_finalized && <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500" title="Finalized" />}
                             </div>
-                            <div className="text-[9px] text-gray-400 font-bold flex items-center gap-1">
-                              <Clock className="w-2.5 h-2.5" /> {new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            <div className="text-[8px] md:text-[9px] text-gray-400 font-bold flex items-center gap-1">
+                              <Clock className="w-2 md:w-2.5 h-2 md:h-2.5" /> {new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                           <button 
                             onClick={() => navigate(`/resumes/${r.id}/preview?from=resumes`)}
-                            className="p-1.5 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-md text-gray-400 hover:text-purple-600 transition-colors"
+                            className="p-1 md:p-1.5 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-md text-gray-400 hover:text-purple-600 transition-colors"
                             title="Preview"
                           >
-                            <Eye className="w-3.5 h-3.5" />
+                            <Eye className="w-3 md:w-3.5 h-3 md:h-3.5" />
                           </button>
                           <button 
                             onClick={() => handleExport(r.id)}
-                            className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md text-gray-400 hover:text-blue-600 transition-colors"
+                            className="p-1 md:p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md text-gray-400 hover:text-blue-600 transition-colors"
                             title="Download PDF"
                           >
-                            <Download className="w-3.5 h-3.5" />
+                            <Download className="w-3 md:w-3.5 h-3 md:h-3.5" />
                           </button>
                           <button 
                             onClick={() => handleDelete(r.id)}
-                            className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md text-gray-400 hover:text-red-600 transition-colors"
+                            className="p-1 md:p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md text-gray-400 hover:text-red-600 transition-colors"
                             title="Delete"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3 md:w-3.5 h-3 md:h-3.5" />
                           </button>
                         </div>
                       </div>
                     ))}
                   </div>
                   
-                  <div className="p-3 bg-gray-50/50 dark:bg-[#1a1a1a]/50 border-t-2 border-dashed border-gray-100 dark:border-gray-800">
-                    <div className="text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest">{group.resumes.length} VERSIONS CREATED</div>
+                  <div className="p-2 md:p-3 bg-gray-50/50 dark:bg-[#1a1a1a]/50 border-t-2 border-dashed border-gray-100 dark:border-gray-800">
+                    <div className="text-[9px] md:text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest">{group.resumes.length} VERSIONS</div>
                   </div>
                 </div>
               ))}
 
               {sortedGroups.length === 0 && (
-                <div className="col-span-full py-12 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
-                   <Briefcase className="w-12 h-12 text-gray-200 dark:text-gray-800 mx-auto mb-4" />
-                   <p className="font-bold text-gray-400">No tailored resumes yet. Start architecting from a job application!</p>
+                <div className="col-span-full py-8 md:py-12 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
+                   <Briefcase className="w-10 h-10 md:w-12 md:h-12 text-gray-200 dark:text-gray-800 mx-auto mb-4" />
+                   <p className="font-bold text-gray-400 text-[12px] md:text-[14px]">No tailored resumes yet. Start architecting from a job application!</p>
                 </div>
               )}
             </div>
@@ -312,7 +324,20 @@ export default function ResumesPage() {
                       <h4 className="font-bold text-[12px] dark:text-white flex items-center gap-2 mb-2 uppercase tracking-wider text-blue-600">
                         <Upload className="w-4 h-4" /> Smart Import
                       </h4>
-                      <p className="text-[10px] text-gray-500 mb-4 leading-tight">Upload your latest PDF resume. Our AI will extract the info and update the text below automatically.</p>
+                      <p className="text-[10px] text-gray-500 mb-4 leading-tight">Upload your latest PDF resume (max 2MB). Our AI will extract the info and update the text below automatically.</p>
+                      
+                      {extractError && (
+                        <div className="mb-4 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg text-[10px] text-red-600 dark:text-red-400 font-bold animate-pulse">
+                          {extractError}
+                        </div>
+                      )}
+
+                      {extractSuccess && (
+                        <div className="mb-4 p-2 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg text-[10px] text-green-600 dark:text-green-400 font-bold">
+                          ✨ AI successfully extracted your profile!
+                        </div>
+                      )}
+
                       <button 
                         onClick={() => document.getElementById('modal-pdf-upload').click()} 
                         disabled={extracting}
@@ -362,9 +387,11 @@ export default function ResumesPage() {
                     }
                     setGlobalContent(editContent);
                     setShowEditModal(false);
+                    setSaveStatus('saved');
+                    setTimeout(() => setSaveStatus('idle'), 3000);
                     loadData();
                   } catch (e) {
-                    alert('Error saving master profile.');
+                    setExtractError('Error saving master profile.');
                   } finally {
                     setSaving(false);
                   }

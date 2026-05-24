@@ -50,9 +50,9 @@ export default function ApplicationForm({ application, tags, onSave, onClose }) 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 border-b-2 border-[#111] dark:border-gray-800">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-2xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-5 border-b-2 border-[#111] dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a] rounded-t-2xl">
           <h2 className="font-bold text-[16px] dark:text-white">
             {application ? 'Edit Application' : 'New Application'}
           </h2>

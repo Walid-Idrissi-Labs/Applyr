@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { resumesAPI } from '../api';
 import ReactMarkdown from 'react-markdown';
@@ -41,10 +41,15 @@ export default function ResumePreviewPage() {
   const [loadingMsg, setLoadingMsg] = useState('');
   const [newResumeId, setNewResumeId] = useState(null);
 
+  const containerRef = useRef(null);
+  const [pageCount, setPageCount] = useState(1);
+
   // Global Edit States
   const [showEditModal, setShowEditModal] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState('');
+  const [extractSuccess, setExtractSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const isAutoPrint = searchParams.get('print') === 'true';
@@ -63,6 +68,26 @@ export default function ResumePreviewPage() {
   useEffect(() => {
     loadResume();
   }, [id]);
+
+  useEffect(() => {
+    if (!containerRef.current || loading) return;
+
+    const updatePageCount = () => {
+      const heightInPx = containerRef.current.scrollHeight;
+      const mmPerPx = 25.4 / 96; // Standard 96 DPI
+      const heightInMm = heightInPx * mmPerPx;
+      // 297mm (A4) + 15mm (Gap) = 312mm repeat cycle
+      const pages = Math.max(1, Math.ceil(heightInMm / 312));
+      setPageCount(pages);
+    };
+
+    const resizeObserver = new ResizeObserver(updatePageCount);
+    resizeObserver.observe(containerRef.current);
+    
+    updatePageCount(); // Initial call
+
+    return () => resizeObserver.disconnect();
+  }, [resume, loading]);
 
   const loadResume = async () => {
     setLoading(true);
@@ -91,6 +116,13 @@ export default function ResumePreviewPage() {
   const handleGlobalUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    setExtractError('');
+    if (file.size > 2 * 1024 * 1024) {
+      setExtractError('File is too large. Maximum size is 2MB (server limit).');
+      return;
+    }
+
     setExtracting(true);
     const formData = new FormData();
     formData.append('file', file);
@@ -98,8 +130,12 @@ export default function ResumePreviewPage() {
     try {
       const res = await resumesAPI.extract(formData);
       setEditContent(res.data.content);
-    } catch (e) {
-      alert('AI extraction failed.');
+      setExtractError('');
+      setExtractSuccess(true);
+      setTimeout(() => setExtractSuccess(false), 5000);
+    } catch (err) {
+      setExtractSuccess(false);
+      setExtractError(err.response?.data?.message || 'AI extraction failed. Please try again or paste text manually.');
     } finally {
       setExtracting(false);
     }
@@ -295,28 +331,69 @@ export default function ResumePreviewPage() {
         )}
 
         {/* Main Content: Resume Preview */}
-        <section className="flex-1 bg-gray-200 dark:bg-[#050505] p-4 sm:p-10 overflow-y-auto custom-scrollbar flex justify-center print:p-0 print:bg-white">
-          <div className="print-container w-full max-w-[800px] bg-white text-black p-10 sm:p-16 border-2 border-[#111] shadow-[12px_12px_0_0_rgba(17,17,17,1)] dark:shadow-[8px_8px_0_0_rgba(255,255,255,0.03)] print:shadow-none print:border-none print:max-w-full"
-               style={{ fontFamily: "'Times New Roman', Times, serif" }}>
+        <section className="flex-1 bg-gray-200 dark:bg-[#050505] p-4 sm:p-12 md:p-20 overflow-y-auto custom-scrollbar flex justify-center print:p-0 print:bg-white relative">
+          <div className="w-full flex flex-col items-center relative">
             
-            <div className="resume-content text-[11pt] leading-[1.5]">
-              <ReactMarkdown
-                components={{
-                  h1: ({node, ...props}) => <h1 className="text-center font-bold uppercase tracking-[2px] mb-6" style={{ fontSize: '22pt' }} {...props} />,
-                  h2: ({node, ...props}) => <h2 className="font-bold border-b-2 border-black mt-8 mb-4 pb-1 uppercase tracking-wider" style={{ fontSize: '12pt' }} {...props} />,
-                  h3: ({node, ...props}) => <h3 className="font-bold mt-4 mb-2" style={{ fontSize: '11pt' }} {...props} />,
-                  p: ({node, ...props}) => <p className="mb-3" {...props} />,
-                  ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-1" {...props} />,
-                  ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-1" {...props} />,
-                  li: ({node, ...props}) => <li {...props} />,
-                  strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
-                  em: ({node, ...props}) => <em className="italic" {...props} />,
-                  a: ({node, ...props}) => <a className="text-black no-underline" {...props} />
-                }}
-              >
-                {resume.content}
-              </ReactMarkdown>
+            {/* Simulated A4 Pages Container */}
+            <div className="w-full lg:w-[210mm] relative transition-all duration-300 print:lg:w-full">
+              
+              {/* This div creates the visual "sheets" effect using a repeating linear gradient */}
+              <div 
+                   ref={containerRef}
+                   className="print-container w-full bg-white text-black border-2 border-[#111] shadow-[12px_12px_0_0_rgba(17,17,17,1)] dark:shadow-[8px_8px_0_0_rgba(255,255,255,0.03)] print:shadow-none print:border-none box-border relative overflow-hidden"
+                   style={{ 
+                     fontFamily: "'Times New Roman', Times, serif", 
+                     minHeight: '297mm',
+                     height: 'auto',
+                     padding: '20mm 20mm', // Standard professional margins
+                     /* The gradient creates a "gap" every 297mm to simulate separate pages */
+                     backgroundImage: `linear-gradient(to bottom, 
+                        white 0mm, 
+                        white 296.8mm, 
+                        #111 296.8mm, 
+                        #111 297mm, 
+                        transparent 297mm, 
+                        transparent 312mm, 
+                        #111 312mm, 
+                        #111 312.2mm, 
+                        white 312.2mm
+                     )`,
+                     backgroundSize: '100% 312mm', // 297mm page + 15mm gap
+                     backgroundRepeat: 'repeat-y',
+                     backgroundColor: 'white'
+                   }}>
+                
+                <div className="resume-content text-[11pt] leading-[1.6] break-words w-full relative z-10">
+                  <ReactMarkdown
+                    components={{
+                      h1: ({node, ...props}) => <h1 className="text-center font-bold uppercase tracking-[2px] mb-8 break-words" style={{ fontSize: '22pt' }} {...props} />,
+                      h2: ({node, ...props}) => <h2 className="font-bold border-b-2 border-black mt-10 mb-5 pb-1 uppercase tracking-wider break-words w-full" style={{ fontSize: '13pt' }} {...props} />,
+                      h3: ({node, ...props}) => <h3 className="font-bold mt-6 mb-2 break-words" style={{ fontSize: '11pt' }} {...props} />,
+                      p: ({node, ...props}) => <p className="mb-4 break-words whitespace-pre-wrap text-justify" {...props} />,
+                      ul: ({node, ...props}) => <ul className="list-disc pl-8 mb-5 space-y-1.5 break-words" {...props} />,
+                      ol: ({node, ...props}) => <ol className="list-decimal pl-8 mb-5 space-y-1.5 break-words" {...props} />,
+                      li: ({node, ...props}) => <li className="break-words" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-bold break-words" {...props} />,
+                      em: ({node, ...props}) => <em className="italic break-words" {...props} />,
+                      a: ({node, ...props}) => <a className="text-black underline break-all overflow-wrap-anywhere" {...props} />
+                    }}
+                  >
+                    {resume.content}
+                  </ReactMarkdown>
+                </div>
+              </div>
+
+              {/* Floating Page Indicators (Desktop only) - Dynamically rendered based on actual content height */}
+              <div className="absolute -right-24 top-0 h-full flex flex-col print:hidden pointer-events-none select-none">
+                 {Array.from({ length: pageCount }).map((_, i) => (
+                   <div key={i} className="font-bold text-[10px] text-gray-400 dark:text-gray-600 bg-white dark:bg-[#111] border-2 border-current px-2 py-1 rounded-md mb-[292.5mm] flex items-center gap-1 shadow-sm transition-all">
+                     <FileText className="w-3 h-3" /> PAGE {i + 1}
+                   </div>
+                 ))}
+              </div>
             </div>
+            {/* Bottom spacer for comfortable scrolling */}
+            <div className="h-48 w-full print:hidden"></div>
           </div>
         </section>
       </main>
@@ -433,7 +510,20 @@ export default function ResumePreviewPage() {
                       <h4 className="font-bold text-[12px] dark:text-white flex items-center gap-2 mb-2 uppercase tracking-wider text-blue-600">
                         <Upload className="w-4 h-4" /> Smart Import
                       </h4>
-                      <p className="text-[10px] text-gray-500 mb-4 leading-tight">Upload your latest PDF resume. Our AI will extract the info and update the text below automatically.</p>
+                      <p className="text-[10px] text-gray-500 mb-4 leading-tight">Upload your latest PDF resume (max 2MB). Our AI will extract the info and update the text below automatically.</p>
+                      
+                      {extractError && (
+                        <div className="mb-4 p-2 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg text-[10px] text-red-600 dark:text-red-400 font-bold animate-pulse">
+                          {extractError}
+                        </div>
+                      )}
+
+                      {extractSuccess && (
+                        <div className="mb-4 p-2 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg text-[10px] text-green-600 dark:text-green-400 font-bold">
+                          ✨ AI successfully extracted your profile!
+                        </div>
+                      )}
+
                       <button 
                         onClick={() => document.getElementById('preview-pdf-upload').click()} 
                         disabled={extracting}

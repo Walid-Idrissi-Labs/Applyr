@@ -11,7 +11,11 @@ By combining a robust backend, a responsive Single Page Application (SPA), and i
 ### For Users
 - **Application Tracking:** Monitor the status of your job applications from initial submission to final offer. Manage metadata such as company, position, salary range, and URLs.
 - **Task Management:** Create, manage, and check off to-do items linked to specific job applications (e.g., "Send follow-up email", "Prepare for technical interview").
-- **Document & Resume Storage:** Securely upload, store, and manage resumes tailored for different roles. Support for generating hyper-tailored resumes using OpenRouter AI based on your global base resume and specific job descriptions, and exporting them cleanly as PDFs using browser-native printing.
+- **Iterative AI Resume Architect:** A powerful, multi-step workflow to generate and refine hyper-tailored resumes. 
+    - **Smart Import:** Upload a PDF to automatically extract your career history using AI and OCR fallback.
+    - **Collaborative Refinement:** Refine drafts using natural language feedback (e.g., "Make it more technical" or "Translate to French").
+    - **Version History:** Track all iterations of your resume for every job application.
+    - **A4 Workspace:** A professional, multi-page preview that simulates actual A4 sheets for accurate document visualization.
 - **AI Job Extraction:** Automatically pull job descriptions, requirements, and metadata from supported job boards using our dedicated Chrome/Firefox browser extensions.
 - **Smart Notifications:** Stay on top of your application pipeline with an integrated notification center.
 - **Dark Mode Support:** A sleek, fully responsive "neu-card" design system that supports both light and dark themes.
@@ -28,10 +32,10 @@ By combining a robust backend, a responsive Single Page Application (SPA), and i
 Applyr is structured as a monorepo consisting of three main environments:
 
 **Backend (Laravel)**
-- **Framework:** Laravel 11 (PHP 8.2+)
+- **Framework:** Laravel 11/12 (PHP 8.2+)
 - **Database:** MySQL / PostgreSQL / SQLite
 - **Authentication:** Laravel Sanctum (Token-based API auth)
-- **Features:** Eloquent ORM, customized Mailables, API Resources, and protected routing.
+- **Features:** Eloquent ORM, customized Mailables, API Resources, protected routing, and PDF parsing/OCR.
 
 **Frontend (React)**
 - **Framework:** React 19 
@@ -55,6 +59,9 @@ Applyr is structured as a monorepo consisting of three main environments:
 - **PHP** (8.2 or higher)
 - **Composer**
 - **Node.js** (v18 or higher) and **npm**
+- **System Binaries** (for Resume Extraction/OCR):
+  - `pdftotext` / `pdftoppm` (poppler-utils)
+  - `tesseract-ocr` (with eng+fra languages)
 - A local database server (MySQL, PostgreSQL, or SQLite)
 
 ### 1. Backend Setup (Laravel)

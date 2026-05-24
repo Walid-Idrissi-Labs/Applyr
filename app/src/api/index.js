@@ -2,9 +2,6 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 api.interceptors.request.use((config) => {
@@ -12,6 +9,14 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // If sending FormData, let the browser set the Content-Type with boundary
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  } else if (!config.headers['Content-Type']) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+  
   return config;
 });
 
@@ -59,9 +64,7 @@ export const tasksAPI = {
 
 export const documentsAPI = {
   getAll: (applicationId) => api.get(`/applications/${applicationId}/documents`),
-  upload: (applicationId, formData) => api.post(`/applications/${applicationId}/documents`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }),
+  upload: (applicationId, formData) => api.post(`/applications/${applicationId}/documents`, formData),
   download: (applicationId, id) => api.get(`/applications/${applicationId}/documents/${id}/download`, {
     responseType: 'blob',
   }),

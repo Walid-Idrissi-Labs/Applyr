@@ -81,9 +81,11 @@ export default function LandingPage() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && entry.target instanceof HTMLElement) {
-            const target = parseInt(entry.target.getAttribute('data-count') || '0');
+            const target = parseInt(entry.target.getAttribute('data-count') || '0', 10);
+            const prefix = entry.target.getAttribute('data-prefix') || '';
+            const suffixAttr = entry.target.getAttribute('data-suffix');
             const label = entry.target.parentElement?.querySelector('.demo-stat-label')?.textContent;
-            const suffix = label === 'Response' ? '%' : '';
+            const suffix = suffixAttr !== null ? suffixAttr : label === 'Response' ? '%' : '';
             let current = 0;
             const duration = 1200;
             const step = target / (duration / 16);
@@ -93,7 +95,7 @@ export default function LandingPage() {
                 current = target;
                 clearInterval(timer);
               }
-              entry.target.textContent = Math.floor(current) + suffix;
+              entry.target.textContent = `${prefix}${Math.floor(current)}${suffix}`;
             }, 16);
             observer.unobserve(entry.target);
           }
@@ -103,46 +105,6 @@ export default function LandingPage() {
     );
     document.querySelectorAll('.demo-stat-value[data-count]').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
-
-  // Growth badge animation
-  useEffect(() => {
-    const el = document.querySelector('.growth-counter');
-    if (!el) return undefined;
-
-    let timerId;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) return;
-          if (entry.target.dataset.animated === 'true') return;
-          entry.target.dataset.animated = 'true';
-
-          const target = parseInt(entry.target.getAttribute('data-count') || '0', 10);
-          let current = 0;
-          const duration = 5000;
-          const step = target / (duration / 16);
-
-          timerId = window.setInterval(() => {
-            current += step;
-            if (current >= target) {
-              current = target;
-              clearInterval(timerId);
-            }
-            entry.target.textContent = `+${Math.floor(current)}%`;
-          }, 16);
-
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.6 }
-    );
-
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      if (timerId) clearInterval(timerId);
-    };
   }, []);
 
   const toggleFaq = (i) => setActiveFaq((prev) => (prev === i ? null : i));
@@ -1088,6 +1050,121 @@ export default function LandingPage() {
         }
         [data-theme="dark"] .ai-card-inner { border: 1.5px solid var(--border); }
 
+        /* Extension Section */
+        .browser-mockup {
+          background: var(--bg);
+          border: 2px solid var(--border);
+          border-radius: var(--radius);
+          padding: 20px;
+          box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow-color);
+          transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-smooth), border-color var(--transition-smooth);
+        }
+        [data-theme="dark"] .browser-mockup {
+          border: 1.5px solid var(--border);
+          box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+        .browser-mockup:hover {
+          transform: translate(-2px, -2px);
+          box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0 var(--shadow-color);
+        }
+        [data-theme="dark"] .browser-mockup:hover {
+          box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+          border-color: #3a3a3c;
+        }
+        .browser-chrome {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+        .browser-dots { display: flex; gap: 6px; }
+        .browser-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--text-faint);
+          border: 1.5px solid var(--border);
+          opacity: 0.6;
+        }
+        .browser-url {
+          flex: 1;
+          height: 24px;
+          border: 1.5px solid var(--border);
+          border-radius: 6px;
+          background: var(--surface);
+          margin-left: 4px;
+        }
+        .extension-popup {
+          border: 2px solid var(--border);
+          border-radius: var(--radius-sm);
+          padding: 20px;
+          background: var(--surface);
+          transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
+        }
+        [data-theme="dark"] .extension-popup { border: 1.5px solid var(--border); }
+        .popup-header {
+          font-size: 12px;
+          font-weight: 700;
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .popup-badge {
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          font-weight: 700;
+          border: 1.5px solid var(--border);
+          padding: 3px 8px;
+          border-radius: 6px;
+          background: var(--accent-green-bg);
+          color: var(--accent-green);
+          transition: background-color var(--transition-smooth), color var(--transition-smooth), border-color var(--transition-smooth);
+        }
+        .popup-lines {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+        .popup-line {
+          height: 10px;
+          background: var(--border-light);
+          border-radius: 4px;
+          transition: background-color var(--transition-smooth);
+        }
+        .popup-line:nth-child(1) { width: 60%; }
+        .popup-line:nth-child(2) { width: 85%; }
+        .popup-line:nth-child(3) { width: 45%; }
+        .popup-success {
+          padding: 10px;
+          background: var(--accent-green-bg);
+          color: var(--accent-green);
+          font-size: 11px;
+          font-weight: 700;
+          text-align: center;
+          border-radius: 6px;
+          border: 1.5px solid var(--border);
+          letter-spacing: 0.05em;
+          transition: background-color var(--transition-smooth), color var(--transition-smooth), border-color var(--transition-smooth);
+        }
+        .extension-features {
+          list-style: none;
+          margin: 24px 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .extension-features li {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
         /* Animations */
         .reveal {
           opacity: 0;
@@ -1120,9 +1197,10 @@ export default function LandingPage() {
             <a href="#features">Features</a>
             <a href="#workflow">Workflow</a>
             <a href="#insights">Insights</a>
+            <a href="#extension">Extension</a>
             <a href="#faq">FAQ</a>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
             <button
               className="theme-toggle"
               onClick={toggleTheme}
@@ -1315,7 +1393,7 @@ export default function LandingPage() {
         {/* Insights */}
         <section id="insights">
           <div className="insights-grid">
-            <div className="reveal">
+            <div className="reveal insights-left">
               <div className="kicker">Insights</div>
               <h2 className="section-title">Progress you can feel.</h2>
               <p
@@ -1355,8 +1433,10 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div
-                  className="growth-counter"
+                  className="growth-counter demo-stat-value"
                   data-count="100"
+                  data-prefix="+"
+                  data-suffix="%"
                   style={{
                     fontSize: '13px',
                     fontWeight: 800,
@@ -1367,7 +1447,7 @@ export default function LandingPage() {
                     border: '1.5px solid var(--border)',
                   }}
                 >
-                  +0%
+                  0
                 </div>
               </div>
               <div className="chart-bars">
@@ -1471,6 +1551,69 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Browser Extension */}
+        <section id="extension">
+          <div className="ai-section-inner reveal">
+            <div>
+              <div className="kicker">Browser Extension</div>
+              <h2 className="section-title">Capture jobs as you browse.</h2>
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '14px',
+                  color: 'var(--text-muted)',
+                  marginTop: '16px',
+                  lineHeight: '1.6',
+                }}
+              >
+                Add applications directly from LinkedIn, Indeed, and other job boards without switching tabs.
+                One click turns any job post into a tracked application in your pipeline.
+              </p>
+              <ul className="extension-features">
+                <li>
+                  <div className="check">✓</div> Auto-fill company, role, and link
+                </li>
+                <li>
+                  <div className="check">✓</div> Detects job status and source site
+                </li>
+                <li>
+                  <div className="check">✓</div> Syncs instantly with your workspace
+                </li>
+              </ul>
+              <a href="/extension.zip" download className="btn-primary" style={{ marginTop: '8px' }}>
+                Download Extension
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '2px' }}>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </a>
+            </div>
+            <div className="browser-mockup">
+              <div className="browser-chrome">
+                <div className="browser-dots">
+                  <div className="browser-dot" />
+                  <div className="browser-dot" />
+                  <div className="browser-dot" />
+                </div>
+                <div className="browser-url" />
+              </div>
+              <div className="extension-popup">
+                <div className="popup-header">
+                  <span>Applyr Extension</span>
+                  <span className="popup-badge">Active</span>
+                </div>
+                <div className="popup-lines">
+                  <div className="popup-line" />
+                  <div className="popup-line" />
+                  <div className="popup-line" />
+                </div>
+                <div className="popup-success">Added to pipeline ✓</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* What makes us different */}
         <section>
           <div className="section-header reveal">
@@ -1565,7 +1708,7 @@ export default function LandingPage() {
           </div>
           <div className="footer-links">
             <a href="mailto:applyr.app@gmail.com">Contact</a>
-              
+            <a href="/extension.zip" download>Download Extension</a>
           </div>
         </footer>
       </div>

@@ -2,3 +2,5 @@ test-implementations/
 tmp/
 composer.phar
 GEMINI.md
+
+.DS_Store

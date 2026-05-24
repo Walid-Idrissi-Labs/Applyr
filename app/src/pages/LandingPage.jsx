@@ -105,6 +105,46 @@ export default function LandingPage() {
     return () => observer.disconnect();
   }, []);
 
+  // Growth badge animation
+  useEffect(() => {
+    const el = document.querySelector('.growth-counter');
+    if (!el) return undefined;
+
+    let timerId;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) return;
+          if (entry.target.dataset.animated === 'true') return;
+          entry.target.dataset.animated = 'true';
+
+          const target = parseInt(entry.target.getAttribute('data-count') || '0', 10);
+          let current = 0;
+          const duration = 5000;
+          const step = target / (duration / 16);
+
+          timerId = window.setInterval(() => {
+            current += step;
+            if (current >= target) {
+              current = target;
+              clearInterval(timerId);
+            }
+            entry.target.textContent = `+${Math.floor(current)}%`;
+          }, 16);
+
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (timerId) clearInterval(timerId);
+    };
+  }, []);
+
   const toggleFaq = (i) => setActiveFaq((prev) => (prev === i ? null : i));
 
   return (
@@ -145,7 +185,7 @@ export default function LandingPage() {
           --text: #f5f5f5;
           --text-muted: #8a8a8a;
           --text-faint: #525252;
-          --border: #2a2a2c;
+          --border: #2c2c2c;
           --border-light: #1a1a1c;
           --accent: #f5f5f5;
           --shadow-color: rgba(0,0,0,0.5);
@@ -1315,6 +1355,8 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div
+                  className="growth-counter"
+                  data-count="100"
                   style={{
                     fontSize: '13px',
                     fontWeight: 800,
@@ -1325,7 +1367,7 @@ export default function LandingPage() {
                     border: '1.5px solid var(--border)',
                   }}
                 >
-                  +18%
+                  +0%
                 </div>
               </div>
               <div className="chart-bars">
@@ -1363,7 +1405,7 @@ export default function LandingPage() {
                   fontFamily: 'var(--font-sans)',
                 }}
               >
-                Clean visuals keep you focused on what matters.
+                Clean and simple visuals keep you focused on what matters.
               </div>
             </div>
           </div>
@@ -1506,7 +1548,7 @@ export default function LandingPage() {
         <section style={{ paddingTop: '40px' }}>
           <div className="cta-card reveal">
             <div>
-              <h2>Ready to bring calm to your search?</h2>
+              <h2>Ready to bring change to your search?</h2>
               <p>Start free and build momentum with a workspace designed for progress.</p>
             </div>
             <Link to="/login" className="cta-btn">
@@ -1522,8 +1564,6 @@ export default function LandingPage() {
             Applyr
           </div>
           <div className="footer-links">
-            <Link to="#">Privacy</Link>
-            <Link to="#">Security</Link>
             <a href="mailto:applyr.app@gmail.com">Contact</a>
               
           </div>

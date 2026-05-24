@@ -130,7 +130,9 @@ export default function LoginPage() {
       <div className="w-full max-w-sm bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 10 }}>
         <div className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#111] dark:border-gray-800 p-5 text-center shrink-0 flex justify-between items-center">
           <div className="w-8" />
-          <h1 className="font-bold text-[22px] tracking-widest dark:text-white">Applyr</h1>
+          <Link to="/" className="font-bold text-[22px] tracking-widest dark:text-white">
+            Applyr
+          </Link>
           <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 dark:text-white" />}
           </button>

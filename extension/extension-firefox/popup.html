@@ -1,46 +1,156 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="popup.css">
-    <title>Applyr Exporter</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Applyr</title>
+  <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Applyr Exporter</h1>
-        </header>
-        
-        <main>
-            <section class="offer-detected">
-                <h2>Offre détectée :</h2>
-                <div class="offer-card">
-                    <div class="role">Software Engineer</div>
-                    <div class="company">Stripe</div>
-                </div>
-            </section>
+  <div id="app">
+    <!-- ========== LOGIN VIEW ========== -->
+    <div id="login-view" class="view">
+      <button id="theme-toggle-login" class="icon-btn theme-corner" title="Toggle theme">
+        <svg id="moon-icon-login" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="sun-icon-login" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
 
-            <section class="destination">
-                <label for="status">Statut de destination :</label>
-                <div class="select-wrapper">
-                    <select id="status">
-                        <option value="wishlist">Wishlist</option>
-                        <option value="applied">Applied</option>
-                        <option value="interview">Interview</option>
-                    </select>
-                </div>
-            </section>
+      <div class="login-card">
+        <div class="logo-area">
+          <h1>Applyr</h1>
+          <p class="subtitle">Job Application Tracker</p>
+        </div>
 
-            <button class="btn-submit">
-                <span class="sparkle">✨</span> Extraire & Envoyer
-            </button>
-        </main>
+        <form id="login-form" class="form-stack">
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="off" />
+          </div>
 
-        <footer>
-            <p>Connecté en tant que <strong>John Doe</strong></p>
-        </footer>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="off" />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+        </form>
+
+        <p class="login-footer">
+          Don't yet have an account? <a href="#" id="link-register">Create one now</a>
+        </p>
+      </div>
     </div>
-    <script src="popup.js"></script>
+
+    <!-- ========== MAIN VIEW ========== -->
+    <div id="main-view" class="view hidden">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-text">Applyr</span>
+        </div>
+        <div class="header-actions">
+          <button id="theme-toggle" class="icon-btn" title="Toggle theme">
+            <svg id="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg id="sun-icon" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </button>
+          <button id="logout-btn" class="icon-btn" title="Sign out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Stats Row -->
+      <section class="stats-row">
+        <div class="stat-card">
+          <span class="stat-label">TOTAL</span>
+          <span class="stat-value" id="stat-total">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">IN PROGRESS</span>
+          <span class="stat-value" id="stat-progress">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">REJECTIONS</span>
+          <span class="stat-value" id="stat-rejected">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">ACCEPTED</span>
+          <span class="stat-value" id="stat-accepted">0</span>
+        </div>
+      </section>
+
+      <!-- Quick Add Form -->
+      <section class="card form-card">
+        <div class="card-header">
+          <h2>+ New Application</h2>
+        </div>
+
+        <form id="application-form" class="form-grid">
+          <div class="field">
+            <label for="company">Company <span class="required">*</span></label>
+            <input type="text" id="company" placeholder="Google" required />
+          </div>
+
+          <div class="field">
+            <label for="position">Position <span class="required">*</span></label>
+            <input type="text" id="position" placeholder="Software Engineer" required />
+          </div>
+
+          <div class="field">
+            <label for="status">Status</label>
+            <select id="status">
+              <option value="Wishlist">Wishlist</option>
+              <option value="Applied" selected>Applied</option>
+              <option value="Interview">Interview</option>
+              <option value="Technical Test">Technical Test</option>
+              <option value="Offer">Offer</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="applied-date">Applied Date</label>
+            <input type="date" id="applied-date" />
+          </div>
+
+          <div class="field">
+            <label for="link">Link</label>
+            <input type="url" id="link" placeholder="https://..." />
+          </div>
+
+          <div class="field">
+            <label for="source">Source</label>
+            <input type="text" id="source" placeholder="LinkedIn..." />
+          </div>
+
+          <div class="field full-width">
+            <label for="reminder-date">Reminder Date</label>
+            <input type="date" id="reminder-date" />
+          </div>
+
+          <div class="field full-width">
+            <label for="notes">Notes</label>
+            <textarea id="notes" rows="2" placeholder="Interview notes, job description..."></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="tags">Tags</label>
+            <input type="text" id="tags" placeholder="remote, senior, urgent..." />
+          </div>
+
+          <div class="form-actions full-width">
+            <button type="submit" class="btn btn-primary">Create Application</button>
+            <button type="button" id="btn-cancel" class="btn btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="popup.js"></script>
 </body>
 </html>

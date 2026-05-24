@@ -109,6 +109,7 @@ class AdminController extends Controller
         $user = User::findOrFail($id);
 
         $user->update(['is_active' => false]);
+        $user->tokens()->delete();
 
         return response()->json($user);
     }

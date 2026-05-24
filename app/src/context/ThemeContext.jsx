@@ -3,7 +3,9 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [theme, setTheme] = useState(() =>
+    localStorage.getItem('theme') || localStorage.getItem('applyr-theme') || 'light'
+  );
 
   useEffect(() => {
     if (theme === 'dark') {

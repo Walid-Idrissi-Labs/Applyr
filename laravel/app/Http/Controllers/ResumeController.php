@@ -111,7 +111,7 @@ class ResumeController extends Controller
             $error = $file->getError();
             $msg = 'The file failed to upload.';
             if ($error === UPLOAD_ERR_INI_SIZE) {
-                $msg = 'The file exceeds the server limit of 2MB (upload_max_filesize).';
+                $msg = 'The file exceeds 2MB (upload_max_filesize).';
             }
             return response()->json(['message' => $msg, 'error_code' => $error], 422);
         }
@@ -133,9 +133,9 @@ class ResumeController extends Controller
                 $pdf = $parser->parseFile($file->getPathname());
                 $pages = $pdf->getPages();
                 
-                // Limit to 5 pages
-                if (count($pages) > 5) {
-                    return response()->json(['message' => 'PDF is too long. Please upload a maximum of 5 pages.'], 422);
+                // Limit to 4 pages
+                if (count($pages) > 4) {
+                    return response()->json(['message' => 'PDF is too long. Please upload a maximum of 4 pages.'], 422);
                 }
 
                 $extractedText = $pdf->getText();
@@ -151,7 +151,7 @@ class ResumeController extends Controller
                 }
 
                 if (empty(trim($extractedText))) {
-                   return response()->json(['message' => 'No text could be extracted from this PDF. It might be password protected or purely image-based.'], 422);
+                   return response()->json(['message' => 'No text could be extracted from this PDF. (It might be password protected or purely image-based.)'], 422);
                 }
 
                 $text = $extractedText;
@@ -164,7 +164,13 @@ class ResumeController extends Controller
             return response()->json(['message' => 'No text could be found to structure. Please upload a file or paste text.'], 422);
         }
 
-        $systemPrompt = "You are a professional resume architect. Your task is to take raw, messy career information and transform it into a clean, structured, and professional resume in Markdown format. \n\n CRITICAL: Do NOT invent information. Use ONLY what is provided. Organize it logically into: Professional Summary, Experience, Education, and Skills.\n\n Output strictly the Markdown resume.";
+        $systemPrompt = "
+            You are a resume data extraction expert. Extract all information from the uploaded resume exactly as written. Do not rewrite, rephrase, improve, or embellish anything.
+            ## RULES
+                1. **NO INVENTION**: Never guess or fill in missing details.
+                2. **VERBATIM**: Preserve all original wording, order, dates, titles, company names, and metrics exactly as they appear.
+                3. **OUTPUT**: Return ONLY the extracted content in simple  Markdown. No commentary or analysis or.
+            ";
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")
@@ -194,8 +200,8 @@ class ResumeController extends Controller
         
         $outputBase = $tempDir . '/page';
         
-        // Convert first 5 pages to images (300 DPI for better OCR)
-        shell_exec("pdftoppm -f 1 -l 5 -png -r 300 " . escapeshellarg($filePath) . " " . escapeshellarg($outputBase));
+        // Convert first 4 pages to images (300 DPI for better OCR)
+        shell_exec("pdftoppm -f 1 -l 4 -png -r 300 " . escapeshellarg($filePath) . " " . escapeshellarg($outputBase));
         
         $files = glob($tempDir . '/*.png');
         $fullText = "";
@@ -237,10 +243,36 @@ class ResumeController extends Controller
             // Fresh generation from Global Base Resume
             $baseResume = $user->resumes()->whereNull('application_id')->latest()->first();
             $baseContent = $baseResume ? $baseResume->content : 'No base resume provided.';
-            $instructions = "Tailor this resume to perfectly match the provided job description. Naturally integrate relevant keywords, move the most relevant experience to the top, and trim irrelevant information.";
+            $instructions = "
+                You are an expert resume writer and ATS (Applicant Tracking System) optimization specialist with 10+ years of experience in executive recruiting. Your task is to rewrite the provided resume so that it is maximally aligned with the provided job description while remaining 100% factually accurate to the candidate's original information.
+                ## RULES
+                1. **NO HALLUCINATION**: Never invent companies, titles, dates, skills, degrees, or metrics not in the original resume. If a JD requirement has no matching experience, omit it.
+                2. **KEYWORDS**: Extract top keywords from the JD. Integrate them only where they accurately describe existing experience. Use exact JD terminology when applicable. No keyword stuffing.
+                3. **REORDER**: Move the most relevant experience and achievements to the top of each section. Reduce unrelated roles to 1 line max; do not delete them entirely.
+                4. **REFRAME**: Transform generic duties into impact statements using the candidate's real metrics and outcomes. Active voice only.
+                5. **ATS FORMAT**: Use standard headings: Professional Summary, Experience, Education, Skills. No tables, text boxes, or headers/footers. Spell out acronyms at first use.
+                6. **LENGTH**: Keep to 1 page and only go to 2 pages if strictly necessary. Past tense for previous roles, present for current.
+                ## FINAL CHECK
+                Before outputting, verify:
+                1. Every fact exists in the original resume.
+                2. The resume reads like it was written specifically for [Target Job Title from JD].
+                3. A recruiter skimming for 10 seconds would see an obvious match.
+            ";
         }
 
-        $systemPrompt = "You are an expert professional resume writer. Your task is to output a perfectly formatted resume in Markdown. \n\n CRITICAL RULES:\n 1. Output ONLY the resume content itself.\n 2. DO NOT include any introductory text, concluding remarks, or 'Notes' about the changes you made.\n 3. DO NOT include any commentary like 'This resume highlights...' or 'I have optimized...'.\n 4. You may ONLY use information explicitly present in the provided source material.\n 5. Output strictly valid Markdown.";
+        $systemPrompt = "
+            You are an expert resume writer and ATS specialist. Rewrite the provided resume to align with the job description using ONLY information from the original resume.
+            ## RULES
+            1. **NO HALLUCINATION**: Never invent companies, titles, dates, skills, degrees, or metrics. If the candidate lacks a JD requirement, omit it—do not fabricate a fit.
+            2. **KEYWORDS**: Integrate top JD keywords naturally where they accurately describe existing experience. Use exact JD terminology when applicable. No stuffing.
+            3. **REORDER & PRIORITIZE**: Move the most relevant experience and achievements to the top. Trim unrelated bullets to 1 line; do not delete entire roles.
+            4. **REFRAME**: Transform generic duties into impact statements using the candidate's real metrics. Active voice only.
+            5. **ATS FORMAT**: Use standard headings: Professional Summary, Experience, Education, Skills. No tables, text boxes, or headers/footers. Spell out acronyms at first use.
+            6. **TONE & LENGTH**: Professional, confident,pragmatic and concise , no clichés. 1 page very likely, 2 pages max and if strictly necessary. Past tense for previous roles, present for current.
+
+            ## OUTPUT
+            Return ONLY the rewritten resume in clean Markdown with ## section headers and no dividers (---) . No introductory text, no explanations, no commentary, no Notes section.
+            ";
 
         $userPrompt = "SOURCE MATERIAL:\n{$baseContent}\n\n";
         

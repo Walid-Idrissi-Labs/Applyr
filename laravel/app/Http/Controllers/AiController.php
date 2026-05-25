@@ -23,12 +23,12 @@ class AiController extends Controller
         }
 
         $prompt = "Extract job information from the following HTML page content. Return ONLY a valid JSON object with this exact structure (no markdown, no explanation):
-{
-    \"company\": \"Company Name\",
-    \"position\": \"Job Title\",
-    \"description\": \"Job description summary\",
-    \"language\": \"en\"
-}
+            {
+                \"company\": \"Company Name\",
+                \"position\": \"Job Title\",
+                \"description\": \"Job description summary\",
+                \"language\": \"en\"
+            }
 
 HTML Content:
 " . substr($validated['html'], 0, 15000);

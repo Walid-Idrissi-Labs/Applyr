@@ -186,7 +186,7 @@ export default function AppLayout() {
       </aside>
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative p-2 md:p-3 transition-all duration-300">
-        <div className="bg-white dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative z-0 transition-colors">
+        <div className="bg-white dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
           <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-white dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
             <div className="flex items-center gap-4">
               <button

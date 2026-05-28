@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Moon, Sparkles, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function LandingPage() {
@@ -277,6 +277,20 @@ export default function LandingPage() {
         .landing-nav-links a.active { color: var(--text); }
         .landing-nav-links a.active::after { width: 100%; }
 
+        .nav-actions {
+          display: flex;
+          gap: 18px;
+          align-items: center;
+        }
+        .nav-signin {
+          font-size: 13px;
+          color: var(--text-muted);
+          text-decoration: none;
+          font-weight: 500;
+          transition: color 0.2s;
+        }
+        .nav-signin:hover { color: var(--text); }
+
         .nav-cta {
           display: inline-flex;
           align-items: center;
@@ -299,7 +313,7 @@ export default function LandingPage() {
         .nav-cta:active { transform: translate(0, 0); box-shadow: none; transition-duration: 0.05s; }
 
         .theme-toggle {
-          background: var(--surface);
+          background: transparent;
           border: 2px solid var(--border);
           border-radius: var(--radius-sm);
           padding: 8px 12px;
@@ -311,22 +325,14 @@ export default function LandingPage() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-smooth), border-color var(--transition-smooth);
+          transition: background-color var(--transition-smooth), border-color var(--transition-smooth), color var(--transition-smooth);
           user-select: none;
         }
-        .theme-toggle:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--border); }
-        [data-theme="dark"] .theme-toggle:hover { box-shadow: 3px 3px 0 rgba(255,255,255,0.08); }
-        .theme-toggle:active { transform: translate(0); box-shadow: none; }
-
-        .mobile-menu-btn {
-          display: none;
-          background: var(--surface);
-          border: 2px solid var(--border);
-          padding: 8px;
-          border-radius: var(--radius-sm);
-          cursor: pointer;
-          color: var(--text);
-          transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
+        .theme-toggle:hover { background: rgba(0,0,0,0.04); }
+        [data-theme="dark"] .theme-toggle:hover { background: rgba(255,255,255,0.06); }
+        .theme-toggle-icon {
+          width: 16px;
+          height: 16px;
         }
 
         /* Hero */
@@ -1178,15 +1184,21 @@ export default function LandingPage() {
 
         /* Responsive */
         @media (max-width: 900px) {
+          nav { padding: 16px 0; }
+          .lp-container { padding: 0 16px; }
+          .logo { font-size: 15px; padding: 6px 12px; letter-spacing: 0.2em; }
+          .nav-actions { gap: 10px; }
+          .nav-signin { display: none; }
+          .nav-cta { padding: 8px 12px; font-size: 12px; }
+          .theme-toggle { padding: 8px 10px; font-size: 13px; }
+          .theme-toggle span:last-child { display: none; }
           .hero { grid-template-columns: 1fr; }
           .demo-card { transform: none; }
           .grid-3, .testimonial-grid, .insights-grid, .workflow-grid, .faq-grid, .ai-section-inner {
             grid-template-columns: 1fr;
           }
           .landing-nav-links { display: none; }
-          .mobile-menu-btn { display: block; }
           .cta-card { padding: 40px 24px; text-align: center; justify-content: center; }
-          .theme-toggle span { display: none; }
         }
       `}</style>
 
@@ -1200,18 +1212,22 @@ export default function LandingPage() {
             <a href="#extension">Extension</a>
             <a href="#faq">FAQ</a>
           </div>
-          <div style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
+          <div className="nav-actions">
             <button
               className="theme-toggle"
               onClick={toggleTheme}
               aria-label="Toggle dark mode"
             >
-              <span>{theme === 'dark' ? '☀' : '☾'}</span>
-              <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+              {theme === 'dark' ? (
+                <Sun className="theme-toggle-icon" strokeWidth={2.2} />
+              ) : (
+                <Moon className="theme-toggle-icon" strokeWidth={2.2} />
+              )}
+              <span className="theme-toggle-label">{theme === 'dark' ? 'Light' : 'Dark'}</span>
             </button>
             <Link
               to="/login"
-              style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'none', fontWeight: 500 }}
+              className="nav-signin"
             >
               Sign in
             </Link>
@@ -1220,18 +1236,6 @@ export default function LandingPage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <button
-            className="mobile-menu-btn"
-            onClick={() =>
-              document.querySelector('.landing-nav-links')?.classList.toggle('active')
-            }
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M3 12h18" />
-              <path d="M3 6h18" />
-              <path d="M3 18h18" />
-            </svg>
-          </button>
         </div>
       </nav>
 

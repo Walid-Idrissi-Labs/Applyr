@@ -115,6 +115,7 @@ export default function ApplicationDetailPage() {
       position: app.position,
       status: app.status,
       applied_at: app.applied_at ? app.applied_at.slice(0, 10) : '',
+      reminder_date: app.reminder_date ? app.reminder_date.slice(0, 10) : '',
       link: app.link || '',
       source: app.source || '',
       notes: app.notes || '',
@@ -363,6 +364,21 @@ export default function ApplicationDetailPage() {
                         <ExternalLink className="w-4 h-4" /> View Listing
                       </a>
                     ) : <span className="text-gray-400 p-2">No link provided</span>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-bold text-gray-400 dark:text-gray-500 uppercase text-[10px]">Follow-up Date</span>
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      value={editForm.reminder_date}
+                      onChange={(e) => handleEditChange('reminder_date', e.target.value)}
+                      className="neu-input py-1.5"
+                    />
+                  ) : (
+                    <span className="dark:text-gray-300 font-bold p-2">
+                      {app.reminder_date ? new Date(app.reminder_date).toLocaleDateString(undefined, { dateStyle: 'long' }) : 'No reminder set'}
+                    </span>
                   )}
                 </div>
                 <div className="flex flex-col gap-1">

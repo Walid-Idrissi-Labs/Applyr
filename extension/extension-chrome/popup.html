@@ -116,7 +116,15 @@
 
           <div class="field">
             <label for="link">Link</label>
-            <input type="url" id="link" placeholder="https://..." />
+            <div class="input-row">
+              <input type="url" id="link" placeholder="https://..." />
+              <button type="button" id="link-grab" class="input-icon-btn" title="Use current tab URL" aria-label="Use current tab URL">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="17" y1="17" x2="7" y2="7"></line>
+                  <polyline points="7 7 7 13 13 13"></polyline>
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div class="field">

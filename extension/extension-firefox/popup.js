@@ -23,6 +23,7 @@
     sunIconLogin: document.getElementById('sun-icon-login'),
     appForm: document.getElementById('application-form'),
     btnCancel: document.getElementById('btn-cancel'),
+    linkGrab: document.getElementById('link-grab'),
     toast: document.getElementById('toast'),
     stats: {
       total: document.getElementById('stat-total'),
@@ -47,6 +48,51 @@
     els.toast.textContent = message;
     els.toast.classList.remove('hidden');
     setTimeout(() => els.toast.classList.add('hidden'), duration);
+  }
+
+  function getActiveTabUrl() {
+    const query = { active: true, currentWindow: true };
+
+    if (typeof browser !== 'undefined' && browser.tabs && typeof browser.tabs.query === 'function') {
+      return browser.tabs.query(query).then((tabs) => (tabs[0] && tabs[0].url ? tabs[0].url : ''));
+    }
+
+    if (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.query === 'function') {
+      return new Promise((resolve, reject) => {
+        chrome.tabs.query(query, (tabs) => {
+          const error = chrome.runtime && chrome.runtime.lastError;
+          if (error) {
+            reject(new Error(error.message));
+            return;
+          }
+          resolve(tabs && tabs[0] && tabs[0].url ? tabs[0].url : '');
+        });
+      });
+    }
+
+    return Promise.reject(new Error('Tabs API not available'));
+  }
+
+  function maybeSetSourceFromUrl(url) {
+    if (!url) return;
+    if (els.inputs.source.value.trim()) return;
+    if (url.toLowerCase().includes('linkedin')) {
+      els.inputs.source.value = 'LinkedIn';
+    }
+  }
+
+  async function handleUseCurrentUrl() {
+    try {
+      const url = await getActiveTabUrl();
+      if (!url) {
+        showToast('No active tab URL found');
+        return;
+      }
+      els.inputs.link.value = url;
+      maybeSetSourceFromUrl(url);
+    } catch (error) {
+      showToast(error.message || 'Unable to read current tab URL');
+    }
   }
 
   function loadAuth() {
@@ -280,6 +326,9 @@
     els.logoutBtn.addEventListener('click', handleLogout);
     els.themeToggle.addEventListener('click', toggleTheme);
     els.themeToggleLogin.addEventListener('click', toggleTheme);
+    if (els.linkGrab) {
+      els.linkGrab.addEventListener('click', handleUseCurrentUrl);
+    }
     els.appForm.addEventListener('submit', handleAddApplication);
     els.btnCancel.addEventListener('click', resetForm);
   }

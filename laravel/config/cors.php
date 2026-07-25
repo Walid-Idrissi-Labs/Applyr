@@ -5,7 +5,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'http://localhost:3000', 'https://*.vercel.app'],
+    'allowed_origins' => ['http://localhost:5173', 'http://localhost:3000', 'https://applyr.walid-idrissi-labs.workers.dev'],
 
     //* : in dev env works fine without it
     //TODO : in case prod breaks api requests from the extension, it'd be because of CORS breaking, we'd then need to add this

@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -50,6 +51,7 @@ class AuthController extends Controller
             ));
         } catch (\Throwable $e) {
             // Email failure should not break registration
+            Log::error('Failed to queue welcome email', ['user_id' => $user->id, 'error' => $e->getMessage()]);
         }
 
         $this->dispatchEmailVerification($user);
@@ -228,6 +230,7 @@ class AuthController extends Controller
                 ));
             } catch (\Throwable $e) {
                 // Email failure should not reveal account status
+                Log::error('Failed to queue password reset email', ['user_id' => $user->id, 'error' => $e->getMessage()]);
             }
         }
 
@@ -294,6 +297,7 @@ class AuthController extends Controller
             ));
         } catch (\Throwable $e) {
             // Email failure should not break verification flow
+            Log::error('Failed to queue verification email', ['user_id' => $user->id, 'error' => $e->getMessage()]);
         }
     }
 }

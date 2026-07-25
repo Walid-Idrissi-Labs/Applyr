@@ -116,7 +116,17 @@ export default function LoginPage() {
       }
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Authentication failed');
+      if (!err.response) {
+        // Timeout or network failure: the request may still have gone through,
+        // so don't imply the credentials were rejected.
+        setError(
+          err.code === 'ECONNABORTED'
+            ? 'The server took too long to respond. Please try signing in — your account may already have been created.'
+            : 'Could not reach the server. Please check your connection and try again.'
+        );
+      } else {
+        setError(err.response?.data?.message || err.response?.data?.error || 'Authentication failed');
+      }
     } finally {
       setLoading(false);
     }

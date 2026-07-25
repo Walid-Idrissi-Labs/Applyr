@@ -8,6 +8,7 @@ use App\Models\AiLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -38,6 +39,7 @@ class AdminController extends Controller
             Mail::to($user->email)->send(new UserCreatedByAdmin($user, $plainPassword));
         } catch (\Exception $e) {
             // Ignore mail errors for local testing if mailer is not configured
+            Log::error('Failed to queue user-created email', ['user_id' => $user->id, 'error' => $e->getMessage()]);
         }
 
         return response()->json($user, 201);

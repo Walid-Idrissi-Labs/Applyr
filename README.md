@@ -7,7 +7,7 @@ Applyr is a job application tracking SaaS with a Laravel API backend and a React
 ## Tech Stack
 
 ### Backend
-- **Framework:** Laravel 13 (PHP 8.3+)
+- **Framework:** Laravel 13 (PHP 8.4+)
 - **Database:** SQLite (local) / PostgreSQL (production)
 - **Authentication:** Laravel Sanctum (token-based API auth)
 - **PDF:** DomPDF (generation), Smalot/PdfParser + Tesseract OCR (extraction)

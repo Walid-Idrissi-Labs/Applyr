@@ -17,7 +17,7 @@ class SendReminders extends Command
     public function handle(): int
     {
         $today = now()->toDateString();
-        $appUrl = config('app.url') . '/login';
+        $appUrl = config('app.frontend_url') . '/login';
 
         $applications = Application::with('user')
             ->whereNotNull('reminder_date')

@@ -32,6 +32,7 @@ RUN composer dump-autoload --optimize \
     && chmod -R 775 storage bootstrap/cache
 
 COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+COPY docker/fpm-listen.conf /usr/local/etc/php-fpm.d/zz-listen.conf
 COPY docker/nginx.conf.template /etc/nginx/conf.d/default.conf.template
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /entrypoint.sh

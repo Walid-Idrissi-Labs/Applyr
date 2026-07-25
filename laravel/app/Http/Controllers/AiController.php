@@ -6,14 +6,17 @@ use App\Models\AiLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AiController extends Controller
 {
     public function extractJob(Request $request): JsonResponse
     {
+        // Only the first 15k chars are ever sent upstream, so cap the accepted
+        // payload well below that headroom instead of buffering megabytes.
         $validated = $request->validate([
-            'html' => ['required', 'string'],
-            'url' => ['nullable', 'url'],
+            'html' => ['required', 'string', 'max:100000'],
+            'url' => ['nullable', 'url', 'max:2048'],
         ]);
 
         $apiKey = config('services.openrouter.api_key');
@@ -44,7 +47,15 @@ HTML Content:
                 ]);
 
             if ($response->failed()) {
-                return response()->json(['message' => 'AI service error', 'error' => $response->body()], 500);
+                // Keep the upstream body in the logs, not in the HTTP response:
+                // it can echo provider details back to the caller.
+                Log::warning('OpenRouter job extraction failed', [
+                    'user_id' => $request->user()->id,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return response()->json(['message' => 'AI service error'], 502);
             }
 
             $data = $response->json();
@@ -58,6 +69,19 @@ HTML Content:
 
             $extracted = json_decode($content, true);
 
+            // Log every completed call, not just the ones that parsed cleanly —
+            // the credits are spent either way and this is the audit trail the
+            // admin AI-log screen reads.
+            AiLog::create([
+                'user_id' => $request->user()->id,
+                'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
+                'tokens_used' => $data['usage']['total_tokens'] ?? 0,
+                'purpose' => 'job_extraction',
+                'prompt' => $prompt,
+                'response' => $content,
+                'created_at' => now(),
+            ]);
+
             if (json_last_error() !== JSON_ERROR_NONE) {
                 return response()->json([
                     'company' => '',
@@ -67,21 +91,14 @@ HTML Content:
                 ]);
             }
 
-            if ($request->user()) {
-                AiLog::create([
-                    'user_id' => $request->user()->id,
-                    'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
-                    'tokens_used' => $data['usage']['total_tokens'] ?? 0,
-                    'purpose' => 'job_extraction',
-                    'prompt' => $prompt,
-                    'response' => $content,
-                    'created_at' => now(),
-                ]);
-            }
-
             return response()->json($extracted);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'AI error: ' . $e->getMessage()], 500);
+            Log::error('AI job extraction threw', [
+                'user_id' => $request->user()->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return response()->json(['message' => 'AI request failed. Please try again.'], 500);
         }
     }
 }

@@ -2,5 +2,8 @@ test-implementations/
 tmp/
 composer.phar
 GEMINI.md
+CLAUDE.md
+.claude
+**/*.sql
 
-*.DS_Store
+**/*.DS_Store

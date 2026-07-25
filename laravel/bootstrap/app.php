@@ -13,7 +13,21 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // The rate limiters key off $request->ip(). Behind a load balancer or
+        // Cloudflare that would be the proxy's IP for everyone, so set
+        // TRUSTED_PROXIES in production (comma separated, or * if the app is
+        // only reachable through the proxy). Left unset, IPs come straight from
+        // REMOTE_ADDR, which is correct for a same-host nginx/php-fpm setup.
+        if ($proxies = env('TRUSTED_PROXIES')) {
+            $middleware->trustProxies(
+                at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies))
+            );
+        }
+
         $middleware->statefulApi();
+        // Laravel no longer throttles the api group by default; the 'api'
+        // limiter is defined in AppServiceProvider.
+        $middleware->throttleApi();
         $middleware->appendToGroup('api', \App\Http\Middleware\EnsureUserIsActive::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

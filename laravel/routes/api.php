@@ -12,15 +12,14 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AiController;
 use App\Http\Controllers\ReminderController;
 
-// Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
-
-// AI extraction (public for browser extension)
-Route::post('/ai/extract-job', [AiController::class, 'extractJob']);
+// Public routes (throttled: these are the brute-force / mail-bomb surface)
+Route::middleware('throttle:auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
+});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -29,7 +28,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::put('/password', [AuthController::class, 'changePassword']);
-    Route::post('/email/verification', [AuthController::class, 'sendEmailVerification']);
+    Route::post('/email/verification', [AuthController::class, 'sendEmailVerification'])
+        ->middleware('throttle:auth');
+
+    // AI — every one of these spends OpenRouter credits, so they carry the
+    // tighter 'ai' limiter on top of authentication.
+    Route::middleware('throttle:ai')->group(function () {
+        Route::post('/ai/extract-job', [AiController::class, 'extractJob']);
+        Route::post('/resumes/extract', [ResumeController::class, 'extract']);
+        Route::post('/resumes/{id}/generate', [ResumeController::class, 'generateWithAi']);
+    });
 
     // Applications
     Route::get('/applications', [ApplicationController::class, 'index']);
@@ -73,8 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/resumes/{id}', [ResumeController::class, 'update']);
     Route::delete('/resumes/{id}', [ResumeController::class, 'destroy']);
     Route::get('/resumes/{id}/export-pdf', [ResumeController::class, 'exportPdf']);
-    Route::post('/resumes/extract', [ResumeController::class, 'extract']);
-    Route::post('/resumes/{id}/generate', [ResumeController::class, 'generateWithAi']);
+    // /resumes/extract and /resumes/{id}/generate are registered above under
+    // the throttle:ai group.
 
     // Admin
     Route::prefix('admin')->group(function () {

@@ -4,6 +4,17 @@ Applyr is a job application tracking SaaS with a Laravel API backend and a React
 
 ---
 
+## Screenshots
+
+| | |
+|---|---|
+| **Landing page** ![Landing page](screenshots/landing.png) | **Dashboard** ![Dashboard](screenshots/dashboard.png) |
+| **Dashboard (dark mode)** ![Dashboard dark mode](screenshots/dashboard-dark.png) | **Applications** ![Applications](screenshots/applications.png) |
+| **Application detail** ![Application detail](screenshots/application-detail.png) | **Resume workspace** ![Resume workspace](screenshots/resume-workspace.png) |
+| **Resume PDF preview** ![Resume PDF preview](screenshots/resume-preview.png) | **Browser extension** ![Browser extension](screenshots/browser-extension.png) |
+
+---
+
 ## Tech Stack
 
 ### Backend

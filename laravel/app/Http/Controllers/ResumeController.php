@@ -87,7 +87,7 @@ class ResumeController extends Controller
         Storage::disk('public')->put($path, $pdf->output());
 
         return response()->json([
-            'url' => Storage::url($path),
+            'url' => Storage::disk('public')->temporaryUrl($path, now()->addMinutes(5)),
             'filename' => $filename,
         ]);
     }

@@ -4,32 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify your Applyr email</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
     <style>
-        body { font-family: ui-monospace, monospace; font-size: 13px; color: #111; background: #f4f4f4; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: #fff; border: 2px solid #111; border-radius: 8px; overflow: hidden; }
-        .header { background: #111; color: #fff; padding: 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 18px; letter-spacing: 4px; }
-        .body { padding: 24px; }
-        .btn { display: inline-block; background: #111; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 12px 4px 0 0; }
-        .muted { color: #666; font-size: 11px; margin-top: 10px; }
-        .footer { padding: 16px 24px; border-top: 1px solid #eee; font-size: 11px; color: #888; text-align: center; }
+        @media (max-width: 600px) {
+            .apr-wrap { width: 100% !important; }
+            .apr-pad { padding-left: 20px !important; padding-right: 20px !important; }
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>APPLYR</h1>
-        </div>
-        <div class="body">
-            <p>Hi <strong>{{ $userName }}</strong>,</p>
-            <p>Please verify your email to receive reminders and updates from Applyr.</p>
-            <a href="{{ $verifyUrl }}" class="btn">Verify Email</a>
-            <p class="muted">This link expires in {{ $expireMinutes }} minutes.</p>
-            <p>If you did not create an Applyr account, you can safely ignore this email.</p>
-        </div>
-        <div class="footer">
-            (c) {{ date('Y') }} Applyr - Job Application Tracker
-        </div>
-    </div>
+<body style="margin:0; padding:0; background-color:#f2efe7;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f2efe7;">
+        <tr>
+            <td align="center" style="padding:40px 16px;">
+                <table role="presentation" class="apr-wrap" width="560" cellpadding="0" cellspacing="0" style="width:560px; max-width:100%; background-color:#ffffff; border:2px solid #111111; border-radius:16px; box-shadow:6px 6px 0px 0px rgba(17,17,17,1);">
+
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" style="background-color:#111111; border-radius:13px 13px 0 0; padding:22px 24px;">
+                            <span style="font-family:'Space Grotesk','Segoe UI',Helvetica,Arial,sans-serif; font-size:18px; font-weight:700; letter-spacing:6px; color:#ffffff;">APPLYR</span>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td class="apr-pad" style="padding:36px 40px 8px 40px; font-family:'IBM Plex Sans',Helvetica,Arial,sans-serif;">
+                            <span style="display:inline-block; font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0f766e;">&#9632;&nbsp; Email verification</span>
+                            <h1 style="margin:12px 0 0 0; font-family:'Space Grotesk','Segoe UI',Helvetica,Arial,sans-serif; font-size:22px; line-height:1.3; color:#111111;">Confirm your email address</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="apr-pad" style="padding:12px 40px 0 40px; font-family:'IBM Plex Sans',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#333333;">
+                            <p style="margin:0 0 16px 0;">Hi {{ $userName }},</p>
+                            <p style="margin:0 0 24px 0;">Verify this address to start receiving application reminders and status updates from Applyr.</p>
+                        </td>
+                    </tr>
+
+                    <!-- CTA -->
+                    <tr>
+                        <td class="apr-pad" align="left" style="padding:0 40px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="background-color:#111111; border-radius:8px;">
+                                        <a href="{{ $verifyUrl }}" target="_blank" style="display:inline-block; padding:13px 28px; font-family:'IBM Plex Sans',Helvetica,Arial,sans-serif; font-size:14px; font-weight:600; color:#ffffff; text-decoration:none;">Verify email &rarr;</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Fallback link + expiry -->
+                    <tr>
+                        <td class="apr-pad" style="padding:24px 40px 0 40px; font-family:'IBM Plex Sans',Helvetica,Arial,sans-serif; font-size:12px; line-height:1.6; color:#8a8a8a;">
+                            <p style="margin:0 0 6px 0;">Or paste this link into your browser:</p>
+                            <p style="margin:0 0 16px 0; word-break:break-all;"><a href="{{ $verifyUrl }}" style="color:#0f766e;">{{ $verifyUrl }}</a></p>
+                            <p style="margin:0;">This link expires in {{ $expireMinutes }} minutes.</p>
+                        </td>
+                    </tr>
+
+                    <!-- Divider -->
+                    <tr>
+                        <td class="apr-pad" style="padding:28px 40px 0 40px;">
+                            <div style="border-top:1px solid #e8e5db;"></div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td class="apr-pad" style="padding:16px 40px 28px 40px; font-family:'IBM Plex Sans',Helvetica,Arial,sans-serif; font-size:11px; line-height:1.6; color:#999999;">
+                            <p style="margin:0;">Didn't create an Applyr account? You can safely ignore this email.</p>
+                            <p style="margin:8px 0 0 0;">&copy; {{ date('Y') }} Applyr &mdash; Job Application Tracker</p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

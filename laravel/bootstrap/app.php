@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // This is a pure API with no server-rendered login page, but Laravel's
+        // ApplicationBuilder defaults guests to redirect to route('login'),
+        // which doesn't exist here — that throws RouteNotFoundException (500)
+        // instead of a 401 for any client that omits Accept: application/json.
+        $middleware->redirectGuestsTo(fn () => null);
+
         // The rate limiters key off $request->ip(). Behind a load balancer or
         // Cloudflare that would be the proxy's IP for everyone, so set
         // TRUSTED_PROXIES in production (comma separated, or * if the app is

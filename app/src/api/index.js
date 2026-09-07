@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+const apiBaseURL = import.meta.env.VITE_API_URL || '/api';
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: apiBaseURL,
   // Generous enough for a cold backend start, short enough that a hung request
   // surfaces as an error instead of spinning indefinitely.
   timeout: 45000,
@@ -49,9 +50,22 @@ export const authAPI = {
   exchangeGoogleCode: (code) => api.post('/auth/google/exchange', { code }),
 };
 
-const backendURL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000').replace(/\/+$/, '');
+const backendURLFromApi = /^https?:\/\//.test(apiBaseURL)
+  ? apiBaseURL.replace(/\/api\/?$/, '')
+  : '';
+const backendURL = (
+  import.meta.env.VITE_BACKEND_URL
+  || backendURLFromApi
+  || (import.meta.env.DEV ? 'http://localhost:8000' : '')
+).replace(/\/+$/, '');
 
-export const googleAuthURL = `${backendURL}/auth/google/redirect`;
+export const getGoogleAuthURL = () => {
+  if (!backendURL) {
+    throw new Error('VITE_BACKEND_URL is required for Google sign-in in production.');
+  }
+
+  return `${backendURL}/auth/google/redirect`;
+};
 
 export const applicationsAPI = {
   getAll: (params) => api.get('/applications', { params }),

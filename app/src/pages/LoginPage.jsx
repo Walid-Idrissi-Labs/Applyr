@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { googleAuthURL } from '../api';
+import { getGoogleAuthURL } from '../api';
 import { Moon, Sun } from 'lucide-react';
 
 export default function LoginPage() {
@@ -137,7 +137,11 @@ export default function LoginPage() {
 
   const handleGoogleLogin = () => {
     setError('');
-    window.location.assign(googleAuthURL);
+    try {
+      window.location.assign(getGoogleAuthURL());
+    } catch {
+      setError('Google sign-in is not configured for this environment.');
+    }
   };
 
   return (

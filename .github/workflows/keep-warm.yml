@@ -2,12 +2,43 @@ name: Keep Render backend warm
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    # Two staggered schedules, offset by ~2.5 min for redundancy.
+    - cron: '*/5 * * * *'   # on the hour mark
+    - cron: '2-59/5 * * * *' # 2 minutes after
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping health check endpoint
-        run: curl -sS -o /dev/null -w "HTTP %{http_code}\n" --fail https://applyr-1abi.onrender.com/up
+      - name: Keep Render service awake
+        env:
+          URL: https://applyr-1abi.onrender.com/up
+        shell: bash
+        run: |
+          set -uo pipefail
+          attempts=0
+          until [ "$attempts" -ge 3 ]; do
+            attempts=$((attempts + 1))
+            code=$(
+              curl -sS -o /tmp/keepwarm.out -w '%{http_code}' \
+                --max-time 30 --connect-timeout 15 "$URL" 2>/tmp/keepwarm.err
+            ) || code=000
+
+            # Time the request to eyeball warm vs cold spin-up latency.
+            echo "attempt $attempts: HTTP $code ($(cat /tmp/keepwarm.err 2>/dev/null))"
+
+            if [ "$code" = "200" ] || [ "$code" = "204" ]; then
+              echo "Service is up (HTTP $code)."
+              exit 0
+            fi
+
+            # 000 / timeouts / 5xx mean the instance may be spinning up.
+            echo "Instance not ready (HTTP $code), retrying..."
+            sleep 15
+          done
+
+          # Report the last body so a genuine failure is debuggable.
+          echo "::error::Render keep-alive failed after 3 attempts."
+          cat /tmp/keepwarm.out 2>/dev/null
+          exit 1

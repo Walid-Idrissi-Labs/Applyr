@@ -68,6 +68,43 @@ npm run build
 - Set proper permissions for sensitive files
 - Use strong DB credentials
 
+### Google OAuth
+
+Create a **Web application** OAuth client in Google Cloud. Register both callback
+URLs you use; each must match exactly:
+
+```text
+http://localhost:8000/auth/google/callback
+https://YOUR-LARAVEL-BACKEND/auth/google/callback
+```
+
+The Cloudflare frontend URL is not a Google redirect URI. Google returns to
+Laravel first, and Laravel redirects to the frontend only after validating the
+response.
+
+Configure the Laravel/Render environment:
+
+```env
+APP_URL=https://YOUR-LARAVEL-BACKEND
+FRONTEND_URL=https://YOUR-CLOUDFLARE-FRONTEND
+GOOGLE_CLIENT_ID=your-web-client-id
+GOOGLE_CLIENT_SECRET=your-web-client-secret
+GOOGLE_REDIRECT_URI=https://YOUR-LARAVEL-BACKEND/auth/google/callback
+OAUTH_LOGIN_CODE_EXPIRE=5
+SESSION_SECURE_COOKIE=true
+```
+
+Configure the Cloudflare Pages build environment:
+
+```env
+VITE_API_URL=https://YOUR-LARAVEL-BACKEND/api
+VITE_BACKEND_URL=https://YOUR-LARAVEL-BACKEND
+```
+
+`VITE_*` values are compiled into the frontend bundle, so trigger a new
+Cloudflare build after changing them. Keep `GOOGLE_CLIENT_SECRET` on Laravel
+only; never add it to Cloudflare or prefix it with `VITE_`.
+
 ---
 
 ## 7. Queue/Jobs (Optional)

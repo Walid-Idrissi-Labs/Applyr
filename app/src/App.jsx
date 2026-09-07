@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import OAuthCallbackPage from './pages/OAuthCallbackPage';
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import ApplicationsPage from './pages/ApplicationsPage';
@@ -63,6 +64,7 @@ function AppRoutes() {
       <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPasswordPage />} />
       <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
       
       {/* Protected Routes Without Layout */}
       <Route path="/resumes/:id/preview" element={<ProtectedRoute><ResumePreviewPage /></ProtectedRoute>} />

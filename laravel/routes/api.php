@@ -5,6 +5,7 @@ use App\Http\Controllers\AiController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\TagController;
@@ -19,6 +20,10 @@ Route::middleware('throttle:auth')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
 });
+
+// The SPA exchanges a short-lived one-time code for its normal Sanctum token.
+Route::post('/auth/google/exchange', [GoogleAuthController::class, 'exchange'])
+    ->middleware('throttle:6,1');
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -25,6 +26,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'has_password',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -33,6 +38,11 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    protected function hasPassword(): Attribute
+    {
+        return Attribute::get(fn () => filled($this->attributes['password'] ?? null));
     }
 
     public function applications(): HasMany
@@ -53,5 +63,10 @@ class User extends Authenticatable
     public function aiLogs(): HasMany
     {
         return $this->hasMany(AiLog::class);
+    }
+
+    public function oauthIdentities(): HasMany
+    {
+        return $this->hasMany(OAuthIdentity::class);
     }
 }

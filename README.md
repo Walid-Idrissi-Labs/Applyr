@@ -20,7 +20,7 @@ Applyr is a job application tracking SaaS with a Laravel API backend and a React
 ### Backend
 - **Framework:** Laravel 13 (PHP 8.4+)
 - **Database:** SQLite (local) / PostgreSQL (production)
-- **Authentication:** Laravel Sanctum (token-based API auth)
+- **Authentication:** Laravel Sanctum (token-based API auth) + Google OAuth through Laravel Socialite
 - **PDF:** DomPDF (generation), Smalot/PdfParser + Tesseract OCR (extraction)
 - **Mail:** Brevo SMTP
 - **AI:** OpenRouter API (`openai/gpt-oss-20b:free`)
@@ -54,6 +54,13 @@ State is managed through React Context:
 
 Vite proxies `/api` requests to the Laravel backend in development, eliminating CORS concerns locally.
 
+Google sign-in begins by navigating the browser to Laravel rather than calling
+Google from React. Google returns to Laravel, where Socialite validates the OAuth
+state and verified identity. Laravel then redirects React with a five-minute,
+single-use code. React exchanges that code for the same Sanctum bearer token used
+by email/password login. Google access tokens and the Google client secret are
+never stored in the browser.
+
 ### Backend (laravel/)
 The Laravel backend exposes a pure REST API. All routes are stateless and protected by Sanctum middleware, except for authentication endpoints and the public AI job extraction endpoint used by the browser extensions.
 
@@ -67,7 +74,9 @@ The schema is normalized around a central `applications` table. Status transitio
 
 ## API Reference
 
-All endpoints are prefixed with `/api`. Protected routes require a valid Sanctum token via the `Authorization: Bearer <token>` header.
+API endpoints are prefixed with `/api`. The two browser redirect routes used by
+Google OAuth are the noted exceptions. Protected routes require a valid Sanctum
+token via the `Authorization: Bearer <token>` header.
 
 ### Authentication
 
@@ -83,6 +92,9 @@ All endpoints are prefixed with `/api`. Protected routes require a valid Sanctum
 | POST | `/reset-password` | No | Reset password with a token |
 | POST | `/email/verify` | No | Verify email address |
 | POST | `/email/verification` | Yes | Resend verification email |
+| GET | `/auth/google/redirect` | No | Start Google OAuth in the browser (not under `/api`) |
+| GET | `/auth/google/callback` | No | Validate Google's callback (not under `/api`) |
+| POST | `/auth/google/exchange` | No | Exchange a single-use code for a Sanctum token |
 
 ### Applications
 
@@ -332,4 +344,3 @@ To load the extensions for local development:
 This project is licensed.
 
 ---
-

@@ -71,7 +71,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! $user->password || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -187,20 +187,24 @@ class AuthController extends Controller
 
     public function changePassword(Request $request): JsonResponse
     {
+        $user = $request->user();
         $validated = $request->validate([
-            'current_password' => ['required', 'string'],
+            'current_password' => [$user->password ? 'required' : 'nullable', 'string'],
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        if (! Hash::check($validated['current_password'], $request->user()->password)) {
+        if ($user->password && ! Hash::check($validated['current_password'], $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['The current password is incorrect.'],
             ]);
         }
 
-        $request->user()->update(['password' => Hash::make($validated['password'])]);
+        $user->update(['password' => Hash::make($validated['password'])]);
 
-        return response()->json(['message' => 'Password updated successfully']);
+        return response()->json([
+            'message' => 'Password updated successfully',
+            'user' => $user->fresh(),
+        ]);
     }
 
     public function forgotPassword(Request $request): JsonResponse

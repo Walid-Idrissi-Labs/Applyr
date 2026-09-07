@@ -44,6 +44,15 @@ export function AuthProvider({ children }) {
     return user;
   };
 
+  const completeGoogleLogin = async (code) => {
+    const res = await authAPI.exchangeGoogleCode(code);
+    const { user, token } = res.data;
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    setUser(user);
+    return user;
+  };
+
   const logout = async () => {
     try {
       await authAPI.logout();
@@ -63,7 +72,12 @@ export function AuthProvider({ children }) {
   };
 
   const changePassword = async (data) => {
-    return authAPI.changePassword(data);
+    const res = await authAPI.changePassword(data);
+    if (res.data?.user) {
+      setUser(res.data.user);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+    }
+    return res;
   };
 
   const sendVerificationEmail = async () => {
@@ -81,7 +95,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
+    <AuthContext.Provider value={{ user, loading, login, register, completeGoogleLogin, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );

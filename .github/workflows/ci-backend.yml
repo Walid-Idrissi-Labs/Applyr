@@ -13,7 +13,6 @@ on:
     paths:
       - 'laravel/**'
       - '.github/workflows/ci-backend.yml'
-   workflow_dispatch:
 
 
 jobs:

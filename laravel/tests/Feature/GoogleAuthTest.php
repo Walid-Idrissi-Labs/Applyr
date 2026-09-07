@@ -57,7 +57,7 @@ class GoogleAuthTest extends TestCase
 
     public function test_google_links_to_an_existing_account_with_the_same_verified_email(): void
     {
-        $existingUser = User::factory()->create(['email' => 'person@example.com']);
+        $existingUser = User::factory()->create(['email' => 'Person@Example.com']);
         Socialite::fake('google', $this->googleUser());
 
         $callback = $this->get('/auth/google/callback');

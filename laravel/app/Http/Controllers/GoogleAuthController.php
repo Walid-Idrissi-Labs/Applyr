@@ -60,7 +60,10 @@ class GoogleAuthController extends Controller
                 } else {
                     // A verified Google email may safely connect to the matching
                     // local account, avoiding duplicate accounts and lost data.
-                    $user = User::query()->where('email', $email)->lockForUpdate()->first();
+                    $user = User::query()
+                        ->whereRaw('LOWER(email) = ?', [$email])
+                        ->lockForUpdate()
+                        ->first();
 
                     if (! $user) {
                         $user = User::create([

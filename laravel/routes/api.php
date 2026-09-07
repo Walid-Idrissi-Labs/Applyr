@@ -1,16 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\DocumentController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\TagController;
-use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AiController;
-use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ResumeController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\TaskController;
+use Illuminate\Support\Facades\Route;
 
 // Public routes (throttled: these are the brute-force / mail-bomb surface)
 Route::middleware('throttle:auth')->group(function () {

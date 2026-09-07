@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { googleAuthURL } from '../api';
 import { Moon, Sun } from 'lucide-react';
 
 export default function LoginPage() {
@@ -134,6 +135,11 @@ export default function LoginPage() {
 
   const setField = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
+  const handleGoogleLogin = () => {
+    setError('');
+    window.location.assign(googleAuthURL);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center p-4 transition-colors duration-300" style={{ position: 'relative', zIndex: 1 }}>
       <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }} />
@@ -156,6 +162,25 @@ export default function LoginPage() {
               {error}
             </div>
           )}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full border-2 border-[#111] dark:border-gray-700 rounded-md bg-white dark:bg-[#1a1a1a] text-[#111] dark:text-white p-2.5 font-bold hover:bg-gray-50 dark:hover:bg-[#222] transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="w-4 h-4">
+              <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.38a4.6 4.6 0 0 1-2 3.02v2.53h3.24c1.9-1.75 2.98-4.32 2.98-7.39Z" />
+              <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.62-2.42l-3.24-2.53c-.9.6-2.05.96-3.38.96-2.61 0-4.82-1.77-5.61-4.14H3.04v2.61A10 10 0 0 0 12 22Z" />
+              <path fill="#FBBC05" d="M6.39 13.87A6 6 0 0 1 6.07 12c0-.65.11-1.28.32-1.87V7.52H3.04A10 10 0 0 0 2 12c0 1.61.38 3.14 1.04 4.48l3.35-2.61Z" />
+              <path fill="#EA4335" d="M12 5.99c1.47 0 2.79.5 3.83 1.49L18.7 4.6A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.52l3.35 2.61C7.18 7.76 9.39 5.99 12 5.99Z" />
+            </svg>
+            Continue with Google
+          </button>
+          <div className="flex items-center gap-3 my-5" aria-hidden="true">
+            <div className="h-px flex-1 bg-gray-300 dark:bg-gray-800" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">or</span>
+            <div className="h-px flex-1 bg-gray-300 dark:bg-gray-800" />
+          </div>
           <form onSubmit={handleSubmit}>
             {isRegister && (
               <div className="mb-4">

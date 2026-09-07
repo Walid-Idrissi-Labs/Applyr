@@ -46,7 +46,12 @@ export const authAPI = {
   resetPassword: (data) => api.post('/reset-password', data),
   sendVerificationEmail: () => api.post('/email/verification'),
   verifyEmail: (data) => api.post('/email/verify', data),
+  exchangeGoogleCode: (code) => api.post('/auth/google/exchange', { code }),
 };
+
+const backendURL = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000').replace(/\/+$/, '');
+
+export const googleAuthURL = `${backendURL}/auth/google/redirect`;
 
 export const applicationsAPI = {
   getAll: (params) => api.get('/applications', { params }),

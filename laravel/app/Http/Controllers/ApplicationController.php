@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
-use App\Models\StatusHistory;
 use App\Models\Notification;
-use Illuminate\Http\Request;
+use App\Models\StatusHistory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
@@ -24,12 +24,12 @@ class ApplicationController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                #sqlite optimized
+                // sqlite optimized
                 $q->where('company_name', 'like', "%{$search}%")
-                  ->orWhere('position', 'like', "%{$search}%");
-                #postgres optimized
-                #$q->where('company_name', 'ilike', "%{$search}%")
-                #->orWhere('position', 'ilike', "%{$search}%");
+                    ->orWhere('position', 'like', "%{$search}%");
+                // postgres optimized
+                // $q->where('company_name', 'ilike', "%{$search}%")
+                // ->orWhere('position', 'ilike', "%{$search}%");
             });
         }
 
@@ -73,7 +73,7 @@ class ApplicationController extends Controller
 
         $application = Application::create($validated);
 
-        if (!isset($validated['status'])) {
+        if (! isset($validated['status'])) {
             StatusHistory::create([
                 'application_id' => $application->id,
                 'old_status' => null,
@@ -89,7 +89,7 @@ class ApplicationController extends Controller
             ]);
         }
 
-        if (!empty($validated['tag_ids'])) {
+        if (! empty($validated['tag_ids'])) {
             $application->tags()->attach($validated['tag_ids']);
         }
 
@@ -219,8 +219,8 @@ class ApplicationController extends Controller
             : 0;
 
         $recentActivity = StatusHistory::whereHas('application', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
+            $q->where('user_id', $user->id);
+        })
             ->with('application:id,company_name,position')
             ->orderBy('changed_at', 'desc')
             ->limit(5)

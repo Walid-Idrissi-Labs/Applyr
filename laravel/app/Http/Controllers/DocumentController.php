@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Document;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
@@ -47,7 +47,7 @@ class DocumentController extends Controller
 
         $document = Document::where('application_id', $applicationId)->findOrFail($id);
 
-        if (!Storage::disk('public')->exists($document->file_path)) {
+        if (! Storage::disk('public')->exists($document->file_path)) {
             return response()->json(['message' => 'File not found'], 404);
         }
 

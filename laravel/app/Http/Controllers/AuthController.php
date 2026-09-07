@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Mail\WelcomeMail;
-use App\Mail\PasswordResetMail;
 use App\Mail\EmailVerificationMail;
-use Illuminate\Http\Request;
+use App\Mail\PasswordResetMail;
+use App\Mail\WelcomeMail;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -71,13 +71,13 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             throw ValidationException::withMessages([
                 'email' => ['This account has been deactivated.'],
             ]);
@@ -112,7 +112,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $validated['email'])->first();
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'email' => ['No account found for this email.'],
             ]);
@@ -127,7 +127,7 @@ class AuthController extends Controller
 
         $record = DB::table('email_verification_tokens')->where('email', $validated['email'])->first();
 
-        if (!$record || !Hash::check($validated['token'], $record->token)) {
+        if (! $record || ! Hash::check($validated['token'], $record->token)) {
             throw ValidationException::withMessages([
                 'token' => ['The verification token is invalid.'],
             ]);
@@ -136,7 +136,7 @@ class AuthController extends Controller
         $expireMinutes = (int) config('auth.email_verification.expire', 60);
         $expiresAt = now()->subMinutes($expireMinutes);
 
-        if (!$record->created_at || Carbon::parse($record->created_at)->lt($expiresAt)) {
+        if (! $record->created_at || Carbon::parse($record->created_at)->lt($expiresAt)) {
             DB::table('email_verification_tokens')->where('email', $validated['email'])->delete();
             throw ValidationException::withMessages([
                 'token' => ['The verification token has expired.'],
@@ -169,7 +169,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
+            'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,'.$request->user()->id],
         ]);
 
         $user = $request->user();
@@ -192,7 +192,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        if (!Hash::check($validated['current_password'], $request->user()->password)) {
+        if (! Hash::check($validated['current_password'], $request->user()->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['The current password is incorrect.'],
             ]);
@@ -219,7 +219,7 @@ class AuthController extends Controller
             );
 
             $frontendUrl = rtrim(config('app.frontend_url'), '/');
-            $resetUrl = $frontendUrl . '/reset-password?token=' . urlencode($token) . '&email=' . urlencode($validated['email']);
+            $resetUrl = $frontendUrl.'/reset-password?token='.urlencode($token).'&email='.urlencode($validated['email']);
             $expireMinutes = (int) config('auth.passwords.users.expire', 60);
 
             try {
@@ -247,7 +247,7 @@ class AuthController extends Controller
 
         $record = DB::table('password_reset_tokens')->where('email', $validated['email'])->first();
 
-        if (!$record || !Hash::check($validated['token'], $record->token)) {
+        if (! $record || ! Hash::check($validated['token'], $record->token)) {
             throw ValidationException::withMessages([
                 'token' => ['The reset token is invalid.'],
             ]);
@@ -256,7 +256,7 @@ class AuthController extends Controller
         $expireMinutes = (int) config('auth.passwords.users.expire', 60);
         $expiresAt = now()->subMinutes($expireMinutes);
 
-        if (!$record->created_at || Carbon::parse($record->created_at)->lt($expiresAt)) {
+        if (! $record->created_at || Carbon::parse($record->created_at)->lt($expiresAt)) {
             DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
             throw ValidationException::withMessages([
                 'token' => ['The reset token has expired.'],
@@ -264,7 +264,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $validated['email'])->first();
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'email' => ['No account found for this email.'],
             ]);
@@ -286,7 +286,7 @@ class AuthController extends Controller
         );
 
         $frontendUrl = rtrim(config('app.frontend_url') ?? config('app.url'), '/');
-        $verifyUrl = $frontendUrl . '/verify-email?token=' . urlencode($token) . '&email=' . urlencode($user->email);
+        $verifyUrl = $frontendUrl.'/verify-email?token='.urlencode($token).'&email='.urlencode($user->email);
         $expireMinutes = (int) config('auth.email_verification.expire', 60);
 
         try {

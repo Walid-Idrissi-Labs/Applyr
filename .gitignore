@@ -6,4 +6,4 @@ CLAUDE.md
 .claude
 **/*.sql
 
-**/*.DS_Store
+**/*.DS_Store/vendor

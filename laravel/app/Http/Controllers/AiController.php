@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\AiLog;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -21,20 +21,20 @@ class AiController extends Controller
 
         $apiKey = config('services.openrouter.api_key');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json(['message' => 'AI not configured'], 500);
         }
 
-        $prompt = "Extract job information from the following HTML page content. Return ONLY a valid JSON object with this exact structure (no markdown, no explanation):
+        $prompt = 'Extract job information from the following HTML page content. Return ONLY a valid JSON object with this exact structure (no markdown, no explanation):
             {
-                \"company\": \"Company Name\",
-                \"position\": \"Job Title\",
-                \"description\": \"Job description summary\",
-                \"language\": \"en\"
+                "company": "Company Name",
+                "position": "Job Title",
+                "description": "Job description summary",
+                "language": "en"
             }
 
 HTML Content:
-" . substr($validated['html'], 0, 15000);
+'.substr($validated['html'], 0, 15000);
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")

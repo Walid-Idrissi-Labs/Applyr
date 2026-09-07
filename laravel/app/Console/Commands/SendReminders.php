@@ -2,9 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\ReminderMail;
 use App\Models\Application;
 use App\Models\Notification;
-use App\Mail\ReminderMail;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -17,7 +18,7 @@ class SendReminders extends Command
     public function handle(): int
     {
         $today = now()->toDateString();
-        $appUrl = config('app.frontend_url') . '/login';
+        $appUrl = config('app.frontend_url').'/login';
 
         $applications = Application::with('user')
             ->whereNotNull('reminder_date')
@@ -39,7 +40,7 @@ class SendReminders extends Command
                         companyName: $application->company_name,
                         position: $application->position,
                         appliedDate: $application->applied_at
-                            ? \Carbon\Carbon::parse($application->applied_at)->format('d/m/Y')
+                            ? Carbon::parse($application->applied_at)->format('d/m/Y')
                             : 'Not specified',
                     ));
 

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Application;
+use App\Mail\UserCreatedByAdmin;
 use App\Models\AiLog;
-use Illuminate\Http\Request;
+use App\Models\Application;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use App\Mail\UserCreatedByAdmin;
 
 class AdminController extends Controller
 {
@@ -51,13 +51,14 @@ class AdminController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,'.$id,
         ]);
 
         $user->update($validated);
 
         return response()->json($user);
     }
+
     public function stats(): JsonResponse
     {
         $totalUsers = User::count();
@@ -92,12 +93,12 @@ class AdminController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                #sqlite optimized
+                // sqlite optimized
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-                #postgres optimized
-                #$q->where('company_name', 'ilike', "%{$search}%")
-                #->orWhere('position', 'ilike', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
+                // postgres optimized
+                // $q->where('company_name', 'ilike', "%{$search}%")
+                // ->orWhere('position', 'ilike', "%{$search}%");
             });
         }
 

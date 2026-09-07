@@ -15,7 +15,7 @@ class EnsureUserIsActive
     {
         $user = $request->user();
 
-        if ($user && !$user->is_active) {
+        if ($user && ! $user->is_active) {
             $token = $user->currentAccessToken();
 
             if ($token) {

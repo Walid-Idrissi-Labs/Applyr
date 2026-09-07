@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Resume;
 use App\Models\AiLog;
-use App\Models\Application;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Resume;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Smalot\PdfParser\Parser;
 
 class ResumeController extends Controller
 {
@@ -81,7 +82,7 @@ class ResumeController extends Controller
 
         $pdf = Pdf::loadHTML($html);
 
-        $filename = "resume_{$resume->id}_" . now()->format('Ymd') . '.pdf';
+        $filename = "resume_{$resume->id}_".now()->format('Ymd').'.pdf';
 
         $path = "pdfs/{$filename}";
         Storage::disk('public')->put($path, $pdf->output());
@@ -95,9 +96,9 @@ class ResumeController extends Controller
     public function extract(Request $request): JsonResponse
     {
         $file = $request->file('file');
-        
+
         // Debug: Log exhaustive request info safely
-        \Illuminate\Support\Facades\Log::info("Extraction debug info", [
+        Log::info('Extraction debug info', [
             'content_type' => $request->header('Content-Type'),
             'has_file_method' => $request->hasFile('file'),
             'file_details' => $file ? [
@@ -107,12 +108,13 @@ class ResumeController extends Controller
             ] : 'no file object',
         ]);
 
-        if ($file && !$file->isValid()) {
+        if ($file && ! $file->isValid()) {
             $error = $file->getError();
             $msg = 'The file failed to upload.';
             if ($error === UPLOAD_ERR_INI_SIZE) {
                 $msg = 'The file exceeds 2MB (upload_max_filesize).';
             }
+
             return response()->json(['message' => $msg, 'error_code' => $error], 422);
         }
 
@@ -122,41 +124,43 @@ class ResumeController extends Controller
         ]);
 
         $apiKey = config('services.openrouter.api_key');
-        if (!$apiKey) return response()->json(['message' => 'AI not configured'], 500);
+        if (! $apiKey) {
+            return response()->json(['message' => 'AI not configured'], 500);
+        }
 
         $text = $request->input('text', '');
 
         if ($file && $file->isValid()) {
-            $parser = new \Smalot\PdfParser\Parser();
-            
+            $parser = new Parser;
+
             try {
                 $pdf = $parser->parseFile($file->getPathname());
                 $pages = $pdf->getPages();
-                
+
                 // Limit to 4 pages
                 if (count($pages) > 4) {
                     return response()->json(['message' => 'PDF is too long. Please upload a maximum of 4 pages.'], 422);
                 }
 
                 $extractedText = $pdf->getText();
-                
+
                 // OCR Fallback if text is empty or too short (likely image-based)
                 if (strlen(trim($extractedText)) < 150) {
                     try {
                         $extractedText = $this->performOcr($file->getPathname());
                     } catch (\Exception $ocrEx) {
                         // Log OCR failure but don't crash, might have some text anyway
-                        \Illuminate\Support\Facades\Log::error("OCR failed: " . $ocrEx->getMessage());
+                        Log::error('OCR failed: '.$ocrEx->getMessage());
                     }
                 }
 
                 if (empty(trim($extractedText))) {
-                   return response()->json(['message' => 'No text could be extracted from this PDF. (It might be password protected or purely image-based.)'], 422);
+                    return response()->json(['message' => 'No text could be extracted from this PDF. (It might be password protected or purely image-based.)'], 422);
                 }
 
                 $text = $extractedText;
             } catch (\Exception $e) {
-                return response()->json(['message' => 'PDF processing failed: ' . $e->getMessage()], 500);
+                return response()->json(['message' => 'PDF processing failed: '.$e->getMessage()], 500);
             }
         }
 
@@ -164,13 +168,13 @@ class ResumeController extends Controller
             return response()->json(['message' => 'No text could be found to structure. Please upload a file or paste text.'], 422);
         }
 
-        $systemPrompt = "
+        $systemPrompt = '
             You are a resume data extraction expert. Extract all information from the uploaded resume exactly as written. Do not rewrite, rephrase, improve, or embellish anything.
             ## RULES
                 1. **NO INVENTION**: Never guess or fill in missing details.
                 2. **VERBATIM**: Preserve all original wording, order, dates, titles, company names, and metrics exactly as they appear.
                 3. **OUTPUT**: Return ONLY the extracted content in simple  Markdown. No commentary or analysis or.
-            ";
+            ';
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")
@@ -179,44 +183,46 @@ class ResumeController extends Controller
                     'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
                     'messages' => [
                         ['role' => 'system', 'content' => $systemPrompt],
-                        ['role' => 'user', 'content' => "RAW CAREER INFO:\n" . substr($text, 0, 12000)],
+                        ['role' => 'user', 'content' => "RAW CAREER INFO:\n".substr($text, 0, 12000)],
                     ],
                 ]);
 
-            if ($response->failed()) return response()->json(['message' => 'AI service error'], 500);
+            if ($response->failed()) {
+                return response()->json(['message' => 'AI service error'], 500);
+            }
 
             $generatedContent = $response->json()['choices'][0]['message']['content'] ?? '';
 
             return response()->json(['content' => $generatedContent]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'AI error: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'AI error: '.$e->getMessage()], 500);
         }
     }
 
     private function performOcr(string $filePath): string
     {
-        $tempDir = storage_path('app/temp_ocr_' . uniqid());
+        $tempDir = storage_path('app/temp_ocr_'.uniqid());
         mkdir($tempDir, 0777, true);
-        
-        $outputBase = $tempDir . '/page';
-        
+
+        $outputBase = $tempDir.'/page';
+
         // Convert first 4 pages to images (300 DPI for better OCR)
-        shell_exec("pdftoppm -f 1 -l 4 -png -r 300 " . escapeshellarg($filePath) . " " . escapeshellarg($outputBase));
-        
-        $files = glob($tempDir . '/*.png');
-        $fullText = "";
-        
+        shell_exec('pdftoppm -f 1 -l 4 -png -r 300 '.escapeshellarg($filePath).' '.escapeshellarg($outputBase));
+
+        $files = glob($tempDir.'/*.png');
+        $fullText = '';
+
         foreach ($files as $file) {
-            $outputFile = $file . '_text';
-            shell_exec("tesseract " . escapeshellarg($file) . " " . escapeshellarg($outputFile) . " -l eng+fra");
-            
-            if (file_exists($outputFile . '.txt')) {
-                $fullText .= file_get_contents($outputFile . '.txt') . "\n";
+            $outputFile = $file.'_text';
+            shell_exec('tesseract '.escapeshellarg($file).' '.escapeshellarg($outputFile).' -l eng+fra');
+
+            if (file_exists($outputFile.'.txt')) {
+                $fullText .= file_get_contents($outputFile.'.txt')."\n";
             }
         }
-        
-        shell_exec("rm -rf " . escapeshellarg($tempDir));
-        
+
+        shell_exec('rm -rf '.escapeshellarg($tempDir));
+
         return $fullText;
     }
 
@@ -226,7 +232,7 @@ class ResumeController extends Controller
 
         $apiKey = config('services.openrouter.api_key');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json(['message' => 'AI not configured'], 500);
         }
 
@@ -235,7 +241,7 @@ class ResumeController extends Controller
 
         // Check if we are refining an existing draft or starting fresh
         $isRefinement = $resume->content && $resume->content !== 'Generating...';
-        
+
         if ($isRefinement) {
             $baseContent = $resume->content;
             $instructions = $request->input('notes', 'Improve the resume based on best practices.');
@@ -275,12 +281,12 @@ class ResumeController extends Controller
             ";
 
         $userPrompt = "SOURCE MATERIAL:\n{$baseContent}\n\n";
-        
+
         if ($application) {
             $userPrompt .= "TARGET JOB:\nCompany: {$application->company_name}\nPosition: {$application->position}\nDescription: {$application->notes}\n\n";
         }
 
-        $userPrompt .= "INSTRUCTIONS:\n{$instructions}\n\nTARGET LANGUAGE: " . ($resume->language ?? 'en');
+        $userPrompt .= "INSTRUCTIONS:\n{$instructions}\n\nTARGET LANGUAGE: ".($resume->language ?? 'en');
 
         try {
             $response = Http::withHeader('Authorization', "Bearer {$apiKey}")
@@ -306,7 +312,7 @@ class ResumeController extends Controller
                 'model' => config('services.openrouter.model', 'openai/gpt-oss-20b:free'),
                 'tokens_used' => $tokensUsed,
                 'purpose' => $isRefinement ? 'resume_refinement' : 'resume_generation',
-                'prompt' => $systemPrompt . "\n\n" . $userPrompt,
+                'prompt' => $systemPrompt."\n\n".$userPrompt,
                 'response' => $generatedContent,
                 'created_at' => now(),
             ]);
@@ -315,7 +321,7 @@ class ResumeController extends Controller
 
             return response()->json($resume);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'AI error: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'AI error: '.$e->getMessage()], 500);
         }
     }
 }

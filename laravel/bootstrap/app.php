@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -34,10 +35,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Laravel no longer throttles the api group by default; the 'api'
         // limiter is defined in AppServiceProvider.
         $middleware->throttleApi();
-        $middleware->appendToGroup('api', \App\Http\Middleware\EnsureUserIsActive::class);
+        $middleware->appendToGroup('api', EnsureUserIsActive::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->shouldRenderJsonWhen(function ($request, \Throwable $e) {
+        $exceptions->shouldRenderJsonWhen(function ($request, Throwable $e) {
             return $request->is('api/*') || $request->expectsJson();
         });
     })->create();

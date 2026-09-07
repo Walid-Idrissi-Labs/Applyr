@@ -1,8 +1,13 @@
 <?php
-$user = \App\Models\User::find(1);
+
+use App\Models\Application;
+use App\Models\Resume;
+use App\Models\User;
+
+$user = User::find(1);
 
 // Add base resume
-\App\Models\Resume::create([
+Resume::create([
     'user_id' => $user->id,
     'application_id' => null,
     'content' => "# Alex Developer\n\n## Summary\nExperienced Software Engineer with a solid background in building scalable web applications using Laravel, React, and Node.js. Strong focus on backend architecture, API design, and performance optimization. Passionate about clean code and agile methodologies.\n\n## Experience\n**Software Engineer, TechCorp** (2020 - Present)\n- Built RESTful APIs using Laravel.\n- Developed responsive frontends with React.\n\n## Skills\nPHP, JavaScript, Laravel, React, Node.js, SQL.",
@@ -10,7 +15,7 @@ $user = \App\Models\User::find(1);
 ]);
 
 // Add job application
-\App\Models\Application::create([
+Application::create([
     'user_id' => $user->id,
     'company_name' => 'OpenAI',
     'position' => 'Senior Platform Engineer',

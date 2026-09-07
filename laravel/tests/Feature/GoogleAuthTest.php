@@ -35,13 +35,24 @@ class GoogleAuthTest extends TestCase
             'provider_user_id' => 'google-user-123',
         ]);
 
-        $this->postJson('/api/auth/google/exchange', ['code' => $code])
+        $exchange = $this->postJson('/api/auth/google/exchange', ['code' => $code])
             ->assertOk()
             ->assertJsonPath('user.email', 'person@example.com')
+            ->assertJsonPath('user.has_password', false)
             ->assertJsonStructure(['user', 'token']);
 
         $this->postJson('/api/auth/google/exchange', ['code' => $code])
             ->assertUnprocessable();
+
+        $this->withToken($exchange->json('token'))->putJson('/api/password', [
+            'password' => 'new-secure-password',
+            'password_confirmation' => 'new-secure-password',
+        ])->assertOk()->assertJsonPath('user.has_password', true);
+
+        $this->postJson('/api/login', [
+            'email' => 'person@example.com',
+            'password' => 'new-secure-password',
+        ])->assertOk();
     }
 
     public function test_google_links_to_an_existing_account_with_the_same_verified_email(): void
@@ -61,7 +72,8 @@ class GoogleAuthTest extends TestCase
 
         $this->postJson('/api/auth/google/exchange', ['code' => $code])
             ->assertOk()
-            ->assertJsonPath('user.id', $existingUser->id);
+            ->assertJsonPath('user.id', $existingUser->id)
+            ->assertJsonPath('user.has_password', true);
     }
 
     public function test_unverified_google_emails_are_not_allowed_to_create_or_link_accounts(): void

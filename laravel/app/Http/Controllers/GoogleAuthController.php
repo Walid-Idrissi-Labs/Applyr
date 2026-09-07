@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -67,10 +66,9 @@ class GoogleAuthController extends Controller
                         $user = User::create([
                             'name' => $googleUser->getName() ?: Str::before($email, '@'),
                             'email' => $email,
-                            // Google-only accounts cannot sign in with this
-                            // generated value. "Forgot password" lets them set
-                            // a password later if they choose to.
-                            'password' => Hash::make(Str::random(64)),
+                            // A Google-only account starts without a local
+                            // password and may set one later from its profile.
+                            'password' => null,
                             'is_active' => true,
                         ]);
                         $user->forceFill(['email_verified_at' => now()])->save();

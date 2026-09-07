@@ -72,7 +72,12 @@ export function AuthProvider({ children }) {
   };
 
   const changePassword = async (data) => {
-    return authAPI.changePassword(data);
+    const res = await authAPI.changePassword(data);
+    if (res.data?.user) {
+      setUser(res.data.user);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+    }
+    return res;
   };
 
   const sendVerificationEmail = async () => {

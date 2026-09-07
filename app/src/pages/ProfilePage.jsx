@@ -19,7 +19,7 @@ export default function ProfilePage() {
     password_confirmation: '',
   });
   const [passwordSaving, setPasswordSaving] = useState(false);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
   const handleProfileSave = async (e) => {
@@ -42,10 +42,11 @@ export default function ProfilePage() {
     setPasswordError('');
     setPasswordSaving(true);
     try {
+      const passwordAction = user?.has_password ? 'changed' : 'set';
       await changePassword(passwordForm);
       setPasswordForm({ current_password: '', password: '', password_confirmation: '' });
-      setPasswordSuccess(true);
-      setTimeout(() => setPasswordSuccess(false), 3000);
+      setPasswordSuccess(passwordAction);
+      setTimeout(() => setPasswordSuccess(''), 3000);
     } catch (err) {
       setPasswordError(err.response?.data?.errors?.current_password?.[0] || 'Failed to change password');
     } finally {
@@ -159,7 +160,9 @@ export default function ProfilePage() {
         <div className="neu-card p-6 space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Lock className="w-4 h-4 dark:text-gray-400" />
-            <h2 className="font-bold text-[14px] dark:text-white">Change Password</h2>
+            <h2 className="font-bold text-[14px] dark:text-white">
+              {user?.has_password ? 'Change Password' : 'Set Password'}
+            </h2>
           </div>
 
           {passwordError && (
@@ -170,21 +173,23 @@ export default function ProfilePage() {
 
           {passwordSuccess && (
             <div className="p-2 bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-800 rounded text-green-700 dark:text-green-300 text-[12px] flex items-center gap-2">
-              <Check className="w-3 h-3" /> Password changed successfully
+              <Check className="w-3 h-3" /> Password {passwordSuccess} successfully
             </div>
           )}
 
           <form onSubmit={handlePasswordSave} className="space-y-4">
-            <div>
-              <label className="neu-label">Current Password</label>
-              <input
-                type="password"
-                value={passwordForm.current_password}
-                onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
-                className="neu-input"
-                required
-              />
-            </div>
+            {user?.has_password && (
+              <div>
+                <label className="neu-label">Current Password</label>
+                <input
+                  type="password"
+                  value={passwordForm.current_password}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                  className="neu-input"
+                  required
+                />
+              </div>
+            )}
             <div>
               <label className="neu-label">New Password</label>
               <input
@@ -206,7 +211,7 @@ export default function ProfilePage() {
               />
             </div>
             <button type="submit" disabled={passwordSaving} className="neu-btn text-[12px]">
-              {passwordSaving ? 'Saving...' : 'Change Password'}
+              {passwordSaving ? 'Saving...' : user?.has_password ? 'Change Password' : 'Set Password'}
             </button>
           </form>
         </div>

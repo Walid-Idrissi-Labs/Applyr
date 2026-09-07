@@ -44,4 +44,15 @@ return [
         'model' => env('OPENROUTER_MODEL', 'openai/gpt-oss-20b:free'),
     ],
 
+    /*
+     * These values belong only in Laravel's environment.  The React app
+     * deliberately never receives GOOGLE_CLIENT_SECRET.
+     */
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+        'login_code_expire' => (int) env('OAUTH_LOGIN_CODE_EXPIRE', 5),
+    ],
+
 ];

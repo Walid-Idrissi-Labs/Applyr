@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(AiLog::class);
     }
+
+    public function oauthIdentities(): HasMany
+    {
+        return $this->hasMany(OAuthIdentity::class);
+    }
 }

@@ -38,7 +38,7 @@ class ReminderMail extends Mailable implements ShouldQueue
     public function build(): static
     {
         return $this->with([
-            'appUrl' => config('app.url') . '/login',
+            'appUrl' => config('app.url').'/login',
         ]);
     }
 }

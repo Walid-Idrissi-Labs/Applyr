@@ -1,6 +1,21 @@
 import axios from 'axios';
 
 const apiBaseURL = import.meta.env.VITE_API_URL || '/api';
+
+// Set VITE_API_DELAY_MS in a local .env file to make existing loading states
+// observable during development. The DEV guard keeps this strictly opt-in for
+// local builds, even if the variable is accidentally present in production.
+const parseDevelopmentApiDelay = (value) => {
+  if (!import.meta.env.DEV || typeof value !== 'string' || value.trim() === '') {
+    return 0;
+  }
+
+  const delay = Number(value);
+  return Number.isFinite(delay) && delay > 0 ? delay : 0;
+};
+
+const developmentApiDelayMs = parseDevelopmentApiDelay(import.meta.env.VITE_API_DELAY_MS);
+
 const api = axios.create({
   baseURL: apiBaseURL,
   // Generous enough for a cold backend start, short enough that a hung request
@@ -8,7 +23,11 @@ const api = axios.create({
   timeout: 45000,
 });
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
+  if (developmentApiDelayMs) {
+    await new Promise((resolve) => setTimeout(resolve, developmentApiDelayMs));
+  }
+
   const token = localStorage.getItem('auth_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

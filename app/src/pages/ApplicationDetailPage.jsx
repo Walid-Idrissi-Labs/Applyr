@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { applicationsAPI, tasksAPI, documentsAPI, resumesAPI, tagsAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import { ApplicationDetailSkeleton } from '../components/loading/PageSkeletons';
+import { usePageLoading } from '../context/LoadingActivityContext';
 import { ArrowLeft, Calendar, ExternalLink, FileText, Plus, Trash2, Upload, Check, Wand2, Edit2, Clock, Save, X } from 'lucide-react';
 
 const STATUSES = ['Wishlist', 'Applied', 'Interview', 'Technical Test', 'Offer', 'Accepted', 'Rejected'];
@@ -36,6 +38,7 @@ export default function ApplicationDetailPage() {
   const [loadingMsg, setLoadingMsg] = useState('');
   const [generatedResumeId, setGeneratedResumeId] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+  usePageLoading(loading);
 
   const QUIRKY_MSGS = [
     "Polishing your experience...",
@@ -226,7 +229,7 @@ export default function ApplicationDetailPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="font-bold dark:text-white">Loading...</div></div>;
+    return <ApplicationDetailSkeleton />;
   }
 
   if (error || !app) {

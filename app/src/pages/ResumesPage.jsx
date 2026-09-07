@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { resumesAPI } from '../api';
 import ReactMarkdown from 'react-markdown';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import { ResumesSkeleton } from '../components/loading/PageSkeletons';
+import { usePageLoading } from '../context/LoadingActivityContext';
 import { FileText, Download, Eye, Upload, Briefcase, ChevronRight, Clock, Trash2, Edit2, X, Wand2, Check } from 'lucide-react';
 
 const LANGUAGES = [
@@ -26,6 +28,7 @@ export default function ResumesPage() {
   const [saveStatus, setSaveStatus] = useState(''); // 'idle', 'saving', 'saved', 'error'
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
   const navigate = useNavigate();
+  usePageLoading(loading);
 
   const openConfirm = (options) => {
     return new Promise((resolve) => {
@@ -170,12 +173,7 @@ export default function ResumesPage() {
       </div>
       
       {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <div className="text-center space-y-4">
-            <div className="w-10 h-10 border-4 border-purple-200 dark:border-purple-900 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
-            <div className="font-bold text-gray-500">Loading your drafts...</div>
-          </div>
-        </div>
+        <ResumesSkeleton />
       ) : (
         <>
           {/* TOP SECTION: Global Base Resume */}

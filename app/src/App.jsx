@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LoadingActivityProvider } from './context/LoadingActivityContext';
+import WorkspaceLoader from './components/loading/WorkspaceLoader';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -22,11 +24,7 @@ function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-[#0a0a0a]">
-        <div className="text-[#111] dark:text-white font-bold">Loading...</div>
-      </div>
-    );
+    return <WorkspaceLoader />;
   }
 
   if (!user) {
@@ -40,11 +38,7 @@ function LandingRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-[#0a0a0a]">
-        <div className="text-[#111] dark:text-white font-bold">Loading...</div>
-      </div>
-    );
+    return <WorkspaceLoader />;
   }
 
   if (user) {
@@ -93,7 +87,9 @@ export default function App() {
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <AppRoutes />
+          <LoadingActivityProvider>
+            <AppRoutes />
+          </LoadingActivityProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

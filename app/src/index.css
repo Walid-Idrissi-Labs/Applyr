@@ -64,6 +64,99 @@
   @apply text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider;
 }
 
+.loading-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  background: #e5e7eb;
+}
+
+.dark .loading-skeleton {
+  background: #27272a;
+}
+
+.loading-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  animation: loading-shimmer 1.6s ease-in-out infinite;
+}
+
+.dark .loading-skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+}
+
+.workspace-loader-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 2px solid #111;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 5px 5px 0 #111;
+}
+
+.dark .workspace-loader-mark {
+  border-color: #52525b;
+  background: #111;
+  box-shadow: 5px 5px 0 rgba(255, 255, 255, 0.08);
+}
+
+.workspace-loader-mark span {
+  width: 0.45rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: #111;
+  animation: workspace-loader-wave 1s ease-in-out infinite;
+}
+
+.dark .workspace-loader-mark span {
+  background: #fff;
+}
+
+.workspace-loader-mark span:nth-child(2) { animation-delay: 120ms; }
+.workspace-loader-mark span:nth-child(3) { animation-delay: 240ms; }
+
+.header-loading-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #d1d5db;
+  border-top-color: #111;
+  border-radius: 999px;
+  animation: header-loading-spin 0.8s linear infinite;
+}
+
+.dark .header-loading-spinner {
+  border-color: #3f3f46;
+  border-top-color: #fff;
+}
+
+@keyframes loading-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes workspace-loader-wave {
+  0%, 100% { transform: scaleY(0.45); opacity: 0.45; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes header-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-skeleton::after,
+  .workspace-loader-mark span,
+  .header-loading-spinner {
+    animation: none;
+  }
+}
+
 
 select option {
   @apply bg-white dark:bg-[#111] text-[#111] dark:text-white;

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLoadingActivity } from '../context/LoadingActivityContext';
 import { notificationsAPI } from '../api';
 import { Menu, Sun, Moon, Bell, User, LogOut, ArrowRightLeft } from 'lucide-react';
 
@@ -26,7 +27,9 @@ export default function AppLayout() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [adminViewMode, setAdminViewMode] = useState(user?.is_admin || false);
+  const [showSlowLoadingMessage, setShowSlowLoadingMessage] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { isPageLoading } = useLoadingActivity();
   const navigate = useNavigate();
   const location = useLocation();
   const hasUnread = unreadCount > 0;
@@ -43,6 +46,16 @@ export default function AppLayout() {
   };
 
   const currentTabs = user?.is_admin && adminViewMode ? ADMIN_TABS : USER_TABS;
+
+  useEffect(() => {
+    if (!isPageLoading) {
+      setShowSlowLoadingMessage(false);
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setShowSlowLoadingMessage(true), 4000);
+    return () => window.clearTimeout(timer);
+  }, [isPageLoading]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -204,6 +217,27 @@ export default function AppLayout() {
               </button>
             </div>
             <div className="flex items-center gap-4 relative">
+              <div
+                className={`flex items-center overflow-hidden transition-[max-width,opacity] duration-500 ease-out motion-reduce:transition-none ${
+                  isPageLoading ? 'max-w-[160px] sm:max-w-[280px] opacity-100' : 'max-w-0 opacity-0'
+                }`}
+                role="status"
+                aria-live="polite"
+                aria-label={showSlowLoadingMessage ? 'Your content is on the way' : 'Loading page'}
+              >
+                <div className="header-loading-spinner shrink-0" aria-hidden="true" />
+                <div
+                  className={`overflow-hidden transition-[max-width,opacity,transform,margin] duration-500 ease-out motion-reduce:transition-none ${
+                    showSlowLoadingMessage
+                      ? 'ml-2 max-w-[135px] sm:max-w-[230px] translate-x-0 opacity-100'
+                      : 'ml-0 max-w-0 translate-x-3 opacity-0'
+                  }`}
+                >
+                  <span className="block whitespace-nowrap text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                    Your content is on the way
+                  </span>
+                </div>
+              </div>
               <button
                 onClick={() => navigate('/notifications')}
                 className={`hover:bg-gray-100 dark:hover:bg-gray-800 p-2 border-2 rounded-md transition-all dark:text-white relative ${

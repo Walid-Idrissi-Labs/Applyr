@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { notificationsAPI } from '../api';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import { NotificationsSkeleton } from '../components/loading/PageSkeletons';
+import { usePageLoading } from '../context/LoadingActivityContext';
 import { Bell, Trash2, Check, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+  usePageLoading(loading);
 
   const openConfirm = (options) => {
     return new Promise((resolve) => {
@@ -105,7 +108,7 @@ export default function NotificationsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-48"><div className="font-bold dark:text-white">Loading...</div></div>
+        <NotificationsSkeleton />
       ) : notifications.length === 0 ? (
         <div className="text-center py-12">
           <Bell className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-700 mb-3" />

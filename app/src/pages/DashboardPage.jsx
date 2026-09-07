@@ -5,6 +5,8 @@ import { Pie } from 'react-chartjs-2';
 import { applicationsAPI } from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
+import { CompactListSkeleton, DashboardSkeleton } from '../components/loading/PageSkeletons';
+import { usePageLoading } from '../context/LoadingActivityContext';
 import { LayoutDashboard, Plus } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -32,6 +34,7 @@ export default function DashboardPage() {
   const [verificationStatus, setVerificationStatus] = useState('');
   const [verificationError, setVerificationError] = useState('');
   const [verificationSending, setVerificationSending] = useState(false);
+  usePageLoading(loading || inProgressLoading);
 
   useEffect(() => {
     let isActive = true;
@@ -90,11 +93,7 @@ export default function DashboardPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-[#111] dark:text-white font-bold">Loading...</div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error) {
@@ -237,7 +236,7 @@ export default function DashboardPage() {
         </div>
       </div>
       {inProgressLoading ? (
-        <div className="text-center py-6 text-gray-400 dark:text-gray-600">Loading in-progress applications...</div>
+        <CompactListSkeleton />
       ) : inProgressApps.length === 0 ? (
         <div className="text-center py-6">
           <div className="text-gray-400 dark:text-gray-600 text-[12px]">No in-progress applications yet</div>

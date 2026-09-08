@@ -7,7 +7,6 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [hasStoredSession] = useState(() => Boolean(localStorage.getItem('auth_token')));
   const [sessionRestorationFailed, setSessionRestorationFailed] = useState(false);
   const [postAuthTransition, setPostAuthTransition] = useState(false);
   const { theme } = useTheme();
@@ -107,7 +106,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, hasStoredSession, sessionRestorationFailed, postAuthTransition, consumePostAuthTransition, login, register, completeGoogleLogin, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
+    <AuthContext.Provider value={{ user, loading, sessionRestorationFailed, postAuthTransition, consumePostAuthTransition, login, register, completeGoogleLogin, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );

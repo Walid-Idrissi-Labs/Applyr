@@ -19,7 +19,6 @@ import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import UserManagementPage from './pages/UserManagementPage';
 import AppLayout from './components/AppLayout';
-import WorkspaceLoader from './components/loading/WorkspaceLoader';
 
 function AnonymousStartup({ isExiting = false }) {
   return (
@@ -33,7 +32,7 @@ function AnonymousStartup({ isExiting = false }) {
 }
 
 function StartupGate({ children }) {
-  const { loading, hasStoredSession } = useAuth();
+  const { loading } = useAuth();
   const [isExiting, setIsExiting] = useState(false);
   const [hasFinished, setHasFinished] = useState(false);
 
@@ -46,18 +45,6 @@ function StartupGate({ children }) {
   }, [loading]);
 
   if (hasFinished) return children;
-
-  if (hasStoredSession) {
-    return (
-      <WorkspaceLoader
-        delay={0}
-        requestActive={loading}
-        completed={!loading}
-        isExiting={isExiting}
-        statusLabel="Restoring your session"
-      />
-    );
-  }
 
   return <AnonymousStartup isExiting={isExiting} />;
 }

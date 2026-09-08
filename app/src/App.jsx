@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoadingActivityProvider } from './context/LoadingActivityContext';
-import WorkspaceLoader from './components/loading/WorkspaceLoader';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -20,11 +19,19 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import UserManagementPage from './pages/UserManagementPage';
 import AppLayout from './components/AppLayout';
 
+function SessionCheck() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a]" role="status" aria-label="Checking your session">
+      <span className="header-loading-spinner" aria-hidden="true" />
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <WorkspaceLoader />;
+    return <SessionCheck />;
   }
 
   if (!user) {
@@ -38,7 +45,7 @@ function LandingRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <WorkspaceLoader />;
+    return <SessionCheck />;
   }
 
   if (user) {

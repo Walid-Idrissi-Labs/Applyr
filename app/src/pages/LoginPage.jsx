@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import WorkspaceLoader from '../components/loading/WorkspaceLoader';
+import LoadingStatus from '../components/loading/LoadingStatus';
 import { useTheme } from '../context/ThemeContext';
 import { getGoogleAuthURL } from '../api';
 import { Moon, Sun } from 'lucide-react';
@@ -147,7 +147,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center p-4 transition-colors duration-300" style={{ position: 'relative', zIndex: 1 }}>
-      {loading && <WorkspaceLoader />}
+      {loading && <LoadingStatus label={isRegister ? 'Creating account' : 'Logging in'} />}
       <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }} />
       <div className="w-full max-w-sm bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 10 }}>
         <div className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#111] dark:border-gray-800 p-5 text-center shrink-0 flex justify-between items-center">
@@ -229,7 +229,14 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full border-2 border-[#111] dark:border-gray-700 rounded-md bg-[#111] dark:bg-white text-white dark:text-[#111] p-2.5 font-bold hover:bg-white dark:hover:bg-[#eee] hover:text-[#111] transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50"
             >
-              {loading ? 'Please wait...' : isRegister ? 'Sign Up' : 'Sign In'}
+              {loading ? (
+                <span className="inline-flex items-center justify-center gap-2">
+                  <span className="login-button-spinner" aria-hidden="true" />
+                  <span className="login-button-status-text">
+                    {isRegister ? 'Creating account' : 'Logging in'}
+                  </span>
+                </span>
+              ) : isRegister ? 'Sign Up' : 'Sign In'}
             </button>
           </form>
           <div className="mt-6 text-center border-t border-dashed border-gray-300 dark:border-gray-800 pt-5">

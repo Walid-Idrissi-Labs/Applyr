@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLoadingActivity } from '../context/LoadingActivityContext';
 import { notificationsAPI } from '../api';
+import WorkspaceLoader from './loading/WorkspaceLoader';
 import { Menu, Sun, Moon, Bell, User, LogOut, ArrowRightLeft } from 'lucide-react';
 
 const USER_TABS = [
@@ -21,13 +22,16 @@ const ADMIN_TABS = [
 ];
 
 export default function AppLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, postAuthTransition, consumePostAuthTransition } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [adminViewMode, setAdminViewMode] = useState(user?.is_admin || false);
   const [showSlowLoadingMessage, setShowSlowLoadingMessage] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [loadingInitialWorkspace, setLoadingInitialWorkspace] = useState(postAuthTransition);
+  const initialWorkspaceLoadStarted = useRef(false);
   const { theme, toggleTheme } = useTheme();
   const { isPageLoading } = useLoadingActivity();
   const navigate = useNavigate();
@@ -56,6 +60,25 @@ export default function AppLayout() {
     const timer = window.setTimeout(() => setShowSlowLoadingMessage(true), 4000);
     return () => window.clearTimeout(timer);
   }, [isPageLoading]);
+
+  useEffect(() => {
+    if (postAuthTransition) {
+      consumePostAuthTransition();
+    }
+  }, [consumePostAuthTransition, postAuthTransition]);
+
+  useEffect(() => {
+    if (!loadingInitialWorkspace) return;
+
+    if (isPageLoading) {
+      initialWorkspaceLoadStarted.current = true;
+      return;
+    }
+
+    if (initialWorkspaceLoadStarted.current) {
+      setLoadingInitialWorkspace(false);
+    }
+  }, [isPageLoading, loadingInitialWorkspace]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -143,12 +166,26 @@ export default function AppLayout() {
   }, [user?.id, location.pathname]);
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/login');
+    setLoggingOut(true);
+    try {
+      await logout();
+      navigate('/login');
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+      {loadingInitialWorkspace && <WorkspaceLoader />}
+      {loggingOut && (
+        <WorkspaceLoader
+          delay={350}
+          variant="closing"
+          title="Closing your workspace"
+          message="Putting everything safely away. See you next time."
+        />
+      )}
       {isMobile && sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-10"
@@ -280,6 +317,7 @@ export default function AppLayout() {
                     </button>
                     <button
                       onClick={handleLogout}
+                      disabled={loggingOut}
                       className="w-full text-left px-4 py-2 text-[13px] text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
                     >
                       <LogOut className="w-3 h-3" /> Logout

@@ -12,6 +12,12 @@ const PAGES = [
   { x: '4px', y: '-2px', rotation: '4deg', startX: '397px', startY: '-43px', startRotation: '18deg' },
   { x: '-3px', y: '2px', rotation: '-2deg', startX: '-409px', startY: '-4px', startRotation: '-20deg' },
   { x: '6px', y: '-4px', rotation: '7deg', startX: '405px', startY: '35px', startRotation: '17deg' },
+  { x: '-7px', y: '4px', rotation: '-5deg', startX: '-401px', startY: '-28px', startRotation: '-18deg' },
+  { x: '3px', y: '-3px', rotation: '3deg', startX: '410px', startY: '-8px', startRotation: '20deg' },
+  { x: '-4px', y: '3px', rotation: '-3deg', startX: '-412px', startY: '26px', startRotation: '-15deg' },
+  { x: '7px', y: '-5px', rotation: '6deg', startX: '399px', startY: '42px', startRotation: '18deg' },
+  { x: '-5px', y: '5px', rotation: '-6deg', startX: '-397px', startY: '7px', startRotation: '-19deg' },
+  { x: '5px', y: '-2px', rotation: '5deg', startX: '414px', startY: '-36px', startRotation: '21deg' },
 ];
 
 export default function WorkspaceLoader({
@@ -83,7 +89,7 @@ export default function WorkspaceLoader({
                       '--page-start-x': page.startX,
                       '--page-start-y': page.startY,
                       '--page-start-rotation': page.startRotation,
-                      '--page-delay': `${index * -0.68}s`,
+                      '--page-delay': `${index * -0.65}s`,
                       '--page-layer': PAGES.length - index,
                     }}
                   />

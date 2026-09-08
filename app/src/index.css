@@ -196,7 +196,7 @@
   box-shadow: 2px 2px 0 rgba(17, 17, 17, 0.18);
   transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation));
   transform-origin: center;
-  animation: workspace-page-settle 6.8s cubic-bezier(0.48, 0, 0.35, 1) infinite;
+  animation: workspace-page-settle 10.4s cubic-bezier(0.48, 0, 0.35, 1) infinite;
   animation-delay: var(--page-delay);
   will-change: transform, opacity;
 }
@@ -308,13 +308,13 @@
     opacity: 1;
     transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation));
   }
-  81% {
-    opacity: 1;
+  79% {
+    opacity: 0.92;
     transform: translate(142px, 58px) rotate(17deg) scale(0.96);
   }
-  84%, 100% {
+  94%, 100% {
     opacity: 0;
-    transform: translate(160px, 68px) rotate(19deg) scale(0.92);
+    transform: translate(220px, 96px) rotate(22deg) scale(0.9);
   }
 }
 
@@ -327,9 +327,13 @@
     opacity: 1;
     transform: translate(var(--page-start-x), var(--page-start-y)) rotate(var(--page-start-rotation)) scale(0.95);
   }
-  54%, 100% {
+  54%, 82% {
     opacity: 1;
     transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation));
+  }
+  94%, 100% {
+    opacity: 0;
+    transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation)) scale(0.96);
   }
 }
 

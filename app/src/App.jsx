@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoadingActivityProvider } from './context/LoadingActivityContext';
@@ -33,7 +33,8 @@ function AnonymousStartup({ isExiting = false }) {
 }
 
 function StartupGate({ children }) {
-  const { loading, hasStoredSession } = useAuth();
+  const { loading, user, hasStoredSession } = useAuth();
+  const location = useLocation();
   const [isExiting, setIsExiting] = useState(false);
   const [hasFinished, setHasFinished] = useState(false);
 
@@ -45,9 +46,11 @@ function StartupGate({ children }) {
     return () => window.clearTimeout(timer);
   }, [loading]);
 
-  if (hasFinished) return children;
+  const canRenderWorkspace = Boolean(user) && location.pathname !== '/';
 
-  if (hasStoredSession) {
+  if (hasFinished || canRenderWorkspace) return children;
+
+  if (hasStoredSession && location.pathname === '/') {
     return (
       <WorkspaceLoader
         delay={0}
@@ -65,7 +68,7 @@ function StartupGate({ children }) {
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
-  if (loading) {
+  if (loading && !user) {
     return null;
   }
 
@@ -77,14 +80,18 @@ function ProtectedRoute({ children }) {
 }
 
 function LandingRoute() {
-  const { user, loading } = useAuth();
+  const { user, loading, sessionRestorationFailed } = useAuth();
 
-  if (loading) {
+  if (loading && !user) {
     return null;
   }
 
   if (user) {
     return <Navigate to={user?.is_admin ? '/admin/dashboard' : '/dashboard'} replace />;
+  }
+
+  if (sessionRestorationFailed) {
+    return <Navigate to="/login" replace />;
   }
 
   return <LandingPage />;

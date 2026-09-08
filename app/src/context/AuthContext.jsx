@@ -4,8 +4,18 @@ import { useTheme } from './ThemeContext';
 
 const AuthContext = createContext();
 
+function getStoredUser() {
+  if (!localStorage.getItem('auth_token')) return null;
+
+  try {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(getStoredUser);
   const [loading, setLoading] = useState(true);
   const [hasStoredSession] = useState(() => Boolean(localStorage.getItem('auth_token')));
   const [sessionRestorationFailed, setSessionRestorationFailed] = useState(false);
@@ -22,6 +32,7 @@ export function AuthProvider({ children }) {
         .catch(() => {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user');
+          setUser(null);
           setSessionRestorationFailed(true);
         })
         .finally(() => setLoading(false));

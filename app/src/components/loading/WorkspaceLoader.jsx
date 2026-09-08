@@ -114,6 +114,7 @@ export default function WorkspaceLoader({
               </div>
             </div>
             <div className="workspace-loader-copy text-center">
+              <span className="workspace-loader-brand">Applyr</span>
               <div className={`font-bold text-[15px] tracking-wide ${
                 variant === 'closing' ? 'text-red-700 dark:text-red-400' : 'text-[#111] dark:text-white'
               }`}>

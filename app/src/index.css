@@ -189,8 +189,27 @@
 }
 
 .workspace-loader-copy {
-  align-self: end;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
   padding: 1.15rem;
+}
+
+.workspace-loader-brand {
+  position: absolute;
+  top: 1.15rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: #111;
+}
+
+.dark .workspace-loader-brand {
+  color: #fff;
 }
 
 .workspace-loader-progress {

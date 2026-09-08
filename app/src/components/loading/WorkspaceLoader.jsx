@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import LoadingStatus from './LoadingStatus';
+import InteractiveDotBackground from '../InteractiveDotBackground';
 
 const PAGES = [
   { x: '-8px', y: '6px', rotation: '-7deg', startX: '-398px', startY: '-16px', startRotation: '-17deg' },
@@ -88,31 +89,12 @@ export default function WorkspaceLoader({
     >
       {visible && (
         <>
+          <InteractiveDotBackground />
           <LoadingStatus
             label={resolvedStatusLabel}
             tone={variant === 'closing' ? 'logout' : 'default'}
           />
           <div className={`workspace-loader-panel workspace-loader-panel--${variant}`} role="status" aria-live="polite" aria-label={title}>
-            <div className="workspace-page-window" aria-hidden="true">
-              <div className="workspace-page-stack">
-                {PAGES.map((page, index) => (
-                  <span
-                    key={index}
-                    className="workspace-loader-page"
-                    style={{
-                      '--page-x': page.x,
-                      '--page-y': page.y,
-                      '--page-rotation': page.rotation,
-                      '--page-start-x': page.startX,
-                      '--page-start-y': page.startY,
-                      '--page-start-rotation': page.startRotation,
-                      '--page-delay': `${index * -0.65}s`,
-                      '--page-layer': PAGES.length - index,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
             <div className="workspace-loader-copy text-center">
               <span className="workspace-loader-brand">Applyr</span>
               <div className={`font-bold text-[15px] tracking-wide ${
@@ -135,6 +117,26 @@ export default function WorkspaceLoader({
                   <span className="workspace-loader-progress-fill" style={{ width: `${progress}%` }} />
                 </div>
               )}
+            </div>
+            <div className="workspace-page-window" aria-hidden="true">
+              <div className="workspace-page-stack">
+                {PAGES.map((page, index) => (
+                  <span
+                    key={index}
+                    className="workspace-loader-page"
+                    style={{
+                      '--page-x': page.x,
+                      '--page-y': page.y,
+                      '--page-rotation': page.rotation,
+                      '--page-start-x': page.startX,
+                      '--page-start-y': page.startY,
+                      '--page-start-rotation': page.startRotation,
+                      '--page-delay': `${index * -0.65}s`,
+                      '--page-layer': PAGES.length - index,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </>

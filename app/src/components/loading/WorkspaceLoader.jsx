@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import LoadingStatus from './LoadingStatus';
+import InteractiveDotBackground from '../InteractiveDotBackground';
 
 const PAGES = [
   { x: '-8px', y: '6px', rotation: '-7deg', startX: '-398px', startY: '-16px', startRotation: '-17deg' },
@@ -34,6 +35,7 @@ export default function WorkspaceLoader({
   message = 'The server may need a moment to wake up. Your content is on the way.',
 }) {
   const [visible, setVisible] = useState(delay === 0);
+  const [hasEntered, setHasEntered] = useState(false);
   const [progress, setProgress] = useState(18);
   const minimumVisibleDurationRef = useRef(minimumVisibleDuration);
   const resolvedStatusLabel = statusLabel || (variant === 'closing' ? 'Logging out' : 'Logging in');
@@ -44,6 +46,12 @@ export default function WorkspaceLoader({
     const timer = window.setTimeout(() => setVisible(true), delay);
     return () => window.clearTimeout(timer);
   }, [delay]);
+
+  useEffect(() => {
+    if (!visible) return undefined;
+    const frame = window.requestAnimationFrame(() => setHasEntered(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [visible]);
 
   useEffect(() => {
     if (!visible || !minimumVisibleDurationRef.current || !onMinimumVisibleDurationElapsed) {
@@ -83,37 +91,19 @@ export default function WorkspaceLoader({
 
   return (
     <div
-      className={`workspace-loader fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] px-6 ${isExiting ? 'workspace-loader--exiting' : ''}`}
+      className={`workspace-loader fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] px-6 ${hasEntered ? '' : 'workspace-loader--entering'} ${isExiting ? 'workspace-loader--exiting' : ''}`}
       aria-busy="true"
     >
+      <InteractiveDotBackground />
       {visible && (
-        <>
+        <div className="workspace-loader-content">
           <LoadingStatus
             label={resolvedStatusLabel}
             tone={variant === 'closing' ? 'logout' : 'default'}
           />
           <div className={`workspace-loader-panel workspace-loader-panel--${variant}`} role="status" aria-live="polite" aria-label={title}>
-            <div className="workspace-page-window" aria-hidden="true">
-              <div className="workspace-page-stack">
-                {PAGES.map((page, index) => (
-                  <span
-                    key={index}
-                    className="workspace-loader-page"
-                    style={{
-                      '--page-x': page.x,
-                      '--page-y': page.y,
-                      '--page-rotation': page.rotation,
-                      '--page-start-x': page.startX,
-                      '--page-start-y': page.startY,
-                      '--page-start-rotation': page.startRotation,
-                      '--page-delay': `${index * -0.65}s`,
-                      '--page-layer': PAGES.length - index,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
             <div className="workspace-loader-copy text-center">
+              <span className="workspace-loader-brand">Applyr</span>
               <div className={`font-bold text-[15px] tracking-wide ${
                 variant === 'closing' ? 'text-red-700 dark:text-red-400' : 'text-[#111] dark:text-white'
               }`}>
@@ -135,8 +125,28 @@ export default function WorkspaceLoader({
                 </div>
               )}
             </div>
+            <div className="workspace-page-window" aria-hidden="true">
+              <div className="workspace-page-stack">
+                {PAGES.map((page, index) => (
+                  <span
+                    key={index}
+                    className="workspace-loader-page"
+                    style={{
+                      '--page-x': page.x,
+                      '--page-y': page.y,
+                      '--page-rotation': page.rotation,
+                      '--page-start-x': page.startX,
+                      '--page-start-y': page.startY,
+                      '--page-start-rotation': page.startRotation,
+                      '--page-delay': `${index * -0.65}s`,
+                      '--page-layer': PAGES.length - index,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

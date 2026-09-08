@@ -71,16 +71,23 @@ export function AuthProvider({ children }) {
     return user;
   };
 
-  const logout = async () => {
+  const logout = async ({ deferLocalSignOut = false } = {}) => {
     try {
       await authAPI.logout();
     } catch (e) {
       // ignore
     }
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
-    setPostAuthTransition(false);
-    setUser(null);
+
+    const clearLocalSession = () => {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      setPostAuthTransition(false);
+      setUser(null);
+    };
+
+    if (deferLocalSignOut) return clearLocalSession;
+
+    clearLocalSession();
   };
 
   const consumePostAuthTransition = useCallback(() => {

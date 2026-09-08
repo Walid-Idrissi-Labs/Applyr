@@ -31,6 +31,7 @@ export default function AppLayout() {
   const [showSlowLoadingMessage, setShowSlowLoadingMessage] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [loadingInitialWorkspace, setLoadingInitialWorkspace] = useState(postAuthTransition);
+  const [workspaceLoadComplete, setWorkspaceLoadComplete] = useState(false);
   const initialWorkspaceLoadStarted = useRef(false);
   const { theme, toggleTheme } = useTheme();
   const { isPageLoading } = useLoadingActivity();
@@ -72,11 +73,17 @@ export default function AppLayout() {
 
     if (isPageLoading) {
       initialWorkspaceLoadStarted.current = true;
+      setWorkspaceLoadComplete(false);
       return;
     }
 
     if (initialWorkspaceLoadStarted.current) {
-      setLoadingInitialWorkspace(false);
+      setWorkspaceLoadComplete(true);
+      const timer = window.setTimeout(() => {
+        setLoadingInitialWorkspace(false);
+        setWorkspaceLoadComplete(false);
+      }, 360);
+      return () => window.clearTimeout(timer);
     }
   }, [isPageLoading, loadingInitialWorkspace]);
 
@@ -177,7 +184,12 @@ export default function AppLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
-      {loadingInitialWorkspace && <WorkspaceLoader />}
+      {loadingInitialWorkspace && (
+        <WorkspaceLoader
+          requestActive={isPageLoading}
+          completed={workspaceLoadComplete}
+        />
+      )}
       {loggingOut && (
         <WorkspaceLoader
           delay={350}

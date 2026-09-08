@@ -18,17 +18,42 @@ export default function WorkspaceLoader({
   delay = 2000,
   variant = 'opening',
   statusLabel,
+  requestActive = false,
+  completed = false,
   title = 'Getting your workspace ready',
   message = 'The server may need a moment to wake up. Your content is on the way.',
 }) {
   const [visible, setVisible] = useState(delay === 0);
+  const [progress, setProgress] = useState(18);
   const resolvedStatusLabel = statusLabel || (variant === 'closing' ? 'Logging out' : 'Logging in');
+  const showProgress = variant === 'opening';
 
   useEffect(() => {
     if (delay === 0) return undefined;
     const timer = window.setTimeout(() => setVisible(true), delay);
     return () => window.clearTimeout(timer);
   }, [delay]);
+
+  useEffect(() => {
+    if (!showProgress) return undefined;
+
+    if (completed) {
+      setProgress(100);
+      return undefined;
+    }
+
+    if (!requestActive) {
+      setProgress(18);
+      return undefined;
+    }
+
+    setProgress((current) => Math.max(current, 42));
+    const timer = window.setInterval(() => {
+      setProgress((current) => Math.min(92, current + Math.max(1, (92 - current) * 0.12)));
+    }, 700);
+
+    return () => window.clearInterval(timer);
+  }, [completed, requestActive, showProgress]);
 
   if (!visible) return null;
 
@@ -73,6 +98,18 @@ export default function WorkspaceLoader({
           <p className="mt-1.5 text-[10px] leading-4 text-gray-500 dark:text-gray-400">
             {message}
           </p>
+          {showProgress && (
+            <div
+              className="workspace-loader-progress"
+              role="progressbar"
+              aria-label="Preparing workspace"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress)}
+            >
+              <span className="workspace-loader-progress-fill" style={{ width: `${progress}%` }} />
+            </div>
+          )}
         </div>
       </div>
     </div>

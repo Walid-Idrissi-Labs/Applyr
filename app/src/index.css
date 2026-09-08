@@ -137,6 +137,49 @@
   padding: 1.15rem;
 }
 
+.workspace-loader-progress {
+  position: relative;
+  height: 0.35rem;
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.dark .workspace-loader-progress {
+  border-color: #71717a;
+  background: #27272a;
+}
+
+.workspace-loader-progress-fill {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: #111;
+  transition: width 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .workspace-loader-progress-fill {
+  background: #f8fafc;
+}
+
+.workspace-loader-progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 2rem;
+  transform: translateX(-150%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  animation: workspace-progress-sweep 1.4s ease-in-out infinite;
+}
+
+.dark .workspace-loader-progress-fill::after {
+  background: linear-gradient(90deg, transparent, rgba(17, 17, 17, 0.45), transparent);
+}
+
 .workspace-loader-page {
   position: absolute;
   top: 0.3rem;
@@ -312,6 +355,10 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
+@keyframes workspace-progress-sweep {
+  to { transform: translateX(350%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .loading-skeleton::after,
   .workspace-loader-page,
@@ -319,7 +366,8 @@
   .login-button-spinner,
   .loading-transition-spinner,
   .login-button-status-text,
-  .loading-transition-status {
+  .loading-transition-status,
+  .workspace-loader-progress-fill::after {
     animation: none;
   }
 

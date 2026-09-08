@@ -205,14 +205,6 @@
   animation-name: workspace-page-collect;
 }
 
-.workspace-loader-panel--closing .workspace-page-window {
-  border-right-color: #dc2626;
-}
-
-.dark .workspace-loader-panel--closing .workspace-page-window {
-  border-right-color: #ef4444;
-}
-
 .dark .workspace-loader-page {
   border-color: #a1a1aa;
   background:
@@ -390,13 +382,6 @@
     border-bottom-color: #52525b;
   }
 
-  .workspace-loader-panel--closing .workspace-page-window {
-    border-bottom-color: #dc2626;
-  }
-
-  .dark .workspace-loader-panel--closing .workspace-page-window {
-    border-bottom-color: #ef4444;
-  }
 }
 
 

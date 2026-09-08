@@ -3,6 +3,8 @@ import { adminAPI } from '../api';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend } from 'chart.js';
 import { Shield } from 'lucide-react';
+import { AdminDashboardSkeleton } from '../components/loading/PageSkeletons';
+import { usePageLoading } from '../context/LoadingActivityContext';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
@@ -10,6 +12,7 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
   const [aiLogs, setAiLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  usePageLoading(loading);
 
   useEffect(() => {
     loadData();
@@ -32,7 +35,7 @@ export default function AdminDashboardPage() {
   };
 
   if (loading && !stats) {
-    return <div className="flex items-center justify-center h-64"><div className="font-bold dark:text-white">Loading...</div></div>;
+    return <AdminDashboardSkeleton />;
   }
 
   const monthlyData = stats?.monthly_users?.reduce((acc, item) => {

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../api';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import { UsersSkeleton } from '../components/loading/PageSkeletons';
+import { usePageLoading } from '../context/LoadingActivityContext';
 import { Users, Trash2, UserX, UserCheck, Crown, Search, Plus, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function UserManagementPage() {
@@ -18,6 +20,7 @@ export default function UserManagementPage() {
   const [userForm, setUserForm] = useState({ name: '', email: '', is_admin: false, is_active: true });
   const [formError, setFormError] = useState('');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+  usePageLoading(loading);
 
   const openConfirm = (options) => {
     return new Promise((resolve) => {
@@ -115,7 +118,7 @@ export default function UserManagementPage() {
   };
 
   if (loading && users.length === 0) {
-    return <div className="flex items-center justify-center h-64"><div className="font-bold dark:text-white">Loading...</div></div>;
+    return <UsersSkeleton />;
   }
 
   return (

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LoadingActivityProvider } from './context/LoadingActivityContext';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -18,15 +19,19 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import UserManagementPage from './pages/UserManagementPage';
 import AppLayout from './components/AppLayout';
 
+function SessionCheck() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a]" role="status" aria-label="Checking your session">
+      <span className="header-loading-spinner" aria-hidden="true" />
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-[#0a0a0a]">
-        <div className="text-[#111] dark:text-white font-bold">Loading...</div>
-      </div>
-    );
+    return <SessionCheck />;
   }
 
   if (!user) {
@@ -40,11 +45,7 @@ function LandingRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-[#0a0a0a]">
-        <div className="text-[#111] dark:text-white font-bold">Loading...</div>
-      </div>
-    );
+    return <SessionCheck />;
   }
 
   if (user) {
@@ -93,7 +94,9 @@ export default function App() {
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <AppRoutes />
+          <LoadingActivityProvider>
+            <AppRoutes />
+          </LoadingActivityProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLoadingActivity } from '../context/LoadingActivityContext';
 import { notificationsAPI } from '../api';
+import WorkspaceLoader from './loading/WorkspaceLoader';
 import { Menu, Sun, Moon, Bell, User, LogOut, ArrowRightLeft } from 'lucide-react';
 
 const USER_TABS = [
@@ -20,13 +22,19 @@ const ADMIN_TABS = [
 ];
 
 export default function AppLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, postAuthTransition, consumePostAuthTransition } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [adminViewMode, setAdminViewMode] = useState(user?.is_admin || false);
+  const [showSlowLoadingMessage, setShowSlowLoadingMessage] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [loadingInitialWorkspace, setLoadingInitialWorkspace] = useState(postAuthTransition);
+  const [workspaceLoadComplete, setWorkspaceLoadComplete] = useState(false);
+  const initialWorkspaceLoadStarted = useRef(false);
   const { theme, toggleTheme } = useTheme();
+  const { isPageLoading } = useLoadingActivity();
   const navigate = useNavigate();
   const location = useLocation();
   const hasUnread = unreadCount > 0;
@@ -43,6 +51,41 @@ export default function AppLayout() {
   };
 
   const currentTabs = user?.is_admin && adminViewMode ? ADMIN_TABS : USER_TABS;
+
+  useEffect(() => {
+    if (!isPageLoading) {
+      setShowSlowLoadingMessage(false);
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setShowSlowLoadingMessage(true), 4000);
+    return () => window.clearTimeout(timer);
+  }, [isPageLoading]);
+
+  useEffect(() => {
+    if (postAuthTransition) {
+      consumePostAuthTransition();
+    }
+  }, [consumePostAuthTransition, postAuthTransition]);
+
+  useEffect(() => {
+    if (!loadingInitialWorkspace) return;
+
+    if (isPageLoading) {
+      initialWorkspaceLoadStarted.current = true;
+      setWorkspaceLoadComplete(false);
+      return;
+    }
+
+    if (initialWorkspaceLoadStarted.current) {
+      setWorkspaceLoadComplete(true);
+      const timer = window.setTimeout(() => {
+        setLoadingInitialWorkspace(false);
+        setWorkspaceLoadComplete(false);
+      }, 360);
+      return () => window.clearTimeout(timer);
+    }
+  }, [isPageLoading, loadingInitialWorkspace]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -130,12 +173,31 @@ export default function AppLayout() {
   }, [user?.id, location.pathname]);
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/login');
+    setLoggingOut(true);
+    try {
+      await logout();
+      navigate('/login');
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+      {loadingInitialWorkspace && (
+        <WorkspaceLoader
+          requestActive={isPageLoading}
+          completed={workspaceLoadComplete}
+        />
+      )}
+      {loggingOut && (
+        <WorkspaceLoader
+          delay={350}
+          variant="closing"
+          title="Closing your workspace"
+          message="Putting everything safely away. See you next time."
+        />
+      )}
       {isMobile && sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-10"
@@ -204,6 +266,27 @@ export default function AppLayout() {
               </button>
             </div>
             <div className="flex items-center gap-4 relative">
+              <div
+                className={`flex items-center overflow-hidden transition-[max-width,opacity] duration-500 ease-out motion-reduce:transition-none ${
+                  isPageLoading ? 'max-w-[160px] sm:max-w-[280px] opacity-100' : 'max-w-0 opacity-0'
+                }`}
+                role="status"
+                aria-live="polite"
+                aria-label={showSlowLoadingMessage ? 'Your content is on the way' : 'Loading page'}
+              >
+                <div className="header-loading-spinner shrink-0" aria-hidden="true" />
+                <div
+                  className={`overflow-hidden transition-[max-width,opacity,transform,margin] duration-500 ease-out motion-reduce:transition-none ${
+                    showSlowLoadingMessage
+                      ? 'ml-2 max-w-[135px] sm:max-w-[230px] translate-x-0 opacity-100'
+                      : 'ml-0 max-w-0 translate-x-3 opacity-0'
+                  }`}
+                >
+                  <span className="block whitespace-nowrap text-[10px] font-bold text-gray-500 dark:text-gray-400">
+                    Your content is on the way
+                  </span>
+                </div>
+              </div>
               <button
                 onClick={() => navigate('/notifications')}
                 className={`hover:bg-gray-100 dark:hover:bg-gray-800 p-2 border-2 rounded-md transition-all dark:text-white relative ${
@@ -246,6 +329,7 @@ export default function AppLayout() {
                     </button>
                     <button
                       onClick={handleLogout}
+                      disabled={loggingOut}
                       className="w-full text-left px-4 py-2 text-[13px] text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
                     >
                       <LogOut className="w-3 h-3" /> Logout

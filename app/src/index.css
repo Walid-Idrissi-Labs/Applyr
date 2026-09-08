@@ -64,6 +64,330 @@
   @apply text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider;
 }
 
+.loading-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  background: #e5e7eb;
+}
+
+.dark .loading-skeleton {
+  background: #27272a;
+}
+
+.loading-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  animation: loading-shimmer 1.6s ease-in-out infinite;
+}
+
+.dark .loading-skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+}
+
+.workspace-loader-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12.5rem;
+  width: min(46rem, calc(100vw - 3rem));
+  min-height: 19rem;
+  overflow: hidden;
+  border: 2px solid #111;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 7px 7px 0 #111;
+}
+
+.dark .workspace-loader-panel {
+  border-color: #52525b;
+  background: #111;
+  box-shadow: 7px 7px 0 rgba(255, 255, 255, 0.08);
+}
+
+.workspace-page-window {
+  position: relative;
+  min-height: 19rem;
+  overflow: hidden;
+  border-right: 2px solid #111;
+  background:
+    radial-gradient(circle, rgba(17, 17, 17, 0.12) 1px, transparent 1.2px) 0 0 / 18px 18px,
+    #f9fafb;
+}
+
+.dark .workspace-page-window {
+  border-right-color: #52525b;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1.2px) 0 0 / 18px 18px,
+    #0a0a0a;
+}
+
+.workspace-page-stack {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4.2rem;
+  height: 5.25rem;
+  transform: translate(-50%, -50%);
+}
+
+.workspace-loader-copy {
+  align-self: end;
+  padding: 1.15rem;
+}
+
+.workspace-loader-progress {
+  position: relative;
+  height: 0.35rem;
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.dark .workspace-loader-progress {
+  border-color: #71717a;
+  background: #27272a;
+}
+
+.workspace-loader-progress-fill {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: #111;
+  transition: width 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .workspace-loader-progress-fill {
+  background: #f8fafc;
+}
+
+.workspace-loader-progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 2rem;
+  transform: translateX(-150%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  animation: workspace-progress-sweep 1.4s ease-in-out infinite;
+}
+
+.dark .workspace-loader-progress-fill::after {
+  background: linear-gradient(90deg, transparent, rgba(17, 17, 17, 0.45), transparent);
+}
+
+.workspace-loader-page {
+  position: absolute;
+  top: 0.3rem;
+  left: 0.25rem;
+  z-index: var(--page-layer);
+  width: 3.7rem;
+  height: 4.65rem;
+  border: 1.5px solid #111;
+  border-radius: 0.3rem;
+  background:
+    linear-gradient(#d4d4d8, #d4d4d8) 0.65rem 0.8rem / 2.2rem 0.18rem no-repeat,
+    linear-gradient(#d4d4d8, #d4d4d8) 0.65rem 1.25rem / 1.65rem 0.18rem no-repeat,
+    #fff;
+  box-shadow: 2px 2px 0 rgba(17, 17, 17, 0.18);
+  transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation));
+  transform-origin: center;
+  animation: workspace-page-settle 10.4s cubic-bezier(0.48, 0, 0.35, 1) infinite;
+  animation-delay: var(--page-delay);
+  will-change: transform, opacity;
+}
+
+.workspace-loader-panel--closing .workspace-loader-page {
+  animation-name: workspace-page-collect;
+}
+
+.dark .workspace-loader-page {
+  border-color: #a1a1aa;
+  background:
+    linear-gradient(#52525b, #52525b) 0.65rem 0.8rem / 2.2rem 0.18rem no-repeat,
+    linear-gradient(#52525b, #52525b) 0.65rem 1.25rem / 1.65rem 0.18rem no-repeat,
+    #18181b;
+  box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.08);
+}
+
+.header-loading-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #d1d5db;
+  border-top-color: #111;
+  border-radius: 999px;
+  animation: header-loading-spin 0.8s linear infinite;
+}
+
+.dark .header-loading-spinner {
+  border-color: #3f3f46;
+  border-top-color: #fff;
+}
+
+.login-button-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: header-loading-spin 0.8s linear infinite;
+}
+
+.login-button-status-text {
+  animation: login-button-status-enter 240ms ease-out both;
+}
+
+.loading-transition-status {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 2px solid #111;
+  border-radius: 0.55rem;
+  background: #fff;
+  box-shadow: 3px 3px 0 #111;
+  padding: 0.5rem 0.65rem;
+  color: #111;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  animation: loading-transition-status-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dark .loading-transition-status {
+  border-color: #52525b;
+  background: #111;
+  box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+
+.loading-transition-status--logout {
+  border-color: #b91c1c;
+  background: #fff7f7;
+  box-shadow: 3px 3px 0 #b91c1c;
+  color: #b91c1c;
+}
+
+.dark .loading-transition-status--logout {
+  border-color: #ef4444;
+  background: #280d0d;
+  box-shadow: 3px 3px 0 rgba(239, 68, 68, 0.34);
+  color: #fca5a5;
+}
+
+.loading-transition-spinner {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid currentColor;
+  border-left-color: transparent;
+  border-radius: 999px;
+  animation: header-loading-spin 0.8s linear infinite;
+}
+
+@keyframes loading-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes workspace-page-settle {
+  0%, 18% {
+    opacity: 0;
+    transform: translate(var(--page-start-x), var(--page-start-y)) rotate(var(--page-start-rotation)) scale(0.92);
+  }
+  21% {
+    opacity: 1;
+    transform: translate(var(--page-start-x), var(--page-start-y)) rotate(var(--page-start-rotation)) scale(0.94);
+  }
+  44%, 60% {
+    opacity: 1;
+    transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation));
+  }
+  79% {
+    opacity: 0.92;
+    transform: translate(142px, 58px) rotate(17deg) scale(0.96);
+  }
+  94%, 100% {
+    opacity: 0;
+    transform: translate(220px, 96px) rotate(22deg) scale(0.9);
+  }
+}
+
+@keyframes workspace-page-collect {
+  0%, 28% {
+    opacity: 0;
+    transform: translate(var(--page-start-x), var(--page-start-y)) rotate(var(--page-start-rotation)) scale(0.92);
+  }
+  31% {
+    opacity: 1;
+    transform: translate(var(--page-start-x), var(--page-start-y)) rotate(var(--page-start-rotation)) scale(0.95);
+  }
+  54%, 82% {
+    opacity: 1;
+    transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation));
+  }
+  94%, 100% {
+    opacity: 0;
+    transform: translate(var(--page-x), var(--page-y)) rotate(var(--page-rotation)) scale(0.96);
+  }
+}
+
+@keyframes header-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes login-button-status-enter {
+  from { opacity: 0; transform: translateX(0.3rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes loading-transition-status-enter {
+  from { opacity: 0; transform: translateX(1.2rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes workspace-progress-sweep {
+  to { transform: translateX(350%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-skeleton::after,
+  .workspace-loader-page,
+  .header-loading-spinner,
+  .login-button-spinner,
+  .loading-transition-spinner,
+  .login-button-status-text,
+  .loading-transition-status,
+  .workspace-loader-progress-fill::after {
+    animation: none;
+  }
+
+  .workspace-loader-page { opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  .workspace-loader-panel {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .workspace-page-window {
+    min-height: 16rem;
+    border-right: 0;
+    border-bottom: 2px solid #111;
+  }
+
+  .dark .workspace-page-window {
+    border-bottom-color: #52525b;
+  }
+
+}
+
 
 select option {
   @apply bg-white dark:bg-[#111] text-[#111] dark:text-white;

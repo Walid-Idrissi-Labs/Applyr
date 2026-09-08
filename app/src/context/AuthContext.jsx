@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../api';
 import { useTheme } from './ThemeContext';
 
@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [postAuthTransition, setPostAuthTransition] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export function AuthProvider({ children }) {
     const { user, token } = res.data;
     localStorage.setItem('auth_token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    setPostAuthTransition(true);
     setUser(user);
     return user;
   };
@@ -40,6 +42,7 @@ export function AuthProvider({ children }) {
     const { user, token } = res.data;
     localStorage.setItem('auth_token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    setPostAuthTransition(true);
     setUser(user);
     return user;
   };
@@ -49,6 +52,7 @@ export function AuthProvider({ children }) {
     const { user, token } = res.data;
     localStorage.setItem('auth_token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    setPostAuthTransition(true);
     setUser(user);
     return user;
   };
@@ -61,8 +65,13 @@ export function AuthProvider({ children }) {
     }
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
+    setPostAuthTransition(false);
     setUser(null);
   };
+
+  const consumePostAuthTransition = useCallback(() => {
+    setPostAuthTransition(false);
+  }, []);
 
   const updateProfile = async (data) => {
     const res = await authAPI.updateProfile(data);
@@ -95,7 +104,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, completeGoogleLogin, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
+    <AuthContext.Provider value={{ user, loading, postAuthTransition, consumePostAuthTransition, login, register, completeGoogleLogin, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );

@@ -227,7 +227,14 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full border-2 border-[#111] dark:border-gray-700 rounded-md bg-[#111] dark:bg-white text-white dark:text-[#111] p-2.5 font-bold hover:bg-white dark:hover:bg-[#eee] hover:text-[#111] transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50"
             >
-              {loading ? 'Please wait...' : isRegister ? 'Sign Up' : 'Sign In'}
+              {loading ? (
+                <span className="inline-flex items-center justify-center gap-2">
+                  <span className="login-button-spinner" aria-hidden="true" />
+                  <span className="login-button-status-text">
+                    {isRegister ? 'Creating account' : 'Logging in'}
+                  </span>
+                </span>
+              ) : isRegister ? 'Sign Up' : 'Sign In'}
             </button>
           </form>
           <div className="mt-6 text-center border-t border-dashed border-gray-300 dark:border-gray-800 pt-5">

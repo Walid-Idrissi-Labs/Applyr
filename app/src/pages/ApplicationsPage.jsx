@@ -4,6 +4,8 @@ import { applicationsAPI, tagsAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import ApplicationForm from '../components/ApplicationForm';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import { ApplicationsSkeleton } from '../components/loading/PageSkeletons';
+import { usePageLoading } from '../context/LoadingActivityContext';
 import { Search, LayoutList, LayoutGrid, Plus, X, Briefcase, Eye, Edit2, Trash2, ExternalLink, Check } from 'lucide-react';
 
 const STATUS_OPTIONS = [
@@ -31,6 +33,7 @@ export default function ApplicationsPage() {
   const searchRef = useRef('');
   const navigate = useNavigate();
   const location = useLocation();
+  usePageLoading(loading);
 
   const openConfirm = (options) => {
     return new Promise((resolve) => {
@@ -183,9 +186,7 @@ export default function ApplicationsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <div className="text-[#111] dark:text-white font-bold">Loading...</div>
-        </div>
+        <ApplicationsSkeleton viewMode={viewMode} />
       ) : filteredApps.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 dark:text-gray-600 text-[14px]">No applications found</div>

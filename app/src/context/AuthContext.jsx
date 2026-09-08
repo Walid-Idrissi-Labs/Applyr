@@ -4,9 +4,20 @@ import { useTheme } from './ThemeContext';
 
 const AuthContext = createContext();
 
+function getStoredUser() {
+  if (!localStorage.getItem('auth_token')) return null;
+
+  try {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(getStoredUser);
   const [loading, setLoading] = useState(true);
+  const [hasStoredSession] = useState(() => Boolean(localStorage.getItem('auth_token')));
   const [sessionRestorationFailed, setSessionRestorationFailed] = useState(false);
   const [postAuthTransition, setPostAuthTransition] = useState(false);
   const { theme } = useTheme();
@@ -21,6 +32,7 @@ export function AuthProvider({ children }) {
         .catch(() => {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user');
+          setUser(null);
           setSessionRestorationFailed(true);
         })
         .finally(() => setLoading(false));
@@ -106,7 +118,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, sessionRestorationFailed, postAuthTransition, consumePostAuthTransition, login, register, completeGoogleLogin, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
+    <AuthContext.Provider value={{ user, loading, hasStoredSession, sessionRestorationFailed, postAuthTransition, consumePostAuthTransition, login, register, completeGoogleLogin, logout, updateProfile, changePassword, sendVerificationEmail, verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );

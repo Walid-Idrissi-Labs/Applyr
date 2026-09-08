@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { getGoogleAuthURL } from '../api';
 import { Moon, Sun } from 'lucide-react';
 
-export default function LoginPage() {
+export default function LoginPage({ sessionRestorationFailed = false }) {
   const [isRegister, setIsRegister] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
   const [error, setError] = useState('');
@@ -104,6 +104,12 @@ export default function LoginPage() {
       cancelAnimationFrame(animationFrame);
     };
   }, [cursor, theme]);
+
+  useEffect(() => {
+    if (sessionRestorationFailed) {
+      setError('Your session ended. Please sign in again.');
+    }
+  }, [sessionRestorationFailed]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

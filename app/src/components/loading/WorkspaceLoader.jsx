@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import LoadingStatus from './LoadingStatus';
 
 const PAGES = [
@@ -27,11 +27,14 @@ export default function WorkspaceLoader({
   requestActive = false,
   completed = false,
   blockImmediately = variant === 'opening',
+  minimumVisibleDuration = 0,
+  onMinimumVisibleDurationElapsed,
   title = 'Getting your workspace ready',
   message = 'The server may need a moment to wake up. Your content is on the way.',
 }) {
   const [visible, setVisible] = useState(delay === 0);
   const [progress, setProgress] = useState(18);
+  const minimumVisibleDurationRef = useRef(minimumVisibleDuration);
   const resolvedStatusLabel = statusLabel || (variant === 'closing' ? 'Logging out' : 'Logging in');
   const showProgress = variant === 'opening';
 
@@ -40,6 +43,19 @@ export default function WorkspaceLoader({
     const timer = window.setTimeout(() => setVisible(true), delay);
     return () => window.clearTimeout(timer);
   }, [delay]);
+
+  useEffect(() => {
+    if (!visible || !minimumVisibleDurationRef.current || !onMinimumVisibleDurationElapsed) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(
+      onMinimumVisibleDurationElapsed,
+      minimumVisibleDurationRef.current,
+    );
+
+    return () => window.clearTimeout(timer);
+  }, [onMinimumVisibleDurationElapsed, visible]);
 
   useEffect(() => {
     if (!showProgress) return undefined;

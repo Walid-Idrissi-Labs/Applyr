@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -32,6 +32,7 @@ export default function AppLayout() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [loadingInitialWorkspace, setLoadingInitialWorkspace] = useState(postAuthTransition);
   const [workspaceLoadComplete, setWorkspaceLoadComplete] = useState(false);
+  const [workspaceMinimumVisible, setWorkspaceMinimumVisible] = useState(false);
   const initialWorkspaceLoadStarted = useRef(false);
   const { theme, toggleTheme } = useTheme();
   const { isPageLoading } = useLoadingActivity();
@@ -39,6 +40,9 @@ export default function AppLayout() {
   const location = useLocation();
   const hasUnread = unreadCount > 0;
   const homePath = user?.is_admin ? '/admin/dashboard' : '/dashboard';
+  const handleWorkspaceMinimumVisible = useCallback(() => {
+    setWorkspaceMinimumVisible(true);
+  }, []);
 
   const handleLogoClick = () => {
     if (user?.is_admin) {
@@ -79,13 +83,21 @@ export default function AppLayout() {
 
     if (initialWorkspaceLoadStarted.current) {
       setWorkspaceLoadComplete(true);
-      const timer = window.setTimeout(() => {
-        setLoadingInitialWorkspace(false);
-        setWorkspaceLoadComplete(false);
-      }, 360);
-      return () => window.clearTimeout(timer);
     }
   }, [isPageLoading, loadingInitialWorkspace]);
+
+  useEffect(() => {
+    if (!loadingInitialWorkspace || !workspaceLoadComplete || !workspaceMinimumVisible) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      setLoadingInitialWorkspace(false);
+      setWorkspaceLoadComplete(false);
+      setWorkspaceMinimumVisible(false);
+    }, 360);
+    return () => window.clearTimeout(timer);
+  }, [loadingInitialWorkspace, workspaceLoadComplete, workspaceMinimumVisible]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -175,7 +187,11 @@ export default function AppLayout() {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      await logout();
+      const minimumDisplayTime = 3000 + Math.floor(Math.random() * 2001);
+      await Promise.all([
+        logout(),
+        new Promise((resolve) => window.setTimeout(resolve, minimumDisplayTime)),
+      ]);
       navigate('/login');
     } finally {
       setLoggingOut(false);
@@ -188,11 +204,13 @@ export default function AppLayout() {
         <WorkspaceLoader
           requestActive={isPageLoading}
           completed={workspaceLoadComplete}
+          minimumVisibleDuration={3000 + Math.floor(Math.random() * 2001)}
+          onMinimumVisibleDurationElapsed={handleWorkspaceMinimumVisible}
         />
       )}
       {loggingOut && (
         <WorkspaceLoader
-          delay={350}
+          delay={0}
           variant="closing"
           title="Closing your workspace"
           message="Putting everything safely away. See you next time."

@@ -89,8 +89,7 @@
 }
 
 .workspace-loader {
-  opacity: 1;
-  transition: opacity 420ms ease;
+  overflow: hidden;
 }
 
 .interactive-dot-background {
@@ -102,7 +101,15 @@
   pointer-events: none;
 }
 
-.workspace-loader--exiting {
+.workspace-loader-content {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 420ms ease;
+}
+
+.workspace-loader--entering .workspace-loader-content,
+.workspace-loader--exiting .workspace-loader-content {
   opacity: 0;
   pointer-events: none;
 }

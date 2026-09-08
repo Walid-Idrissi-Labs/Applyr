@@ -192,12 +192,13 @@ export default function AppLayout() {
     setLoggingOut(true);
     try {
       const minimumDisplayTime = 3000 + Math.floor(Math.random() * 2001);
-      await Promise.all([
-        logout(),
+      const [finishLogout] = await Promise.all([
+        logout({ deferLocalSignOut: true }),
         new Promise((resolve) => window.setTimeout(resolve, minimumDisplayTime)),
       ]);
       setLogoutLoaderExiting(true);
       await new Promise((resolve) => window.setTimeout(resolve, 480));
+      finishLogout();
       navigate('/login');
     } finally {
       setLoggingOut(false);

@@ -35,6 +35,7 @@ export default function WorkspaceLoader({
   message = 'The server may need a moment to wake up. Your content is on the way.',
 }) {
   const [visible, setVisible] = useState(delay === 0);
+  const [hasEntered, setHasEntered] = useState(false);
   const [progress, setProgress] = useState(18);
   const minimumVisibleDurationRef = useRef(minimumVisibleDuration);
   const resolvedStatusLabel = statusLabel || (variant === 'closing' ? 'Logging out' : 'Logging in');
@@ -45,6 +46,12 @@ export default function WorkspaceLoader({
     const timer = window.setTimeout(() => setVisible(true), delay);
     return () => window.clearTimeout(timer);
   }, [delay]);
+
+  useEffect(() => {
+    if (!visible) return undefined;
+    const frame = window.requestAnimationFrame(() => setHasEntered(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [visible]);
 
   useEffect(() => {
     if (!visible || !minimumVisibleDurationRef.current || !onMinimumVisibleDurationElapsed) {
@@ -84,12 +91,12 @@ export default function WorkspaceLoader({
 
   return (
     <div
-      className={`workspace-loader fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] px-6 ${isExiting ? 'workspace-loader--exiting' : ''}`}
+      className={`workspace-loader fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] px-6 ${hasEntered ? '' : 'workspace-loader--entering'} ${isExiting ? 'workspace-loader--exiting' : ''}`}
       aria-busy="true"
     >
+      <InteractiveDotBackground />
       {visible && (
-        <>
-          <InteractiveDotBackground />
+        <div className="workspace-loader-content">
           <LoadingStatus
             label={resolvedStatusLabel}
             tone={variant === 'closing' ? 'logout' : 'default'}
@@ -139,7 +146,7 @@ export default function WorkspaceLoader({
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

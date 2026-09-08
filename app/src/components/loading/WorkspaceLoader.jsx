@@ -29,6 +29,7 @@ export default function WorkspaceLoader({
   blockImmediately = variant === 'opening',
   minimumVisibleDuration = 0,
   onMinimumVisibleDurationElapsed,
+  isExiting = false,
   title = 'Getting your workspace ready',
   message = 'The server may need a moment to wake up. Your content is on the way.',
 }) {
@@ -82,7 +83,7 @@ export default function WorkspaceLoader({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] px-6"
+      className={`workspace-loader fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] px-6 ${isExiting ? 'workspace-loader--exiting' : ''}`}
       aria-busy="true"
     >
       {visible && (

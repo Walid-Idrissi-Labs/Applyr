@@ -242,8 +242,10 @@ export default function LoginPage() {
               {isRegister ? 'Already have an account?' : "Don't have an account?"}
             </p>
             <button
+              type="button"
               onClick={() => { setIsRegister(!isRegister); setError(''); }}
-              className="w-full border-2 border-[#111] dark:border-gray-700 rounded-md bg-white dark:bg-[#1a1a1a] text-[#111] dark:text-white p-2 text-[12px] font-bold hover:bg-gray-50 dark:hover:bg-[#222] transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]"
+              disabled={loading}
+              className="w-full border-2 border-[#111] dark:border-gray-700 rounded-md bg-white dark:bg-[#1a1a1a] text-[#111] dark:text-white p-2 text-[12px] font-bold hover:bg-gray-50 dark:hover:bg-[#222] transition-colors shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isRegister ? 'Sign In' : 'Create an account'}
             </button>

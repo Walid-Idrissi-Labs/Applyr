@@ -88,6 +88,16 @@
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
 }
 
+.workspace-loader {
+  opacity: 1;
+  transition: opacity 420ms ease;
+}
+
+.workspace-loader--exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .workspace-loader-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 12.5rem;
@@ -363,8 +373,10 @@
   .loading-transition-spinner,
   .login-button-status-text,
   .loading-transition-status,
-  .workspace-loader-progress-fill::after {
+  .workspace-loader-progress-fill::after,
+  .workspace-loader {
     animation: none;
+    transition: none;
   }
 
   .workspace-loader-page { opacity: 1; }

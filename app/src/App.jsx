@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -18,20 +19,54 @@ import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import UserManagementPage from './pages/UserManagementPage';
 import AppLayout from './components/AppLayout';
+import WorkspaceLoader from './components/loading/WorkspaceLoader';
 
-function SessionCheck() {
+function AnonymousStartup({ isExiting = false }) {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a]" role="status" aria-label="Checking your session">
-      <span className="header-loading-spinner" aria-hidden="true" />
+    <div className={`startup-loader fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] ${isExiting ? 'startup-loader--exiting' : ''}`} role="status" aria-label="Preparing sign in">
+      <div className="startup-loader-dots" aria-hidden="true" />
+      <div className="startup-loader-mark" aria-hidden="true">
+        <span className="header-loading-spinner" />
+      </div>
     </div>
   );
+}
+
+function StartupGate({ children }) {
+  const { loading, hasStoredSession } = useAuth();
+  const [isExiting, setIsExiting] = useState(false);
+  const [hasFinished, setHasFinished] = useState(false);
+
+  useEffect(() => {
+    if (loading) return undefined;
+
+    setIsExiting(true);
+    const timer = window.setTimeout(() => setHasFinished(true), 420);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
+
+  if (hasFinished) return children;
+
+  if (hasStoredSession) {
+    return (
+      <WorkspaceLoader
+        delay={0}
+        requestActive={loading}
+        completed={!loading}
+        isExiting={isExiting}
+        statusLabel="Restoring your session"
+      />
+    );
+  }
+
+  return <AnonymousStartup isExiting={isExiting} />;
 }
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <SessionCheck />;
+    return null;
   }
 
   if (!user) {
@@ -45,7 +80,7 @@ function LandingRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <SessionCheck />;
+    return null;
   }
 
   if (user) {
@@ -56,12 +91,12 @@ function LandingRoute() {
 }
 
 function AppRoutes() {
-  const { user } = useAuth();
+  const { user, sessionRestorationFailed } = useAuth();
 
   return (
     <Routes>
       <Route path="/" element={<LandingRoute />} />
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage sessionRestorationFailed={sessionRestorationFailed} />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPasswordPage />} />
       <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -95,7 +130,9 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <LoadingActivityProvider>
-            <AppRoutes />
+            <StartupGate>
+              <AppRoutes />
+            </StartupGate>
           </LoadingActivityProvider>
         </AuthProvider>
       </ThemeProvider>

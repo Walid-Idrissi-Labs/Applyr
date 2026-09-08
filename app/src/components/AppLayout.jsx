@@ -30,9 +30,11 @@ export default function AppLayout() {
   const [adminViewMode, setAdminViewMode] = useState(user?.is_admin || false);
   const [showSlowLoadingMessage, setShowSlowLoadingMessage] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutLoaderExiting, setLogoutLoaderExiting] = useState(false);
   const [loadingInitialWorkspace, setLoadingInitialWorkspace] = useState(postAuthTransition);
   const [workspaceLoadComplete, setWorkspaceLoadComplete] = useState(false);
   const [workspaceMinimumVisible, setWorkspaceMinimumVisible] = useState(false);
+  const [workspaceLoaderExiting, setWorkspaceLoaderExiting] = useState(false);
   const initialWorkspaceLoadStarted = useRef(false);
   const { theme, toggleTheme } = useTheme();
   const { isPageLoading } = useLoadingActivity();
@@ -91,11 +93,13 @@ export default function AppLayout() {
       return undefined;
     }
 
+    setWorkspaceLoaderExiting(true);
     const timer = window.setTimeout(() => {
       setLoadingInitialWorkspace(false);
       setWorkspaceLoadComplete(false);
       setWorkspaceMinimumVisible(false);
-    }, 360);
+      setWorkspaceLoaderExiting(false);
+    }, 480);
     return () => window.clearTimeout(timer);
   }, [loadingInitialWorkspace, workspaceLoadComplete, workspaceMinimumVisible]);
 
@@ -192,9 +196,12 @@ export default function AppLayout() {
         logout(),
         new Promise((resolve) => window.setTimeout(resolve, minimumDisplayTime)),
       ]);
+      setLogoutLoaderExiting(true);
+      await new Promise((resolve) => window.setTimeout(resolve, 480));
       navigate('/login');
     } finally {
       setLoggingOut(false);
+      setLogoutLoaderExiting(false);
     }
   };
 
@@ -206,12 +213,14 @@ export default function AppLayout() {
           completed={workspaceLoadComplete}
           minimumVisibleDuration={3000 + Math.floor(Math.random() * 2001)}
           onMinimumVisibleDurationElapsed={handleWorkspaceMinimumVisible}
+          isExiting={workspaceLoaderExiting}
         />
       )}
       {loggingOut && (
         <WorkspaceLoader
           delay={0}
           variant="closing"
+          isExiting={logoutLoaderExiting}
           title="Closing your workspace"
           message="Putting everything safely away. See you next time."
         />

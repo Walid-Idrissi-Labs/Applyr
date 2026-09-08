@@ -88,6 +88,57 @@
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
 }
 
+.workspace-loader {
+  opacity: 1;
+  transition: opacity 420ms ease;
+}
+
+.workspace-loader--exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.startup-loader {
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 420ms ease;
+}
+
+.startup-loader--exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.startup-loader-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(17, 17, 17, 0.18) 1px, transparent 1.2px);
+  background-size: 2rem 2rem;
+  mask-image: radial-gradient(circle at center, #000 0, rgba(0, 0, 0, 0.65) 38%, transparent 80%);
+}
+
+.dark .startup-loader-dots {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.13) 1px, transparent 1.2px);
+}
+
+.startup-loader-mark {
+  position: relative;
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 2px solid #111;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 4px 4px 0 #111;
+}
+
+.dark .startup-loader-mark {
+  border-color: #a1a1aa;
+  background: #111;
+  box-shadow: 4px 4px 0 rgba(255, 255, 255, 0.1);
+}
+
 .workspace-loader-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 12.5rem;
@@ -363,8 +414,11 @@
   .loading-transition-spinner,
   .login-button-status-text,
   .loading-transition-status,
-  .workspace-loader-progress-fill::after {
+  .workspace-loader-progress-fill::after,
+  .workspace-loader,
+  .startup-loader {
     animation: none;
+    transition: none;
   }
 
   .workspace-loader-page { opacity: 1; }

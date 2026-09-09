@@ -18,6 +18,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import UserManagementPage from './pages/UserManagementPage';
+import LegalPage from './pages/LegalPage';
 import AppLayout from './components/AppLayout';
 import WorkspaceLoader from './components/loading/WorkspaceLoader';
 
@@ -103,6 +104,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingRoute />} />
+      <Route path="/legal" element={<Navigate to="/legal/terms" replace />} />
+      <Route path="/legal/:documentId" element={<LegalPage />} />
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage sessionRestorationFailed={sessionRestorationFailed} />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPasswordPage />} />
       <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPasswordPage />} />

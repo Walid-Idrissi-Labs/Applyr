@@ -1712,6 +1712,10 @@ export default function LandingPage() {
           </div>
           <div className="footer-links">
             <a href="mailto:applyr.app@gmail.com">Contact</a>
+            <Link to="/legal/terms">Terms</Link>
+            <Link to="/legal/privacy">Privacy</Link>
+            <Link to="/legal/ai-use">AI Use</Link>
+            <Link to="/legal/cookies">Cookies</Link>
             <a href="/extension.zip" download>Download Extension</a>
           </div>
         </footer>

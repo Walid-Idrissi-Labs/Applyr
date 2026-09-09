@@ -471,8 +471,12 @@
     min-height: 0;
   }
 
+  .workspace-loader-copy {
+    min-height: clamp(8.5rem, 30vh, 10rem);
+  }
+
   .workspace-page-window {
-    min-height: 16rem;
+    min-height: clamp(7rem, calc(100vh - 12rem), 16rem);
     border-left: 0;
     border-top: 2px solid #111;
   }

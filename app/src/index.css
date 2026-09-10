@@ -48,11 +48,17 @@
 }
 
 .workspace-sidebar {
-  background-color: #f9f8f4;
+  background: #faf9f6 url('/workspace-paper-texture.webp') center / cover;
 }
 
 .dark .workspace-sidebar {
   background-color: #111;
+}
+
+@media (min-width: 768px) {
+  .workspace-sidebar {
+    background-attachment: fixed;
+  }
 }
 
 ::-webkit-scrollbar {

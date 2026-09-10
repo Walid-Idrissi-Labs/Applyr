@@ -50,7 +50,7 @@ export default function LegalPage() {
           min-height: 100vh;
           background: var(--legal-bg);
           color: var(--legal-text);
-          font-family: "JetBrains Mono", "SF Mono", "Courier New", monospace;
+          font-family: "IBM Plex Mono", "SF Mono", "Courier New", monospace;
           line-height: 1.6;
           position: relative;
           isolation: isolate;
@@ -120,7 +120,7 @@ export default function LegalPage() {
           border: 2px solid var(--legal-border);
           border-radius: var(--legal-radius);
           padding: 8px 12px;
-          font: 600 12px "JetBrains Mono", "SF Mono", monospace;
+          font: 600 12px "IBM Plex Mono", "SF Mono", monospace;
           display: inline-flex;
           gap: 6px;
           align-items: center;
@@ -147,7 +147,7 @@ export default function LegalPage() {
         .legal-cta:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--legal-border); }
         .legal-content { width: min(800px, calc(100% - 40px)); margin: 0 auto; padding: 72px 0 90px; }
         .legal-document { background: var(--legal-surface); border: 2px solid var(--legal-border); border-radius: 14px; padding: clamp(28px, 6vw, 64px); box-shadow: 7px 7px 0 var(--legal-border); animation: legal-page-enter .8s cubic-bezier(.22, 1, .36, 1) both; }
-        .legal-document article { font-family: Inter, system-ui, sans-serif; }
+        .legal-document article { font-family: "Instrument Sans", Inter, system-ui, sans-serif; }
         .legal-document h1 { font-size: clamp(30px, 5vw, 46px); letter-spacing: -.055em; line-height: 1.05; margin: 0 0 30px; color: var(--legal-text); }
         .legal-document h2 { color: var(--legal-text); font-size: 20px; margin: 40px 0 12px; padding-top: 22px; border-top: 1px solid color-mix(in srgb, var(--legal-muted) 30%, transparent); }
         .legal-document p, .legal-document li { color: var(--legal-muted); font-size: 14px; }
@@ -156,7 +156,7 @@ export default function LegalPage() {
         .legal-document ul { padding-left: 22px; }
         .legal-document li { margin: 7px 0; }
         .legal-related { margin-top: 68px; }
-        .legal-related h2 { margin: 0 0 20px; font-family: Inter, system-ui, sans-serif; font-size: 22px; letter-spacing: -.035em; }
+        .legal-related h2 { margin: 0 0 20px; font-family: "Instrument Sans", Inter, system-ui, sans-serif; font-size: 22px; letter-spacing: -.035em; }
         .legal-related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
         .legal-related-card { display: flex; min-height: 130px; flex-direction: column; justify-content: space-between; padding: 16px; border: 2px solid var(--legal-border); border-radius: 10px; color: var(--legal-text); text-decoration: none; background: var(--legal-bg); box-shadow: 3px 3px 0 var(--legal-border); transition: transform .15s ease, box-shadow .15s ease; }
         .legal-related-card:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--legal-border); }

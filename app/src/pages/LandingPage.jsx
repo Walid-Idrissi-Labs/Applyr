@@ -133,8 +133,9 @@ export default function LandingPage() {
           --accent-gray-text: #374151;
           --radius: 14px;
           --radius-sm: 10px;
-          --font-mono: "JetBrains Mono", "SF Mono", "Courier New", monospace;
-          --font-sans: "Inter", system-ui, sans-serif;
+          --font-mono: "IBM Plex Mono", "SF Mono", "Courier New", monospace;
+          --font-sans: "Instrument Sans", system-ui, sans-serif;
+          --font-logo: "JetBrains Mono", "SF Mono", "Courier New", monospace;
           --shadow-offset: 8px;
           --shadow-color: rgba(0,0,0,0.08);
           --transition-fast: 0.15s;
@@ -175,6 +176,11 @@ export default function LandingPage() {
           position: relative;
           z-index: 0;
           transition: background-color var(--transition-smooth), color var(--transition-smooth);
+        }
+
+        .landing-root :is(h1, h2, h3) {
+          font-family: var(--font-sans);
+          letter-spacing: -0.025em;
         }
 
         .landing-root::before {
@@ -222,6 +228,7 @@ export default function LandingPage() {
           justify-content: space-between;
         }
         .logo {
+          font-family: var(--font-logo);
           font-weight: 800;
           font-size: 18px;
           letter-spacing: 0.25em;
@@ -1707,7 +1714,7 @@ export default function LandingPage() {
 
         {/* Footer */}
         <footer>
-          <div style={{ fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '14px' }}>
+          <div style={{ fontFamily: 'var(--font-logo)', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '14px' }}>
             Applyr
           </div>
           <div className="footer-links">

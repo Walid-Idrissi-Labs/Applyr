@@ -205,8 +205,8 @@ export default function ApplicationsPage() {
                     onClick={() => navigate(`/applications/${app.id}`)}
                     className="text-left min-w-0"
                   >
-                    <div className="font-bold text-[13px] dark:text-white truncate">{app.company_name}</div>
-                    <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{app.position}</div>
+                    <div className="type-sans font-bold text-[13px] dark:text-white truncate">{app.company_name}</div>
+                    <div className="type-sans text-[11px] text-gray-500 dark:text-gray-400 truncate">{app.position}</div>
                   </button>
                   <StatusBadge status={app.status} />
                 </div>
@@ -270,8 +270,8 @@ export default function ApplicationsPage() {
                   onClick={() => navigate(`/applications/${app.id}`)}
                   className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors cursor-pointer group"
                 >
-                  <td className="p-3 font-bold dark:text-white">{app.company_name}</td>
-                  <td className="p-3 dark:text-gray-300">{app.position}</td>
+                  <td className="type-sans p-3 font-bold dark:text-white">{app.company_name}</td>
+                  <td className="type-sans p-3 dark:text-gray-300">{app.position}</td>
                   <td className="p-3"><StatusBadge status={app.status} /></td>
                   <td className="p-3 text-gray-500 dark:text-gray-400">
                     {app.applied_at ? new Date(app.applied_at).toLocaleDateString() : '—'}
@@ -449,8 +449,8 @@ function BoardView({ applications, onStatusChange, onEdit, onDelete, onRowClick 
                   onClick={() => onRowClick(app)}
                   className="neu-card p-3 cursor-pointer group/card"
                 >
-                  <div className="font-bold text-[12px] mb-1 dark:text-white group-hover/card:text-blue-600 transition-colors">{app.company_name}</div>
-                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">{app.position}</div>
+                  <div className="type-sans font-bold text-[12px] mb-1 dark:text-white group-hover/card:text-blue-600 transition-colors">{app.company_name}</div>
+                  <div className="type-sans text-[11px] text-gray-500 dark:text-gray-400 mb-2">{app.position}</div>
                   <div className="flex justify-between items-center mt-2 pt-2 border-t-2 border-dashed border-gray-200 dark:border-gray-800">
                     <div className="flex gap-2 text-gray-500">
                       {/* Attachments / Tasks could go here later */}

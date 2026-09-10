@@ -207,7 +207,7 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+    <div className="app-ui flex h-screen overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
       {loadingInitialWorkspace && (
         <WorkspaceLoader
           requestActive={isPageLoading}
@@ -240,7 +240,7 @@ export default function AppLayout() {
           <button
             type="button"
             onClick={handleLogoClick}
-            className="font-bold text-[18px] tracking-widest mb-6 px-2 mt-2 dark:text-white text-left"
+            className="applyr-wordmark font-bold text-[18px] tracking-widest mb-6 px-2 mt-2 dark:text-white text-left"
           >
             Applyr
           </button>
@@ -288,7 +288,7 @@ export default function AppLayout() {
               <button
                 type="button"
                 onClick={handleLogoClick}
-                className={`font-bold tracking-widest dark:text-white transition-opacity ${sidebarOpen ? 'opacity-0 hidden md:block' : 'opacity-100'}`}
+                className={`applyr-wordmark font-bold tracking-widest dark:text-white transition-opacity ${sidebarOpen ? 'opacity-0 hidden md:block' : 'opacity-100'}`}
               >
                 Applyr
               </button>

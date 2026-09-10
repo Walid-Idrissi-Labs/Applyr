@@ -103,7 +103,7 @@ export default function WorkspaceLoader({
           />
           <div className={`workspace-loader-panel workspace-loader-panel--${variant}`} role="status" aria-live="polite" aria-label={title}>
             <div className="workspace-loader-copy text-center">
-              <span className="workspace-loader-brand">Applyr</span>
+              <span className="applyr-wordmark workspace-loader-brand">Applyr</span>
               <div className={`font-bold text-[15px] tracking-wide ${
                 variant === 'closing' ? 'text-red-700 dark:text-red-400' : 'text-[#111] dark:text-white'
               }`}>

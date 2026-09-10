@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Applyr — Typography Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f2f0e9;
+        --sheet: #fffefa;
+        --ink: #171715;
+        --muted: #6f706b;
+        --faint: #a9aaa4;
+        --rule: #d8d6cf;
+        --soft: #eeece5;
+        --accent: #2457d6;
+        --shadow: #171715;
+        --mono: "IBM Plex Mono", monospace;
+        --sans: "Instrument Sans", sans-serif;
+        --logo: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      }
+
+      * { box-sizing: border-box; }
+
+      html { font-size: 16px; }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 20% 0%, rgba(255,255,255,.74), transparent 30rem),
+          repeating-linear-gradient(0deg, rgba(23,23,21,.018) 0, rgba(23,23,21,.018) 1px, transparent 1px, transparent 4px),
+          var(--paper);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button { font: inherit; color: inherit; }
+
+      button:focus-visible {
+        outline: 3px solid #80a2ff;
+        outline-offset: 2px;
+      }
+
+      .lab {
+        width: min(1500px, calc(100% - 32px));
+        margin: 22px auto 44px;
+      }
+
+      .lab-header {
+        display: grid;
+        grid-template-columns: minmax(240px, .72fr) minmax(600px, 1.7fr) auto;
+        align-items: end;
+        gap: 24px;
+        margin-bottom: 18px;
+      }
+
+      .eyebrow,
+      .option-kicker,
+      .meta-label,
+      .nav-item,
+      .table-label,
+      .stat-label,
+      .status,
+      .button,
+      .mini-label {
+        font-family: var(--mono);
+      }
+
+      .eyebrow {
+        margin: 0 0 5px;
+        font-size: .7rem;
+        font-weight: 600;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .lab-title {
+        margin: 0;
+        font-family: var(--sans);
+        font-size: clamp(1.6rem, 2.5vw, 2.3rem);
+        line-height: 1;
+        letter-spacing: -.045em;
+      }
+
+      .lab-title .logo-lock {
+        font-family: var(--logo);
+        font-size: .92em;
+        letter-spacing: .08em;
+      }
+
+      .pair-picker {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .pair-option {
+        position: relative;
+        min-height: 76px;
+        padding: 12px 13px;
+        border: 1.5px solid var(--ink);
+        border-radius: 10px;
+        background: rgba(255, 254, 250, .68);
+        text-align: left;
+        cursor: pointer;
+        transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+      }
+
+      .pair-option:hover { transform: translateY(-2px); }
+
+      .pair-option[aria-pressed="true"] {
+        background: var(--sheet);
+        box-shadow: 3px 3px 0 var(--shadow);
+        transform: translate(-1px, -1px);
+      }
+
+      .pair-option[aria-pressed="true"]::after {
+        content: "Selected";
+        position: absolute;
+        top: 8px;
+        right: 9px;
+        font-family: var(--mono);
+        font-size: .55rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .option-kicker {
+        display: block;
+        margin-bottom: 8px;
+        font-size: .6rem;
+        font-weight: 600;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .option-pair {
+        display: block;
+        max-width: 85%;
+        font-size: .82rem;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .header-actions { display: flex; gap: 8px; }
+
+      .icon-button,
+      .view-button {
+        display: inline-grid;
+        min-width: 42px;
+        height: 42px;
+        place-items: center;
+        border: 1.5px solid var(--ink);
+        border-radius: 9px;
+        background: var(--sheet);
+        cursor: pointer;
+      }
+
+      .view-button {
+        display: inline-flex;
+        gap: 7px;
+        width: auto;
+        padding: 0 12px;
+        font-family: var(--mono);
+        font-size: .68rem;
+        font-weight: 600;
+      }
+
+      .icon-button svg,
+      .view-button svg { width: 16px; height: 16px; }
+
+      .app-shell {
+        display: grid;
+        grid-template-columns: 192px minmax(0, 1fr);
+        min-height: 760px;
+        border: 1.8px solid var(--ink);
+        border-radius: 18px;
+        background: var(--sheet);
+        box-shadow: 8px 8px 0 var(--shadow);
+        overflow: hidden;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        padding: 24px 15px 16px;
+        border-right: 1.5px solid var(--ink);
+        background:
+          linear-gradient(rgba(255,255,255,.2), rgba(255,255,255,.2)),
+          repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(23,23,21,.035) 31px, rgba(23,23,21,.035) 32px),
+          #f4f2ec;
+      }
+
+      .brand {
+        margin: 0 9px 34px;
+        font-family: var(--logo);
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: .19em;
+      }
+
+      .brand-note {
+        display: block;
+        margin-top: 6px;
+        font-family: var(--sans);
+        font-size: .58rem;
+        font-weight: 500;
+        letter-spacing: 0;
+        color: var(--muted);
+      }
+
+      .nav { display: grid; gap: 5px; }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 9px 10px;
+        border: 1.5px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        font-size: .73rem;
+        font-weight: 600;
+        text-align: left;
+      }
+
+      .nav-item.active {
+        border-color: var(--ink);
+        background: var(--sheet);
+        box-shadow: 2px 2px 0 var(--shadow);
+      }
+
+      .sidebar-footer {
+        margin: auto 9px 0;
+        font-family: var(--mono);
+        font-size: .6rem;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .workspace {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        background:
+          radial-gradient(circle, rgba(23,23,21,.085) .7px, transparent .8px) 0 0 / 22px 22px,
+          #fbfaf6;
+      }
+
+      .app-header {
+        display: flex;
+        height: 62px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        border-bottom: 1px solid var(--rule);
+        background: rgba(255,254,250,.86);
+        backdrop-filter: blur(8px);
+      }
+
+      .crumb {
+        font-family: var(--mono);
+        font-size: .65rem;
+        color: var(--muted);
+      }
+
+      .user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: .68rem;
+        font-weight: 600;
+      }
+
+      .user-dot {
+        width: 25px;
+        height: 25px;
+        border: 1.5px solid var(--ink);
+        border-radius: 50%;
+        background: #dfe8ff;
+      }
+
+      .content { padding: 28px; }
+
+      .page-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .page-heading h2 {
+        margin: 0 0 6px;
+        font-family: var(--sans);
+        font-size: clamp(1.55rem, 2.2vw, 2rem);
+        line-height: 1.05;
+        letter-spacing: -.045em;
+      }
+
+      .page-heading p {
+        margin: 0;
+        max-width: 530px;
+        color: var(--muted);
+        font-size: .9rem;
+        line-height: 1.45;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 38px;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 13px;
+        border: 1.5px solid var(--ink);
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--sheet);
+        box-shadow: 2px 2px 0 #8d8c86;
+        font-size: .67rem;
+        font-weight: 600;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .card {
+        border: 1.5px solid var(--ink);
+        border-radius: 12px;
+        background: rgba(255,254,250,.94);
+        box-shadow: 3px 3px 0 var(--shadow);
+      }
+
+      .stat { padding: 16px; }
+
+      .stat-label,
+      .table-label,
+      .meta-label,
+      .mini-label {
+        font-size: .59rem;
+        font-weight: 600;
+        letter-spacing: .075em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .stat-value {
+        margin-top: 8px;
+        font-family: var(--mono);
+        font-size: 1.65rem;
+        font-weight: 600;
+        letter-spacing: -.06em;
+      }
+
+      .stat-delta {
+        float: right;
+        margin-top: 9px;
+        font-family: var(--sans);
+        font-size: .67rem;
+        font-weight: 600;
+        color: #197249;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(280px, .75fr);
+        gap: 16px;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .card-header h3 {
+        margin: 0;
+        font-family: var(--sans);
+        font-size: .95rem;
+        letter-spacing: -.02em;
+      }
+
+      .card-link {
+        border: 0;
+        background: transparent;
+        font-family: var(--mono);
+        font-size: .6rem;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .applications { padding: 3px 16px 8px; }
+
+      .app-row {
+        display: grid;
+        grid-template-columns: minmax(170px, 1fr) 115px 78px;
+        align-items: center;
+        gap: 15px;
+        min-height: 61px;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .app-row:last-child { border-bottom: 0; }
+
+      .company {
+        margin-bottom: 3px;
+        font-family: var(--sans);
+        font-size: .84rem;
+        font-weight: 700;
+        letter-spacing: -.015em;
+      }
+
+      .role {
+        color: var(--muted);
+        font-size: .72rem;
+      }
+
+      .status {
+        width: fit-content;
+        padding: 4px 6px;
+        border-radius: 3px;
+        font-size: .53rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      .status.blue { color: #184cae; background: #dce9ff; }
+      .status.amber { color: #815900; background: #fff0bd; }
+      .status.green { color: #17673b; background: #d3f3df; }
+      .status.gray { color: #555954; background: #e7e8e4; }
+
+      .date {
+        font-family: var(--mono);
+        font-size: .6rem;
+        color: var(--muted);
+        text-align: right;
+      }
+
+      .note-card { padding: 18px; }
+
+      .note-card h3 {
+        margin: 10px 0 8px;
+        font-family: var(--sans);
+        font-size: 1.08rem;
+        line-height: 1.15;
+        letter-spacing: -.035em;
+      }
+
+      .note-card p {
+        margin: 0 0 15px;
+        color: var(--muted);
+        font-size: .79rem;
+        line-height: 1.55;
+      }
+
+      .paper-note {
+        position: relative;
+        margin-top: 16px;
+        padding: 18px 16px 14px;
+        border: 1px solid #d8ca9e;
+        background:
+          repeating-linear-gradient(0deg, transparent 0, transparent 25px, rgba(128,102,31,.12) 25px, rgba(128,102,31,.12) 26px),
+          #fff8d8;
+        transform: rotate(.4deg);
+      }
+
+      .paper-note::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: 42%;
+        width: 62px;
+        height: 16px;
+        background: rgba(225,217,190,.75);
+        transform: rotate(-2deg);
+      }
+
+      .paper-note p {
+        margin: 0;
+        color: #3f3a29;
+        font-size: .78rem;
+        line-height: 1.65;
+      }
+
+      .pair-caption {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.3fr;
+        gap: 18px;
+        margin-top: 18px;
+        padding: 16px 18px;
+        border: 1px solid var(--rule);
+        border-radius: 11px;
+        background: rgba(255,254,250,.58);
+      }
+
+      .meta-value {
+        display: block;
+        margin-top: 4px;
+        font-size: .78rem;
+        font-weight: 650;
+      }
+
+      .verdict { line-height: 1.4; }
+
+      .compare-grid {
+        display: none;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      body.compare-mode .app-shell,
+      body.compare-mode .pair-caption { display: none; }
+
+      body.compare-mode .compare-grid { display: grid; }
+
+      .mini-preview {
+        min-width: 0;
+        overflow: hidden;
+        border: 1.5px solid var(--ink);
+        border-radius: 13px;
+        background: var(--sheet);
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+
+      .mini-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .mini-logo {
+        font-family: var(--logo);
+        font-size: .78rem;
+        font-weight: 700;
+        letter-spacing: .15em;
+      }
+
+      .mini-body { padding: 18px; }
+
+      .mini-body h3 {
+        margin: 0 0 4px;
+        font-family: var(--mini-sans);
+        font-size: 1.25rem;
+        letter-spacing: -.04em;
+      }
+
+      .mini-subtitle {
+        margin: 0 0 17px;
+        font-family: var(--mini-sans);
+        font-size: .69rem;
+        color: var(--muted);
+      }
+
+      .mini-label { font-family: var(--mini-mono); }
+
+      .mini-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .mini-row strong {
+        display: block;
+        margin-bottom: 2px;
+        font-family: var(--mini-sans);
+        font-size: .76rem;
+      }
+
+      .mini-row span {
+        display: block;
+        font-family: var(--mini-sans);
+        font-size: .63rem;
+        color: var(--muted);
+      }
+
+      .mini-number {
+        margin-top: 10px;
+        font-family: var(--mini-mono);
+        font-size: 1.65rem;
+        font-weight: 600;
+        letter-spacing: -.06em;
+      }
+
+      .mini-a { --mini-mono: "IBM Plex Mono", monospace; --mini-sans: "Instrument Sans", sans-serif; }
+      .mini-b { --mini-mono: "Spline Sans Mono", monospace; --mini-sans: "Manrope", sans-serif; }
+      .mini-c { --mini-mono: "Azeret Mono", monospace; --mini-sans: "Plus Jakarta Sans", sans-serif; }
+
+      .mini-preview[data-pair="a"] .mini-label,
+      .mini-preview[data-pair="a"] .mini-number { font-family: "IBM Plex Mono", monospace; }
+      .mini-preview[data-pair="a"] h3,
+      .mini-preview[data-pair="a"] .mini-subtitle,
+      .mini-preview[data-pair="a"] .mini-row strong,
+      .mini-preview[data-pair="a"] .mini-row span { font-family: "Instrument Sans", sans-serif; }
+
+      .mini-preview[data-pair="b"] .mini-label,
+      .mini-preview[data-pair="b"] .mini-number { font-family: "Spline Sans Mono", monospace; }
+      .mini-preview[data-pair="b"] h3,
+      .mini-preview[data-pair="b"] .mini-subtitle,
+      .mini-preview[data-pair="b"] .mini-row strong,
+      .mini-preview[data-pair="b"] .mini-row span { font-family: "Manrope", sans-serif; }
+
+      .mini-preview[data-pair="c"] .mini-label,
+      .mini-preview[data-pair="c"] .mini-number { font-family: "Azeret Mono", monospace; }
+      .mini-preview[data-pair="c"] h3,
+      .mini-preview[data-pair="c"] .mini-subtitle,
+      .mini-preview[data-pair="c"] .mini-row strong,
+      .mini-preview[data-pair="c"] .mini-row span { font-family: "Plus Jakarta Sans", sans-serif; }
+
+      @media (max-width: 1100px) {
+        .lab-header { grid-template-columns: 1fr auto; }
+        .pair-picker { grid-column: 1 / -1; grid-row: 2; }
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .dashboard-grid { grid-template-columns: 1fr; }
+        .compare-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 760px) {
+        .lab { width: min(100% - 18px, 620px); margin-top: 10px; }
+        .lab-header { gap: 12px; }
+        .pair-picker { grid-template-columns: 1fr; }
+        .app-shell { grid-template-columns: 1fr; min-height: 0; box-shadow: 5px 5px 0 var(--shadow); }
+        .sidebar { display: none; }
+        .content { padding: 19px 14px 24px; }
+        .page-heading { align-items: stretch; flex-direction: column; }
+        .button { align-self: flex-start; }
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .app-row { grid-template-columns: minmax(120px, 1fr) auto; }
+        .date { display: none; }
+        .pair-caption { grid-template-columns: 1fr; }
+        .view-button span { display: none; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="lab">
+      <header class="lab-header">
+        <div>
+          <p class="eyebrow">Typography prototype · 01</p>
+          <h1 class="lab-title"><span class="logo-lock">Applyr</span> font lab</h1>
+        </div>
+
+        <div class="pair-picker" role="group" aria-label="Choose a font pairing">
+          <button class="pair-option" data-pair="editorial" aria-pressed="true">
+            <span class="option-kicker">01 · Editorial utility</span>
+            <span class="option-pair">IBM Plex Mono + Instrument Sans</span>
+          </button>
+          <button class="pair-option" data-pair="warm" aria-pressed="false">
+            <span class="option-kicker">02 · Soft precision</span>
+            <span class="option-pair">Spline Sans Mono + Manrope</span>
+          </button>
+          <button class="pair-option" data-pair="sharp" aria-pressed="false">
+            <span class="option-kicker">03 · Crisp system</span>
+            <span class="option-pair">Azeret Mono + Plus Jakarta Sans</span>
+          </button>
+        </div>
+
+        <div class="header-actions">
+          <button class="view-button" id="compareButton" type="button" aria-pressed="false" title="Compare all pairings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg>
+            <span>Compare all</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="app-shell" aria-label="Applyr dashboard typography preview">
+        <aside class="sidebar">
+          <div class="brand">Applyr<span class="brand-note">Logo remains unchanged</span></div>
+          <nav class="nav" aria-label="Main navigation">
+            <button class="nav-item active" type="button">Dashboard <span>01</span></button>
+            <button class="nav-item" type="button">Applications <span>12</span></button>
+            <button class="nav-item" type="button">Resumes <span>04</span></button>
+            <button class="nav-item" type="button">Notifications <span>02</span></button>
+            <button class="nav-item" type="button">Profile <span>↗</span></button>
+          </nav>
+          <p class="sidebar-footer">Light mode<br />Paper surface · v1.0</p>
+        </aside>
+
+        <section class="workspace">
+          <header class="app-header">
+            <span class="crumb">Workspace / Dashboard</span>
+            <div class="user"><span class="user-dot" aria-hidden="true"></span> Walid</div>
+          </header>
+
+          <div class="content">
+            <div class="page-heading">
+              <div>
+                <h2>Good morning, Walid.</h2>
+                <p>Your job search, on one quiet page. Four applications need attention this week.</p>
+              </div>
+              <button class="button" type="button">＋ New application</button>
+            </div>
+
+            <section class="stats" aria-label="Application summary">
+              <article class="card stat"><span class="stat-label">Total</span><span class="stat-delta">+2</span><div class="stat-value">12</div></article>
+              <article class="card stat"><span class="stat-label">In progress</span><span class="stat-delta">75%</span><div class="stat-value">09</div></article>
+              <article class="card stat"><span class="stat-label">Interviews</span><span class="stat-delta">+1</span><div class="stat-value">03</div></article>
+              <article class="card stat"><span class="stat-label">Offers</span><span class="stat-delta">8%</span><div class="stat-value">01</div></article>
+            </section>
+
+            <div class="dashboard-grid">
+              <article class="card">
+                <header class="card-header">
+                  <h3>Applications in motion</h3>
+                  <button class="card-link" type="button">View all →</button>
+                </header>
+                <div class="applications">
+                  <div class="app-row"><div><div class="company">Linear</div><div class="role">Software Engineer</div></div><span class="status green">Accepted</span><span class="date">20 May</span></div>
+                  <div class="app-row"><div><div class="company">Airbnb</div><div class="role">Software Engineer Intern</div></div><span class="status amber">Interview</span><span class="date">29 May</span></div>
+                  <div class="app-row"><div><div class="company">Shopify</div><div class="role">Junior Backend Developer</div></div><span class="status blue">Applied</span><span class="date">18 May</span></div>
+                  <div class="app-row"><div><div class="company">GitHub</div><div class="role">DevOps Engineer</div></div><span class="status gray">Wishlist</span><span class="date">—</span></div>
+                </div>
+              </article>
+
+              <aside class="card note-card">
+                <span class="meta-label">Next up · Today</span>
+                <h3>Prepare your Figma interview notes</h3>
+                <p>Review the role, pull three project examples, and write down two questions for the team.</p>
+                <button class="button" type="button">Open application →</button>
+                <div class="paper-note">
+                  <p>“Keep the workflow calm enough that the work—not the interface—holds attention.”</p>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="pair-caption" aria-live="polite">
+        <div><span class="meta-label">Mono voice</span><span class="meta-value" id="monoName">IBM Plex Mono</span></div>
+        <div><span class="meta-label">Sans voice</span><span class="meta-value" id="sansName">Instrument Sans</span></div>
+        <div><span class="meta-label">Character</span><span class="meta-value verdict" id="verdict">Editorial, composed, and closest to Applyr’s paper-like roots.</span></div>
+      </section>
+
+      <section class="compare-grid" aria-label="Side-by-side typography comparison">
+        <article class="mini-preview" data-pair="a">
+          <div class="mini-top"><span class="mini-logo">Applyr</span><span class="mini-label">01 · Editorial</span></div>
+          <div class="mini-body"><span class="mini-label">IBM Plex Mono + Instrument Sans</span><h3>Applications in motion</h3><p class="mini-subtitle">Composed, editorial, and distinctly paper-like.</p><span class="mini-label">In progress</span><div class="mini-number">09</div><div class="mini-row"><div><strong>Airbnb</strong><span>Software Engineer Intern</span></div><span class="status amber">Interview</span></div><div class="mini-row"><div><strong>Shopify</strong><span>Junior Backend Developer</span></div><span class="status blue">Applied</span></div></div>
+        </article>
+        <article class="mini-preview" data-pair="b">
+          <div class="mini-top"><span class="mini-logo">Applyr</span><span class="mini-label">02 · Soft</span></div>
+          <div class="mini-body"><span class="mini-label">Spline Sans Mono + Manrope</span><h3>Applications in motion</h3><p class="mini-subtitle">Friendly, open, and gently contemporary.</p><span class="mini-label">In progress</span><div class="mini-number">09</div><div class="mini-row"><div><strong>Airbnb</strong><span>Software Engineer Intern</span></div><span class="status amber">Interview</span></div><div class="mini-row"><div><strong>Shopify</strong><span>Junior Backend Developer</span></div><span class="status blue">Applied</span></div></div>
+        </article>
+        <article class="mini-preview" data-pair="c">
+          <div class="mini-top"><span class="mini-logo">Applyr</span><span class="mini-label">03 · Crisp</span></div>
+          <div class="mini-body"><span class="mini-label">Azeret Mono + Plus Jakarta Sans</span><h3>Applications in motion</h3><p class="mini-subtitle">Sharper, more digital, and confidently modern.</p><span class="mini-label">In progress</span><div class="mini-number">09</div><div class="mini-row"><div><strong>Airbnb</strong><span>Software Engineer Intern</span></div><span class="status amber">Interview</span></div><div class="mini-row"><div><strong>Shopify</strong><span>Junior Backend Developer</span></div><span class="status blue">Applied</span></div></div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const pairs = {
+        editorial: {
+          mono: '"IBM Plex Mono", monospace',
+          sans: '"Instrument Sans", sans-serif',
+          monoName: 'IBM Plex Mono',
+          sansName: 'Instrument Sans',
+          verdict: 'Editorial, composed, and closest to Applyr’s paper-like roots.'
+        },
+        warm: {
+          mono: '"Spline Sans Mono", monospace',
+          sans: '"Manrope", sans-serif',
+          monoName: 'Spline Sans Mono',
+          sansName: 'Manrope',
+          verdict: 'Softer and friendlier, with more breathing room in longer text.'
+        },
+        sharp: {
+          mono: '"Azeret Mono", monospace',
+          sans: '"Plus Jakarta Sans", sans-serif',
+          monoName: 'Azeret Mono',
+          sansName: 'Plus Jakarta Sans',
+          verdict: 'Crisp and product-forward; the most modern, least nostalgic option.'
+        }
+      };
+
+      const root = document.documentElement;
+      const optionButtons = [...document.querySelectorAll('.pair-option')];
+      const compareButton = document.getElementById('compareButton');
+
+      function selectPair(key) {
+        const pair = pairs[key];
+        root.style.setProperty('--mono', pair.mono);
+        root.style.setProperty('--sans', pair.sans);
+        document.getElementById('monoName').textContent = pair.monoName;
+        document.getElementById('sansName').textContent = pair.sansName;
+        document.getElementById('verdict').textContent = pair.verdict;
+        optionButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.pair === key)));
+      }
+
+      optionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          document.body.classList.remove('compare-mode');
+          compareButton.setAttribute('aria-pressed', 'false');
+          compareButton.querySelector('span').textContent = 'Compare all';
+          selectPair(button.dataset.pair);
+        });
+      });
+
+      compareButton.addEventListener('click', () => {
+        const isComparing = document.body.classList.toggle('compare-mode');
+        compareButton.setAttribute('aria-pressed', String(isComparing));
+        compareButton.querySelector('span').textContent = isComparing ? 'Live preview' : 'Compare all';
+      });
+    </script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -492,12 +492,31 @@ select option {
   @apply bg-white dark:bg-[#111] text-[#111] dark:text-white;
 }
 .landing-root {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
   color: #111;
 }
 
 .landing-display {
-  font-family: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+}
+
+/*
+ * Applyr's wordmark intentionally keeps its original system-mono voice.
+ * Product typography can evolve independently without silently redrawing the logo.
+ */
+.applyr-wordmark {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* The workspace stays utility-led in IBM Plex Mono; editorial content uses Instrument Sans. */
+.app-ui :is(h1, h2, h3, h4, h5, h6),
+.auth-surface :is(h2, p),
+.type-sans {
+  font-family: 'Instrument Sans', Inter, system-ui, sans-serif;
+}
+
+.app-ui :is(h1, h2, h3, h4, h5, h6) {
+  letter-spacing: -0.025em;
 }
 
 .landing-bg {

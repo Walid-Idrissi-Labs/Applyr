@@ -205,8 +205,8 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#f9f8f4] dark:bg-[#0a0a0a] transition-colors duration-300">
-      <img className="workspace-paper-surface" src="/paper-rules-texture.webp" alt="" aria-hidden="true" />
+    <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#faf9f6] dark:bg-[#0a0a0a] transition-colors duration-300">
+      <img className="workspace-paper-surface" src="/workspace-paper-texture.webp" alt="" aria-hidden="true" />
       {loadingInitialWorkspace && (
         <WorkspaceLoader
           requestActive={isPageLoading}

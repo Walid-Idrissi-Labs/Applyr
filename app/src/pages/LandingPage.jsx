@@ -1250,7 +1250,6 @@ export default function LandingPage() {
         {/* Hero */}
         <section className="hero">
           <div className="reveal">
-            <div className="hero-badge"><span>Job search, without the noise</span></div>
             <h1>A workspace built for hiring momentum.</h1>
             <p>
               Applyr keeps your applications, resumes, and follow-ups in one calm hub. Stay

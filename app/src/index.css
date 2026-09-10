@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -492,12 +492,12 @@ select option {
   @apply bg-white dark:bg-[#111] text-[#111] dark:text-white;
 }
 .landing-root {
-  font-family: 'Instrument Sans', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: #111;
 }
 
 .landing-display {
-  font-family: 'Instrument Sans', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /*
@@ -508,11 +508,11 @@ select option {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
-/* The workspace stays utility-led in IBM Plex Mono; editorial content uses Instrument Sans. */
+/* The workspace stays utility-led in Azeret Mono; editorial content uses Plus Jakarta Sans. */
 .app-ui :is(h1, h2, h3, h4, h5, h6),
 .auth-surface :is(h2, p),
 .type-sans {
-  font-family: 'Instrument Sans', Inter, system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
 }
 
 .app-ui :is(h1, h2, h3, h4, h5, h6) {

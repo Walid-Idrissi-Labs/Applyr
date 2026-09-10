@@ -133,8 +133,8 @@ export default function LandingPage() {
           --accent-gray-text: #374151;
           --radius: 14px;
           --radius-sm: 10px;
-          --font-mono: "IBM Plex Mono", "SF Mono", "Courier New", monospace;
-          --font-sans: "Instrument Sans", system-ui, sans-serif;
+          --font-mono: "Azeret Mono", "SF Mono", "Courier New", monospace;
+          --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
           --font-logo: "JetBrains Mono", "SF Mono", "Courier New", monospace;
           --shadow-offset: 8px;
           --shadow-color: rgba(0,0,0,0.08);

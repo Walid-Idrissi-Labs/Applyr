@@ -130,7 +130,7 @@ export default function DashboardPage() {
       legend: {
         position: 'bottom',
         labels: {
-          font: { family: 'IBM Plex Mono', size: 11 },
+          font: { family: 'Azeret Mono', size: 11 },
           color: user?.is_admin ? '#fff' : '#111',
         },
       },

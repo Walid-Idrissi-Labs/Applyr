@@ -8,8 +8,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['IBM Plex Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
-        sans: ['Instrument Sans', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['Azeret Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
     },
   },

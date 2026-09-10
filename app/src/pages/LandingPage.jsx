@@ -113,8 +113,8 @@ export default function LandingPage() {
     <div className="landing-root" data-theme={theme}>
       <style>{`
         :root {
-          --bg: #f4f4f5;
-          --surface: #ffffff;
+          --bg: #f9f8f4;
+          --surface: #fffefa;
           --text: #09090b;
           --text-muted: #71717a;
           --text-faint: #a1a1aa;
@@ -129,7 +129,7 @@ export default function LandingPage() {
           --accent-yellow-text: #92400e;
           --accent-blue-bg: #dbeafe;
           --accent-blue-text: #1e40af;
-          --accent-gray-bg: #f3f4f6;
+          --accent-gray-bg: #fdfcf9;
           --accent-gray-text: #374151;
           --radius: 14px;
           --radius-sm: 10px;
@@ -213,7 +213,7 @@ export default function LandingPage() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(244,244,245, 0.85);
+          background: rgba(249,248,244, 0.85);
           backdrop-filter: blur(12px);
           border-bottom: 2px solid transparent;
           transition: border-color 0.3s, background-color var(--transition-smooth);

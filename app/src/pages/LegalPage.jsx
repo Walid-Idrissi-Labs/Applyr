@@ -41,8 +41,8 @@ export default function LegalPage() {
     <div className="legal-root" data-theme={theme}>
       <style>{`
         .legal-root {
-          --legal-bg: #f4f4f5;
-          --legal-surface: #fff;
+          --legal-bg: #f9f8f4;
+          --legal-surface: #fffefa;
           --legal-text: #09090b;
           --legal-muted: #71717a;
           --legal-border: #09090b;
@@ -80,7 +80,7 @@ export default function LegalPage() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(244, 244, 245, .85);
+          background: rgba(249, 248, 244, .85);
           backdrop-filter: blur(12px);
           border-bottom: 2px solid transparent;
           transition: border-color .3s, background-color .35s ease;

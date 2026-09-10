@@ -47,8 +47,24 @@
   opacity: 0;
 }
 
+.content-paper-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dark .content-paper-surface {
+  opacity: 0;
+}
+
 .workspace-sidebar {
-  background: #faf9f6 url('/workspace-paper-texture.webp') center / cover;
+  background: #f9f8f4 url('/workspace-paper-surface-v3.webp') center / cover;
 }
 
 .dark .workspace-sidebar {

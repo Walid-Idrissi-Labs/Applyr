@@ -46,9 +46,9 @@ export default function OAuthCallbackPage() {
   }, [completeGoogleLogin, navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="auth-surface min-h-screen bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl p-6 text-center shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)]">
-        <div className="font-bold text-[22px] tracking-widest dark:text-white mb-5">Applyr</div>
+        <div className="applyr-wordmark font-bold text-[22px] tracking-widest dark:text-white mb-5">Applyr</div>
         {error ? (
           <>
             <div className="p-3 bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-800 rounded-md text-red-700 dark:text-red-300 text-[12px] mb-5">

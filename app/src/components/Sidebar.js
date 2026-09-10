@@ -3,7 +3,7 @@ import React from 'react';
 export default function Sidebar({ activeTab, setActiveTab, unreadNotifs }) {
   return (
     <aside className="w-40 border-r border-[#111] p-4 shrink-0 flex flex-col">
-      <div className="font-bold text-[18px] tracking-widest mb-8">Applyr</div>
+      <div className="applyr-wordmark font-bold text-[18px] tracking-widest mb-8">Applyr</div>
       <nav className="flex flex-col gap-1 flex-1">
         {['Dashboard', 'Candidatures', 'Notifications', 'Profil'].map(tab => (
           <button 

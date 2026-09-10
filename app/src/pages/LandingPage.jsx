@@ -113,8 +113,8 @@ export default function LandingPage() {
     <div className="landing-root" data-theme={theme}>
       <style>{`
         :root {
-          --bg: #f4f4f5;
-          --surface: #ffffff;
+          --bg: #f9f8f4;
+          --surface: #fffefa;
           --text: #09090b;
           --text-muted: #71717a;
           --text-faint: #a1a1aa;
@@ -129,12 +129,13 @@ export default function LandingPage() {
           --accent-yellow-text: #92400e;
           --accent-blue-bg: #dbeafe;
           --accent-blue-text: #1e40af;
-          --accent-gray-bg: #f3f4f6;
+          --accent-gray-bg: #fdfcf9;
           --accent-gray-text: #374151;
           --radius: 14px;
           --radius-sm: 10px;
-          --font-mono: "JetBrains Mono", "SF Mono", "Courier New", monospace;
-          --font-sans: "Inter", system-ui, sans-serif;
+          --font-mono: "Azeret Mono", "SF Mono", "Courier New", monospace;
+          --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+          --font-logo: "JetBrains Mono", "SF Mono", "Courier New", monospace;
           --shadow-offset: 8px;
           --shadow-color: rgba(0,0,0,0.08);
           --transition-fast: 0.15s;
@@ -177,6 +178,11 @@ export default function LandingPage() {
           transition: background-color var(--transition-smooth), color var(--transition-smooth);
         }
 
+        .landing-root :is(h1, h2, h3) {
+          font-family: var(--font-sans);
+          letter-spacing: -0.025em;
+        }
+
         .landing-root::before {
           content: "";
           position: fixed;
@@ -207,7 +213,7 @@ export default function LandingPage() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(244,244,245, 0.85);
+          background: rgba(249,248,244, 0.85);
           backdrop-filter: blur(12px);
           border-bottom: 2px solid transparent;
           transition: border-color 0.3s, background-color var(--transition-smooth);
@@ -222,6 +228,7 @@ export default function LandingPage() {
           justify-content: space-between;
         }
         .logo {
+          font-family: var(--font-logo);
           font-weight: 800;
           font-size: 18px;
           letter-spacing: 0.25em;
@@ -1243,7 +1250,6 @@ export default function LandingPage() {
         {/* Hero */}
         <section className="hero">
           <div className="reveal">
-            <div className="hero-badge"><span>Job search, without the noise</span></div>
             <h1>A workspace built for hiring momentum.</h1>
             <p>
               Applyr keeps your applications, resumes, and follow-ups in one calm hub. Stay
@@ -1707,7 +1713,7 @@ export default function LandingPage() {
 
         {/* Footer */}
         <footer>
-          <div style={{ fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '14px' }}>
+          <div style={{ fontFamily: 'var(--font-logo)', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '14px' }}>
             Applyr
           </div>
           <div className="footer-links">

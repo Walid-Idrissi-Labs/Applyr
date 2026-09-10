@@ -130,7 +130,7 @@ export default function DashboardPage() {
       legend: {
         position: 'bottom',
         labels: {
-          font: { family: 'ui-monospace', size: 11 },
+          font: { family: 'Azeret Mono', size: 11 },
           color: user?.is_admin ? '#fff' : '#111',
         },
       },
@@ -258,8 +258,8 @@ export default function DashboardPage() {
               className="w-full text-left flex items-center justify-between gap-4 p-3 border-2 border-gray-100 dark:border-gray-800 rounded-lg hover:border-[#111] dark:hover:border-gray-600 transition-all"
             >
               <div>
-                <div className="font-bold text-[12px] dark:text-white">{app.company_name}</div>
-                <div className="text-[11px] text-gray-500 dark:text-gray-400">{app.position}</div>
+                <div className="type-sans font-bold text-[12px] dark:text-white">{app.company_name}</div>
+                <div className="type-sans text-[11px] text-gray-500 dark:text-gray-400">{app.position}</div>
               </div>
               <div className="flex items-center gap-3">
                 <StatusBadge status={app.status} />

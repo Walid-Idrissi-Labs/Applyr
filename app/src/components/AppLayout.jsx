@@ -109,9 +109,7 @@ export default function AppLayout() {
     const handleChange = (event) => {
       const matches = event?.matches ?? media.matches;
       setIsMobile(matches);
-      if (matches) {
-        setSidebarOpen(false);
-      }
+      setSidebarOpen(!matches);
     };
     handleChange(media);
     media.addEventListener('change', handleChange);
@@ -207,7 +205,8 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+    <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#f9f8f4] dark:bg-[#0a0a0a] transition-colors duration-300">
+      <img className="workspace-paper-surface" src="/paper-rules-texture.webp" alt="" aria-hidden="true" />
       {loadingInitialWorkspace && (
         <WorkspaceLoader
           requestActive={isPageLoading}
@@ -228,19 +227,20 @@ export default function AppLayout() {
       )}
       {isMobile && sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-10"
+          className="fixed inset-0 bg-black/40 z-30"
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
       )}
       <aside
-        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} ${sidebarOpen ? 'md:w-48' : 'md:w-0'} fixed inset-y-0 left-0 w-64 md:static md:translate-x-0 shrink-0 flex flex-col transition-all duration-300 bg-white dark:bg-[#111] md:bg-transparent md:dark:bg-transparent border-r-2 border-[#111] dark:border-gray-800 md:border-0 md:dark:border-0 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] md:shadow-none md:dark:shadow-none overflow-hidden whitespace-nowrap z-20`}
+        id="workspace-sidebar"
+        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} ${sidebarOpen ? 'md:w-48' : 'md:w-0'} workspace-sidebar fixed inset-y-0 left-0 w-64 md:static md:translate-x-0 shrink-0 flex flex-col transition-all duration-300 bg-transparent dark:bg-[#111] border-r-2 border-[#111] dark:border-gray-800 md:border-0 md:dark:border-0 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] md:shadow-none md:dark:shadow-none overflow-y-auto overflow-x-hidden whitespace-nowrap z-40`}
       >
         <div className="p-2 md:p-3 flex flex-col h-full w-full">
           <button
             type="button"
             onClick={handleLogoClick}
-            className="font-bold text-[18px] tracking-widest mb-6 px-2 mt-2 dark:text-white text-left"
+            className="applyr-wordmark font-bold text-[18px] tracking-widest mb-6 px-2 mt-2 dark:text-white text-left"
           >
             Applyr
           </button>
@@ -275,12 +275,15 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative p-2 md:p-3 transition-all duration-300">
-        <div className="bg-white dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
-          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-white dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
+      <div className="relative z-10 flex-1 flex flex-col h-screen overflow-hidden p-2 md:p-3 transition-all duration-300">
+        <div className="bg-[#fdfcf9] dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
+          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-[#fdfcf9] dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+                aria-controls="workspace-sidebar"
+                aria-expanded={sidebarOpen}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800 p-1.5 border-2 border-transparent hover:border-[#111] dark:hover:border-gray-600 rounded-md transition-all dark:text-white"
               >
                 <Menu className="w-5 h-5" />
@@ -288,7 +291,7 @@ export default function AppLayout() {
               <button
                 type="button"
                 onClick={handleLogoClick}
-                className={`font-bold tracking-widest dark:text-white transition-opacity ${sidebarOpen ? 'opacity-0 hidden md:block' : 'opacity-100'}`}
+                className={`applyr-wordmark font-bold tracking-widest dark:text-white transition-opacity ${sidebarOpen ? 'opacity-0 hidden md:block' : 'opacity-100'}`}
               >
                 Applyr
               </button>

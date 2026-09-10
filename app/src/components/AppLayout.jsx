@@ -205,7 +205,7 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#f7f6f1] dark:bg-[#0a0a0a] transition-colors duration-300">
+    <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#f9f8f4] dark:bg-[#0a0a0a] transition-colors duration-300">
       <img className="workspace-paper-surface" src="/paper-rules-texture.webp" alt="" aria-hidden="true" />
       {loadingInitialWorkspace && (
         <WorkspaceLoader
@@ -276,8 +276,8 @@ export default function AppLayout() {
       </aside>
 
       <div className="relative z-10 flex-1 flex flex-col h-screen overflow-hidden p-2 md:p-3 transition-all duration-300">
-        <div className="bg-[#fcfbf6] dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
-          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-[#fcfbf6] dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
+        <div className="bg-[#fdfcf9] dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
+          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-[#fdfcf9] dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}

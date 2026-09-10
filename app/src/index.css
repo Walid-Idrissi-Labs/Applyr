@@ -23,15 +23,30 @@
 
 @media (max-width: 767px) {
   .workspace-sidebar {
-    background-color: #f7f6f1;
-    background-image: url('/paper-rules-texture.webp');
-    background-position: center;
-    background-size: cover;
+    background-color: #f9f8f4;
+  }
+
+  .workspace-sidebar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('/paper-rules-texture.webp') center / cover;
+    opacity: .52;
+    pointer-events: none;
+  }
+
+  .workspace-sidebar > * {
+    position: relative;
+    z-index: 1;
   }
 
   .dark .workspace-sidebar {
     background-color: #111;
-    background-image: none;
+  }
+
+  .dark .workspace-sidebar::before {
+    content: none;
   }
 }
 
@@ -76,7 +91,7 @@
 }
 
 .neu-card {
-  @apply bg-[#fdfbf6] dark:bg-[#111] rounded-xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] transition-colors;
+  @apply bg-[#fffefa] dark:bg-[#111] rounded-xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] transition-colors;
 }
 
 .neu-input {

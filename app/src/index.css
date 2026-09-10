@@ -47,32 +47,35 @@
   opacity: 0;
 }
 
-@media (max-width: 767px) {
+.workspace-sidebar {
+  background-color: #f9f8f4;
+}
+
+.workspace-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('/sidebar-paper-texture.webp') center / cover;
+  pointer-events: none;
+}
+
+.workspace-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dark .workspace-sidebar {
+  background-color: #111;
+}
+
+.dark .workspace-sidebar::before {
+  content: none;
+}
+
+@media (min-width: 768px) {
   .workspace-sidebar {
-    background-color: #f9f8f4;
-  }
-
-  .workspace-sidebar::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background: url('/paper-rules-texture.webp') center / cover;
-    opacity: .52;
-    pointer-events: none;
-  }
-
-  .workspace-sidebar > * {
     position: relative;
-    z-index: 1;
-  }
-
-  .dark .workspace-sidebar {
-    background-color: #111;
-  }
-
-  .dark .workspace-sidebar::before {
-    content: none;
   }
 }
 

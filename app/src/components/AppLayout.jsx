@@ -206,7 +206,7 @@ export default function AppLayout() {
 
   return (
     <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#f9f8f4] dark:bg-[#0a0a0a] transition-colors duration-300">
-      <img className="workspace-paper-surface" src="/workspace-paper-surface-v3.webp" alt="" aria-hidden="true" />
+      <img className="workspace-paper-surface" src="/workspace-paper-surface-v10.webp" alt="" aria-hidden="true" />
       {loadingInitialWorkspace && (
         <WorkspaceLoader
           requestActive={isPageLoading}
@@ -283,7 +283,7 @@ export default function AppLayout() {
             alt=""
             aria-hidden="true"
           />
-          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-transparent dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
+          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-transparent dark:bg-[#111] z-30 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}

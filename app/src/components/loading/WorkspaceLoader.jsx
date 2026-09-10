@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import LoadingStatus from './LoadingStatus';
+import InteractiveDotBackground from '../InteractiveDotBackground';
 
 const PAGES = [
   { x: '-8px', y: '6px', rotation: '-7deg', startX: '-398px', startY: '-16px', startRotation: '-17deg' },
@@ -93,6 +94,7 @@ export default function WorkspaceLoader({
       className={`workspace-loader fixed inset-0 z-[100] flex items-center justify-center bg-gray-100 dark:bg-[#0a0a0a] px-6 ${hasEntered ? '' : 'workspace-loader--entering'} ${isExiting ? 'workspace-loader--exiting' : ''}`}
       aria-busy="true"
     >
+      <InteractiveDotBackground />
       {visible && (
         <div className="workspace-loader-content">
           <LoadingStatus

@@ -41,14 +41,14 @@ export default function LegalPage() {
     <div className="legal-root" data-theme={theme}>
       <style>{`
         .legal-root {
-          --legal-bg: #f7f6f1;
+          --legal-bg: #f4f4f5;
           --legal-surface: #fff;
           --legal-text: #09090b;
           --legal-muted: #71717a;
           --legal-border: #09090b;
           --legal-radius: 10px;
           min-height: 100vh;
-          background: transparent;
+          background: var(--legal-bg);
           color: var(--legal-text);
           font-family: "Azeret Mono", "SF Mono", "Courier New", monospace;
           line-height: 1.6;
@@ -56,7 +56,16 @@ export default function LegalPage() {
           isolation: isolate;
           transition: background-color .35s ease, color .35s ease;
         }
-        .legal-root::before { content: none; }
+        .legal-root::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          z-index: -1;
+          background-image: radial-gradient(circle, #d4d4d8 1px, transparent 1px);
+          background-size: 26px 26px;
+          opacity: .55;
+          pointer-events: none;
+        }
         .legal-root[data-theme="dark"] {
           --legal-bg: #0a0a0a;
           --legal-surface: #111;
@@ -64,6 +73,7 @@ export default function LegalPage() {
           --legal-muted: #a1a1aa;
           --legal-border: #2c2c2c;
         }
+        .legal-root[data-theme="dark"]::before { background-image: radial-gradient(circle, #2a2a2c 1px, transparent 1px); opacity: .4; }
         .legal-nav-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
         .legal-navbar {
           padding: 24px 0;

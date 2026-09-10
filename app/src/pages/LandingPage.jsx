@@ -113,7 +113,7 @@ export default function LandingPage() {
     <div className="landing-root" data-theme={theme}>
       <style>{`
         :root {
-          --bg: #f4f4f5;
+          --bg: #f7f6f1;
           --surface: #ffffff;
           --text: #09090b;
           --text-muted: #71717a;
@@ -168,7 +168,7 @@ export default function LandingPage() {
 
         .landing-root {
           font-family: var(--font-mono);
-          background: var(--bg);
+          background: transparent;
           color: var(--text);
           line-height: 1.5;
           -webkit-font-smoothing: antialiased;
@@ -183,21 +183,7 @@ export default function LandingPage() {
           letter-spacing: -0.025em;
         }
 
-        .landing-root::before {
-          content: "";
-          position: fixed;
-          inset: 0;
-          background-image: radial-gradient(circle, #d4d4d8 1px, transparent 1px);
-          background-size: 32px 32px;
-          opacity: 0.9;
-          pointer-events: none;
-          z-index: 0;
-          transition: opacity var(--transition-smooth);
-        }
-        .landing-root[data-theme="dark"]::before {
-          background-image: radial-gradient(circle, #2a2a2c 1px, transparent 1px);
-          opacity: 0.4;
-        }
+        .landing-root::before { content: none; }
 
         .lp-container {
           max-width: 1200px;

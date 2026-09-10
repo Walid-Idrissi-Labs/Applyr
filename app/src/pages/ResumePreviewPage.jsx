@@ -184,7 +184,7 @@ export default function ResumePreviewPage() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0a0a0a]">
+      <div className="h-screen flex items-center justify-center bg-transparent dark:bg-[#0a0a0a]">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-purple-200 dark:border-purple-900 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
           <div className="font-bold text-gray-500 dark:text-gray-400">Loading Resume Architect...</div>
@@ -194,7 +194,7 @@ export default function ResumePreviewPage() {
   }
 
   if (!resume) {
-    return <div className="p-8 text-center text-red-500 bg-gray-100 dark:bg-[#0a0a0a] min-h-screen">Failed to load resume.</div>;
+    return <div className="p-8 text-center text-red-500 bg-transparent dark:bg-[#0a0a0a] min-h-screen">Failed to load resume.</div>;
   }
 
   const application = resume.application;
@@ -204,7 +204,7 @@ export default function ResumePreviewPage() {
   const versionNumber = versions.length - sortedVersions.findIndex(v => v.id === resume.id);
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-100 dark:bg-[#0a0a0a] text-[#111] dark:text-gray-100 font-mono transition-colors duration-300 print:bg-white print:h-auto print:overflow-visible">
+    <div className="h-screen flex flex-col overflow-hidden bg-transparent dark:bg-[#0a0a0a] text-[#111] dark:text-gray-100 font-mono transition-colors duration-300 print:bg-white print:h-auto print:overflow-visible">
       <style>
         {`
           @media print {

@@ -136,16 +136,21 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <AuthProvider>
-          <LoadingActivityProvider>
-            <StartupGate>
-              <AppRoutes />
-            </StartupGate>
-          </LoadingActivityProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <div className="paper-app">
+      <img className="paper-surface" src="/paper-rules-texture.webp" alt="" aria-hidden="true" />
+      <div className="paper-app-content">
+        <BrowserRouter>
+          <ThemeProvider>
+            <AuthProvider>
+              <LoadingActivityProvider>
+                <StartupGate>
+                  <AppRoutes />
+                </StartupGate>
+              </LoadingActivityProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </div>
+    </div>
   );
 }

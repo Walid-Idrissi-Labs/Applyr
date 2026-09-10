@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { getGoogleAuthURL } from '../api';
 import { Moon, Sun } from 'lucide-react';
-import InteractiveDotBackground from '../components/InteractiveDotBackground';
 
 export default function LoginPage({ sessionRestorationFailed = false }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -61,7 +60,6 @@ export default function LoginPage({ sessionRestorationFailed = false }) {
 
   return (
     <div className="auth-surface min-h-screen bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center p-4 transition-colors duration-300" style={{ position: 'relative', zIndex: 1 }}>
-      <InteractiveDotBackground />
       <div className="w-full max-w-sm bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 10 }}>
         <div className="bg-gray-50 dark:bg-[#1a1a1a] border-b-2 border-[#111] dark:border-gray-800 p-5 text-center shrink-0 flex justify-between items-center">
           <div className="w-8" />

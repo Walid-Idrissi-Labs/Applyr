@@ -36,6 +36,7 @@ export default function AppLayout() {
   const [workspaceMinimumVisible, setWorkspaceMinimumVisible] = useState(false);
   const [workspaceLoaderExiting, setWorkspaceLoaderExiting] = useState(false);
   const initialWorkspaceLoadStarted = useRef(false);
+  const userMenuRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { isPageLoading } = useLoadingActivity();
   const navigate = useNavigate();
@@ -123,6 +124,19 @@ export default function AppLayout() {
   }, [location.pathname, isMobile]);
 
   useEffect(() => {
+    if (!showUserMenu) return undefined;
+
+    const handleOutsidePointerDown = (event) => {
+      if (!userMenuRef.current?.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handleOutsidePointerDown);
+    return () => document.removeEventListener('pointerdown', handleOutsidePointerDown);
+  }, [showUserMenu]);
+
+  useEffect(() => {
     let isActive = true;
 
     const loadUnreadCount = async () => {
@@ -206,7 +220,7 @@ export default function AppLayout() {
 
   return (
     <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#f9f8f4] dark:bg-[#0a0a0a] transition-colors duration-300">
-      <img className="workspace-paper-surface" src="/paper-rules-texture.webp" alt="" aria-hidden="true" />
+      <img className="workspace-paper-surface" src="/workspace-paper-surface-v10.webp" alt="" aria-hidden="true" />
       {loadingInitialWorkspace && (
         <WorkspaceLoader
           requestActive={isPageLoading}
@@ -277,7 +291,13 @@ export default function AppLayout() {
 
       <div className="relative z-10 flex-1 flex flex-col h-screen overflow-hidden p-2 md:p-3 transition-all duration-300">
         <div className="bg-[#fdfcf9] dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
-          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-[#fdfcf9] dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
+          <img
+            className="content-paper-surface"
+            src="/content-paper-surface-v5.webp"
+            alt=""
+            aria-hidden="true"
+          />
+          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-transparent dark:bg-[#111] z-30 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -328,7 +348,7 @@ export default function AppLayout() {
               >
                 <Bell className="w-4 h-4" />
               </button>
-              <div className="relative">
+              <div ref={userMenuRef} className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 hover:underline text-[12px] font-bold dark:text-gray-300"
@@ -371,11 +391,11 @@ export default function AppLayout() {
             </div>
           </header>
           {user?.is_admin && !adminViewMode && (
-            <div className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-500 text-[11px] font-bold text-center py-1.5 border-b-2 border-yellow-200 dark:border-yellow-800 shrink-0">
+            <div className="relative z-10 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-500 text-[11px] font-bold text-center py-1.5 border-b-2 border-yellow-200 dark:border-yellow-800 shrink-0">
               Viewing as User (Admin Mode disabled)
             </div>
           )}
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+          <div className="relative z-10 flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
             <Outlet />
           </div>
         </div>

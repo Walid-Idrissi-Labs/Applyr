@@ -36,6 +36,7 @@ export default function AppLayout() {
   const [workspaceMinimumVisible, setWorkspaceMinimumVisible] = useState(false);
   const [workspaceLoaderExiting, setWorkspaceLoaderExiting] = useState(false);
   const initialWorkspaceLoadStarted = useRef(false);
+  const userMenuRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { isPageLoading } = useLoadingActivity();
   const navigate = useNavigate();
@@ -121,6 +122,19 @@ export default function AppLayout() {
       setSidebarOpen(false);
     }
   }, [location.pathname, isMobile]);
+
+  useEffect(() => {
+    if (!showUserMenu) return undefined;
+
+    const handleOutsidePointerDown = (event) => {
+      if (!userMenuRef.current?.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handleOutsidePointerDown);
+    return () => document.removeEventListener('pointerdown', handleOutsidePointerDown);
+  }, [showUserMenu]);
 
   useEffect(() => {
     let isActive = true;
@@ -334,7 +348,7 @@ export default function AppLayout() {
               >
                 <Bell className="w-4 h-4" />
               </button>
-              <div className="relative">
+              <div ref={userMenuRef} className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 hover:underline text-[12px] font-bold dark:text-gray-300"

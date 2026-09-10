@@ -234,7 +234,7 @@ export default function AppLayout() {
       )}
       <aside
         id="workspace-sidebar"
-        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} ${sidebarOpen ? 'md:w-48' : 'md:w-0'} fixed inset-y-0 left-0 w-64 md:static md:translate-x-0 shrink-0 flex flex-col transition-all duration-300 bg-transparent dark:bg-[#111] border-r-2 border-[#111] dark:border-gray-800 md:border-0 md:dark:border-0 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] md:shadow-none md:dark:shadow-none overflow-hidden whitespace-nowrap z-40`}
+        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} ${sidebarOpen ? 'md:w-48' : 'md:w-0'} workspace-sidebar fixed inset-y-0 left-0 w-64 md:static md:translate-x-0 shrink-0 flex flex-col transition-all duration-300 bg-transparent dark:bg-[#111] border-r-2 border-[#111] dark:border-gray-800 md:border-0 md:dark:border-0 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] md:shadow-none md:dark:shadow-none overflow-y-auto overflow-x-hidden whitespace-nowrap z-40`}
       >
         <div className="p-2 md:p-3 flex flex-col h-full w-full">
           <button
@@ -276,8 +276,8 @@ export default function AppLayout() {
       </aside>
 
       <div className="relative z-10 flex-1 flex flex-col h-screen overflow-hidden p-2 md:p-3 transition-all duration-300">
-        <div className="bg-[#fffdf8] dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
-          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-[#fffdf8] dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
+        <div className="bg-[#fbfaf5] dark:bg-[#111] rounded-2xl border-2 border-[#111] dark:border-gray-800 shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.05)] h-full flex flex-col overflow-hidden relative transition-colors">
+          <header className="p-3 px-5 flex justify-between items-center shrink-0 bg-[#fbfaf5] dark:bg-[#111] z-10 border-b-2 border-gray-100 dark:border-gray-800 transition-colors">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}

@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Moon, Sparkles, Sun } from 'lucide-react';
+import { ArrowRight, Check, Moon, Sparkles, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function LandingPage() {
   const { theme, toggleTheme } = useTheme();
-  const [scrolled, setScrolled] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
+  const scrollFrame = useRef(null);
 
   // Allow scrolling on the landing page even if body is locked globally.
   useEffect(() => {
@@ -20,59 +20,70 @@ export default function LandingPage() {
   // Scroll handlers: navbar state + active nav highlighting
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (scrollFrame.current !== null) return;
 
-      const sections = document.querySelectorAll('section[id]');
-      const navLinks = document.querySelectorAll('.landing-nav-links a');
-      let current = '';
-      sections.forEach((section) => {
-        if (!(section instanceof HTMLElement)) return;
-        const top = section.offsetTop - 100;
-        if (window.scrollY >= top) {
-          current = section.getAttribute('id') || '';
-        }
-      });
-      navLinks.forEach((link) => {
-        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+      scrollFrame.current = window.requestAnimationFrame(() => {
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.landing-nav-links a');
+        let current = '';
+        sections.forEach((section) => {
+          if (!(section instanceof HTMLElement)) return;
+          const top = section.offsetTop - 100;
+          if (window.scrollY >= top) {
+            current = section.getAttribute('id') || '';
+          }
+        });
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+        });
+        scrollFrame.current = null;
       });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current);
+    };
   }, []);
 
-  // Reveal animations
+  // Start section transitions before they enter view, so scrolling stays smooth.
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const revealElements = Array.from(document.querySelectorAll('.reveal'));
+    const handleTransitionEnd = (event) => {
+      if (event.propertyName === 'transform') {
+        event.currentTarget.classList.remove('is-prepared');
+      }
+    };
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) return;
 
-  // Bar chart animations
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.target instanceof HTMLElement) {
-            const target = entry.target.getAttribute('data-height');
-            if (target) entry.target.style.height = target + '%';
-            observer.unobserve(entry.target);
+          const isInitialRender = window.scrollY === 0 && entry.boundingClientRect.top < window.innerHeight;
+          entry.target.classList.add('visible');
+          if (isInitialRender) {
+            entry.target.classList.add('no-motion');
+            entry.target.classList.remove('is-prepared');
           }
+          observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.5 }
+      { rootMargin: '0px 0px 64px 0px', threshold: 0 }
     );
-    document.querySelectorAll('.bar').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+
+    revealElements.forEach((element) => {
+      element.classList.add('is-prepared');
+      element.addEventListener('transitionend', handleTransitionEnd);
+      observer.observe(element);
+    });
+
+    return () => {
+      observer.disconnect();
+      revealElements.forEach((element) => element.removeEventListener('transitionend', handleTransitionEnd));
+    };
   }, []);
 
   // Counter animations
@@ -138,6 +149,7 @@ export default function LandingPage() {
           --font-logo: "JetBrains Mono", "SF Mono", "Courier New", monospace;
           --shadow-offset: 8px;
           --shadow-color: rgba(0,0,0,0.08);
+          --filled-button-shadow: 0 8px 16px rgba(9, 9, 11, 0.22);
           --transition-fast: 0.15s;
           --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -162,13 +174,15 @@ export default function LandingPage() {
           --accent-blue-text: #60a5fa;
           --accent-gray-bg: rgba(255,255,255,0.06);
           --accent-gray-text: #a1a1aa;
+          --filled-button-shadow: 0 8px 18px rgba(0, 0, 0, 0.34);
         }
-
-        html { scroll-behavior: smooth; }
 
         .landing-root {
           font-family: var(--font-mono);
           background: var(--bg);
+          background-image: radial-gradient(circle, #d4d4d8 1px, transparent 1px);
+          background-size: 32px 32px;
+          background-attachment: scroll;
           color: var(--text);
           line-height: 1.5;
           -webkit-font-smoothing: antialiased;
@@ -183,20 +197,8 @@ export default function LandingPage() {
           letter-spacing: -0.025em;
         }
 
-        .landing-root::before {
-          content: "";
-          position: fixed;
-          inset: 0;
-          background-image: radial-gradient(circle, #d4d4d8 1px, transparent 1px);
-          background-size: 32px 32px;
-          opacity: 0.9;
-          pointer-events: none;
-          z-index: 0;
-          transition: opacity var(--transition-smooth);
-        }
-        .landing-root[data-theme="dark"]::before {
+        .landing-root[data-theme="dark"] {
           background-image: radial-gradient(circle, #2a2a2c 1px, transparent 1px);
-          opacity: 0.4;
         }
 
         .lp-container {
@@ -213,15 +215,11 @@ export default function LandingPage() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(249,248,244, 0.85);
-          backdrop-filter: blur(12px);
-          border-bottom: 2px solid transparent;
+          background: var(--bg);
+          border-bottom: 2px solid var(--border);
           transition: border-color 0.3s, background-color var(--transition-smooth);
+          isolation: isolate;
         }
-        [data-theme="dark"] nav { background: rgba(10,10,10, 0.85); }
-        nav.scrolled { border-bottom-color: var(--border); }
-        [data-theme="dark"] nav.scrolled { border-bottom-color: var(--border); }
-
         .nav-inner {
           display: flex;
           align-items: center;
@@ -315,8 +313,7 @@ export default function LandingPage() {
           position: relative;
           overflow: hidden;
         }
-        .nav-cta:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--border); }
-        [data-theme="dark"] .nav-cta:hover { box-shadow: 4px 4px 0 rgba(255,255,255,0.08); }
+        .nav-cta:hover { transform: translate(-2px, -2px); box-shadow: var(--filled-button-shadow); }
         .nav-cta:active { transform: translate(0, 0); box-shadow: none; transition-duration: 0.05s; }
 
         .theme-toggle {
@@ -424,8 +421,7 @@ export default function LandingPage() {
           position: relative;
           overflow: hidden;
         }
-        .btn-primary:hover { transform: translate(-3px, -3px); box-shadow: 5px 5px 0 var(--border); }
-        [data-theme="dark"] .btn-primary:hover { box-shadow: 5px 5px 0 rgba(255,255,255,0.08); }
+        .btn-primary:hover { transform: translate(-3px, -3px); box-shadow: var(--filled-button-shadow); }
         .btn-primary:active { transform: translate(0); box-shadow: none; transition-duration: 0.05s; }
         .btn-secondary {
           display: inline-flex;
@@ -668,17 +664,8 @@ export default function LandingPage() {
           padding: 20px 0;
           border-bottom: 1.5px solid var(--border-light);
           transition: border-color var(--transition-smooth);
-          opacity: 0;
-          transform: translateX(-10px);
-          animation: slide-in-right 0.6s forwards;
         }
-        .workflow-step:nth-child(2) { animation-delay: 0.1s; }
-        .workflow-step:nth-child(3) { animation-delay: 0.2s; }
-        .workflow-step:nth-child(4) { animation-delay: 0.3s; }
         .workflow-step:last-child { border-bottom: none; }
-        @keyframes slide-in-right {
-          to { opacity: 1; transform: translateX(0); }
-        }
         .step-num {
           width: 36px;
           height: 36px;
@@ -708,17 +695,10 @@ export default function LandingPage() {
           border-radius: var(--radius);
           padding: 28px;
           transition: transform 0.3s, box-shadow 0.3s, background-color var(--transition-smooth), border-color var(--transition-smooth);
-          opacity: 0;
-          transform: translateY(20px);
-          animation: slide-up 0.6s forwards;
         }
         [data-theme="dark"] .side-card {
           border: 1.5px solid var(--border);
           box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-        }
-        .side-card:nth-child(2) { animation-delay: 0.15s; }
-        @keyframes slide-up {
-          to { opacity: 1; transform: translateY(0); }
         }
         .side-card:hover { transform: translateX(8px); box-shadow: 6px 6px 0 var(--shadow-color); }
         [data-theme="dark"] .side-card:hover {
@@ -762,73 +742,86 @@ export default function LandingPage() {
           gap: 10px;
           font-size: 14px;
           font-weight: 500;
-          opacity: 0;
-          transform: translateX(-10px);
-          animation: slide-in-right 0.5s forwards;
         }
-        .insights-left li:nth-child(2) { animation-delay: 0.1s; }
-        .insights-left li:nth-child(3) { animation-delay: 0.2s; }
         .check {
-          width: 20px;
-          height: 20px;
+          width: 22px;
+          height: 22px;
           background: var(--accent-green-bg);
-          border: 2px solid var(--border);
+          border: 1.5px solid var(--accent-green);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 10px;
           color: var(--accent-green);
           flex-shrink: 0;
           transition: transform 0.3s, background-color var(--transition-smooth), border-color var(--transition-smooth);
         }
+        .check svg { width: 13px; height: 13px; stroke-width: 3; }
         .insights-left li:hover .check { transform: scale(1.2) rotate(10deg); }
-        .chart-card {
+        .pipeline-card {
           background: var(--surface);
           border: 2.5px solid var(--border);
           border-radius: var(--radius);
           padding: 32px;
           transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
         }
-        [data-theme="dark"] .chart-card {
+        [data-theme="dark"] .pipeline-card {
           border: 1.5px solid var(--border);
           box-shadow: 0 2px 12px rgba(0,0,0,0.3);
         }
-        .chart-header {
+        .pipeline-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           margin-bottom: 24px;
         }
-        .chart-bars {
-          display: flex;
-          align-items: flex-end;
-          gap: 12px;
-          height: 140px;
+        .pipeline-badge {
+          font-size: 11px;
+          font-weight: 800;
+          color: var(--accent-yellow-text);
+          background: var(--accent-yellow-bg);
+          padding: 5px 9px;
+          border-radius: 999px;
+          white-space: nowrap;
         }
-        .bar-wrap {
-          flex: 1;
+        .pipeline-list {
           display: flex;
           flex-direction: column;
+          gap: 10px;
+        }
+        .pipeline-item {
+          display: flex;
           align-items: center;
+          gap: 12px;
+          padding: 12px;
+          border: 1.5px solid var(--border-light);
+          border-radius: var(--radius-sm);
+          background: var(--bg);
+        }
+        .pipeline-item-dot {
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: var(--accent-green);
+          box-shadow: 0 0 0 4px var(--accent-green-bg);
+          flex-shrink: 0;
+        }
+        .pipeline-item-dot--yellow { background: var(--accent-yellow-text); box-shadow: 0 0 0 4px var(--accent-yellow-bg); }
+        .pipeline-item-copy { min-width: 0; flex: 1; }
+        .pipeline-item-title { font-size: 13px; font-weight: 700; }
+        .pipeline-item-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .pipeline-item-time { font-size: 10px; font-weight: 800; color: var(--text-muted); white-space: nowrap; }
+        .pipeline-summary {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
           gap: 8px;
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1.5px solid var(--border-light);
         }
-        .bar {
-          width: 100%;
-          background: var(--text);
-          border-radius: 6px;
-          transition: height 1.2s cubic-bezier(0.4, 0, 0.2, 1), background-color var(--transition-smooth);
-          position: relative;
-        }
-        .bar-bg {
-          width: 100%;
-          background: var(--border-light);
-          border-radius: 6px;
-          position: relative;
-          overflow: hidden;
-          transition: background-color var(--transition-smooth);
-        }
-        .bar-wrap:hover .bar { filter: brightness(1.2); }
+        .pipeline-summary-item { text-align: center; }
+        .pipeline-summary-count { font-size: 18px; font-weight: 800; }
+        .pipeline-summary-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-top: 2px; }
 
         /* Testimonials / Different */
         .testimonial-grid {
@@ -1178,15 +1171,15 @@ export default function LandingPage() {
           font-weight: 500;
         }
 
-        /* Animations */
-        .reveal {
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        .reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
+        @media (prefers-reduced-motion: no-preference) {
+          .reveal {
+            opacity: 0;
+            transform: translate3d(0, 20px, 0);
+            transition: opacity 480ms ease-out, transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+          }
+          .reveal.is-prepared { will-change: opacity, transform; }
+          .reveal.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+          .reveal.no-motion { transition: none; }
         }
 
         /* Responsive */
@@ -1209,7 +1202,7 @@ export default function LandingPage() {
         }
       `}</style>
 
-      <nav id="navbar" className={scrolled ? 'scrolled' : ''}>
+      <nav id="navbar">
         <div className="lp-container nav-inner">
           <Link to="/" className="logo">Applyr</Link>
           <div className="landing-nav-links">
@@ -1416,86 +1409,65 @@ export default function LandingPage() {
                   lineHeight: '1.6',
                 }}
               >
-                Dashboards summarize your search with clean metrics and growth charts. For admins,
-                it&apos;s a dedicated view that keeps the team aligned.
+                Dashboards turn your activity into clear next steps, so you always know where to
+                focus without digging through a noisy pipeline.
               </p>
               <ul>
                 <li>
-                  <div className="check">✓</div> Track outcomes by status
+                  <div className="check"><Check aria-hidden="true" /></div> Track outcomes by status
                 </li>
                 <li>
-                  <div className="check">✓</div> Measure response and success rates
+                  <div className="check"><Check aria-hidden="true" /></div> Measure response and success rates
                 </li>
                 <li>
-                  <div className="check">✓</div> See monthly growth trends
+                  <div className="check"><Check aria-hidden="true" /></div> See your next actions at a glance
                 </li>
               </ul>
               <Link to="/login" className="btn-secondary" style={{ marginTop: '8px' }}>
                 Explore dashboards
               </Link>
             </div>
-            <div className="chart-card reveal" style={{ transitionDelay: '0.15s' }}>
-              <div className="chart-header">
+            <div className="pipeline-card reveal" style={{ transitionDelay: '0.15s' }}>
+              <div className="pipeline-header">
                 <div>
-                  <div className="side-label">Monthly growth</div>
+                  <div className="side-label">This week&apos;s focus</div>
                   <div style={{ fontSize: '22px', fontWeight: 800, marginTop: '4px' }}>
-                    Consistent momentum
+                    Keep momentum moving.
                   </div>
                 </div>
-                <div
-                  className="growth-counter demo-stat-value"
-                  data-count="100"
-                  data-prefix="+"
-                  data-suffix="%"
-                  style={{
-                    fontSize: '13px',
-                    fontWeight: 800,
-                    color: 'var(--accent-green)',
-                    background: 'var(--accent-green-bg)',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    border: '1.5px solid var(--border)',
-                  }}
-                >
-                  0
+                <div className="pipeline-badge">2 actions due</div>
+              </div>
+              <div className="pipeline-list">
+                <div className="pipeline-item">
+                  <div className="pipeline-item-dot pipeline-item-dot--yellow" />
+                  <div className="pipeline-item-copy">
+                    <div className="pipeline-item-title">Follow up with Linear</div>
+                    <div className="pipeline-item-detail">UX Researcher application</div>
+                  </div>
+                  <div className="pipeline-item-time">Today</div>
+                </div>
+                <div className="pipeline-item">
+                  <div className="pipeline-item-dot" />
+                  <div className="pipeline-item-copy">
+                    <div className="pipeline-item-title">Prepare for Stripe</div>
+                    <div className="pipeline-item-detail">Product Designer interview</div>
+                  </div>
+                  <div className="pipeline-item-time">Thu</div>
                 </div>
               </div>
-              <div className="chart-bars">
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="32" />
-                  </div>
+              <div className="pipeline-summary">
+                <div className="pipeline-summary-item">
+                  <div className="pipeline-summary-count">12</div>
+                  <div className="pipeline-summary-label">Active</div>
                 </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="40" />
-                  </div>
+                <div className="pipeline-summary-item">
+                  <div className="pipeline-summary-count">3</div>
+                  <div className="pipeline-summary-label">Interviews</div>
                 </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="28" />
-                  </div>
+                <div className="pipeline-summary-item">
+                  <div className="pipeline-summary-count">2</div>
+                  <div className="pipeline-summary-label">Offers</div>
                 </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="48" />
-                  </div>
-                </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="52" />
-                  </div>
-                </div>
-              </div>
-              <div
-                style={{
-                  marginTop: '16px',
-                  fontSize: '11px',
-                  color: 'var(--text-muted)',
-                  fontFamily: 'var(--font-sans)',
-                }}
-              >
-                Clean and simple visuals keep you focused on what matters.
               </div>
             </div>
           </div>
@@ -1581,13 +1553,13 @@ export default function LandingPage() {
               </p>
               <ul className="extension-features">
                 <li>
-                  <div className="check">✓</div> Auto-fill company, role, and link
+                  <div className="check"><Check aria-hidden="true" /></div> Auto-fill company, role, and link
                 </li>
                 <li>
-                  <div className="check">✓</div> Detects job status and source site
+                  <div className="check"><Check aria-hidden="true" /></div> Detects job status and source site
                 </li>
                 <li>
-                  <div className="check">✓</div> Syncs instantly with your workspace
+                  <div className="check"><Check aria-hidden="true" /></div> Syncs instantly with your workspace
                 </li>
               </ul>
               <a href="/extension.zip" download className="btn-primary" style={{ marginTop: '8px' }}>

@@ -66,13 +66,16 @@ export default function LandingPage() {
         entries.forEach((entry) => {
           if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) return;
 
-          const isAlreadyOnScreen = entry.boundingClientRect.top < window.innerHeight;
+          const isInitialRender = window.scrollY === 0 && entry.boundingClientRect.top < window.innerHeight;
           entry.target.classList.add('visible');
-          if (isAlreadyOnScreen) entry.target.classList.add('no-motion');
+          if (isInitialRender) {
+            entry.target.classList.add('no-motion');
+            entry.target.classList.remove('is-prepared');
+          }
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: '0px 0px 280px 0px', threshold: 0 }
+      { rootMargin: '0px 0px 64px 0px', threshold: 0 }
     );
 
     revealElements.forEach((element) => {
@@ -1178,8 +1181,8 @@ export default function LandingPage() {
         @media (prefers-reduced-motion: no-preference) {
           .reveal {
             opacity: 0;
-            transform: translate3d(0, 16px, 0);
-            transition: opacity 360ms ease-out, transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+            transform: translate3d(0, 20px, 0);
+            transition: opacity 480ms ease-out, transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
           }
           .reveal.is-prepared { will-change: opacity, transform; }
           .reveal.visible { opacity: 1; transform: translate3d(0, 0, 0); }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, Moon, Sparkles, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -7,6 +7,7 @@ export default function LandingPage() {
   const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
+  const scrollFrame = useRef(null);
 
   // Allow scrolling on the landing page even if body is locked globally.
   useEffect(() => {
@@ -20,59 +21,34 @@ export default function LandingPage() {
   // Scroll handlers: navbar state + active nav highlighting
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (scrollFrame.current !== null) return;
 
-      const sections = document.querySelectorAll('section[id]');
-      const navLinks = document.querySelectorAll('.landing-nav-links a');
-      let current = '';
-      sections.forEach((section) => {
-        if (!(section instanceof HTMLElement)) return;
-        const top = section.offsetTop - 100;
-        if (window.scrollY >= top) {
-          current = section.getAttribute('id') || '';
-        }
-      });
-      navLinks.forEach((link) => {
-        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+      scrollFrame.current = window.requestAnimationFrame(() => {
+        const isScrolled = window.scrollY > 20;
+        setScrolled((previous) => (previous === isScrolled ? previous : isScrolled));
+
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.landing-nav-links a');
+        let current = '';
+        sections.forEach((section) => {
+          if (!(section instanceof HTMLElement)) return;
+          const top = section.offsetTop - 100;
+          if (window.scrollY >= top) {
+            current = section.getAttribute('id') || '';
+          }
+        });
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+        });
+        scrollFrame.current = null;
       });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Reveal animations
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  // Bar chart animations
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.target instanceof HTMLElement) {
-            const target = entry.target.getAttribute('data-height');
-            if (target) entry.target.style.height = target + '%';
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    document.querySelectorAll('.bar').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current);
+    };
   }, []);
 
   // Counter animations
@@ -171,6 +147,9 @@ export default function LandingPage() {
         .landing-root {
           font-family: var(--font-mono);
           background: var(--bg);
+          background-image: radial-gradient(circle, #d4d4d8 1px, transparent 1px);
+          background-size: 32px 32px;
+          background-attachment: scroll;
           color: var(--text);
           line-height: 1.5;
           -webkit-font-smoothing: antialiased;
@@ -185,20 +164,8 @@ export default function LandingPage() {
           letter-spacing: -0.025em;
         }
 
-        .landing-root::before {
-          content: "";
-          position: fixed;
-          inset: 0;
-          background-image: radial-gradient(circle, #d4d4d8 1px, transparent 1px);
-          background-size: 32px 32px;
-          opacity: 0.9;
-          pointer-events: none;
-          z-index: 0;
-          transition: opacity var(--transition-smooth);
-        }
-        .landing-root[data-theme="dark"]::before {
+        .landing-root[data-theme="dark"] {
           background-image: radial-gradient(circle, #2a2a2c 1px, transparent 1px);
-          opacity: 0.4;
         }
 
         .lp-container {
@@ -783,52 +750,70 @@ export default function LandingPage() {
         }
         .check svg { width: 13px; height: 13px; stroke-width: 3; }
         .insights-left li:hover .check { transform: scale(1.2) rotate(10deg); }
-        .chart-card {
+        .pipeline-card {
           background: var(--surface);
           border: 2.5px solid var(--border);
           border-radius: var(--radius);
           padding: 32px;
           transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
         }
-        [data-theme="dark"] .chart-card {
+        [data-theme="dark"] .pipeline-card {
           border: 1.5px solid var(--border);
           box-shadow: 0 2px 12px rgba(0,0,0,0.3);
         }
-        .chart-header {
+        .pipeline-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           margin-bottom: 24px;
         }
-        .chart-bars {
-          display: flex;
-          align-items: flex-end;
-          gap: 12px;
-          height: 140px;
+        .pipeline-badge {
+          font-size: 11px;
+          font-weight: 800;
+          color: var(--accent-yellow-text);
+          background: var(--accent-yellow-bg);
+          padding: 5px 9px;
+          border-radius: 999px;
+          white-space: nowrap;
         }
-        .bar-wrap {
-          flex: 1;
+        .pipeline-list {
           display: flex;
           flex-direction: column;
+          gap: 10px;
+        }
+        .pipeline-item {
+          display: flex;
           align-items: center;
+          gap: 12px;
+          padding: 12px;
+          border: 1.5px solid var(--border-light);
+          border-radius: var(--radius-sm);
+          background: var(--bg);
+        }
+        .pipeline-item-dot {
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: var(--accent-green);
+          box-shadow: 0 0 0 4px var(--accent-green-bg);
+          flex-shrink: 0;
+        }
+        .pipeline-item-dot--yellow { background: var(--accent-yellow-text); box-shadow: 0 0 0 4px var(--accent-yellow-bg); }
+        .pipeline-item-copy { min-width: 0; flex: 1; }
+        .pipeline-item-title { font-size: 13px; font-weight: 700; }
+        .pipeline-item-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .pipeline-item-time { font-size: 10px; font-weight: 800; color: var(--text-muted); white-space: nowrap; }
+        .pipeline-summary {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
           gap: 8px;
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1.5px solid var(--border-light);
         }
-        .bar {
-          width: 100%;
-          background: var(--text);
-          border-radius: 6px;
-          transition: height 1.2s cubic-bezier(0.4, 0, 0.2, 1), background-color var(--transition-smooth);
-          position: relative;
-        }
-        .bar-bg {
-          width: 100%;
-          background: var(--border-light);
-          border-radius: 6px;
-          position: relative;
-          overflow: hidden;
-          transition: background-color var(--transition-smooth);
-        }
-        .bar-wrap:hover .bar { filter: brightness(1.2); }
+        .pipeline-summary-item { text-align: center; }
+        .pipeline-summary-count { font-size: 18px; font-weight: 800; }
+        .pipeline-summary-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-top: 2px; }
 
         /* Testimonials / Different */
         .testimonial-grid {
@@ -1178,17 +1163,6 @@ export default function LandingPage() {
           font-weight: 500;
         }
 
-        /* Animations */
-        .reveal {
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        .reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
         /* Responsive */
         @media (max-width: 900px) {
           nav { padding: 16px 0; }
@@ -1416,8 +1390,8 @@ export default function LandingPage() {
                   lineHeight: '1.6',
                 }}
               >
-                Dashboards summarize your search with clean metrics and growth charts. For admins,
-                it&apos;s a dedicated view that keeps the team aligned.
+                Dashboards turn your activity into clear next steps, so you always know where to
+                focus without digging through a noisy pipeline.
               </p>
               <ul>
                 <li>
@@ -1427,75 +1401,54 @@ export default function LandingPage() {
                   <div className="check"><Check aria-hidden="true" /></div> Measure response and success rates
                 </li>
                 <li>
-                  <div className="check"><Check aria-hidden="true" /></div> See monthly growth trends
+                  <div className="check"><Check aria-hidden="true" /></div> See your next actions at a glance
                 </li>
               </ul>
               <Link to="/login" className="btn-secondary" style={{ marginTop: '8px' }}>
                 Explore dashboards
               </Link>
             </div>
-            <div className="chart-card reveal" style={{ transitionDelay: '0.15s' }}>
-              <div className="chart-header">
+            <div className="pipeline-card reveal" style={{ transitionDelay: '0.15s' }}>
+              <div className="pipeline-header">
                 <div>
-                  <div className="side-label">Monthly growth</div>
+                  <div className="side-label">This week&apos;s focus</div>
                   <div style={{ fontSize: '22px', fontWeight: 800, marginTop: '4px' }}>
-                    Consistent momentum
+                    Keep momentum moving.
                   </div>
                 </div>
-                <div
-                  className="growth-counter demo-stat-value"
-                  data-count="100"
-                  data-prefix="+"
-                  data-suffix="%"
-                  style={{
-                    fontSize: '13px',
-                    fontWeight: 800,
-                    color: 'var(--accent-green)',
-                    background: 'var(--accent-green-bg)',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    border: '1.5px solid var(--border)',
-                  }}
-                >
-                  0
+                <div className="pipeline-badge">2 actions due</div>
+              </div>
+              <div className="pipeline-list">
+                <div className="pipeline-item">
+                  <div className="pipeline-item-dot pipeline-item-dot--yellow" />
+                  <div className="pipeline-item-copy">
+                    <div className="pipeline-item-title">Follow up with Linear</div>
+                    <div className="pipeline-item-detail">UX Researcher application</div>
+                  </div>
+                  <div className="pipeline-item-time">Today</div>
+                </div>
+                <div className="pipeline-item">
+                  <div className="pipeline-item-dot" />
+                  <div className="pipeline-item-copy">
+                    <div className="pipeline-item-title">Prepare for Stripe</div>
+                    <div className="pipeline-item-detail">Product Designer interview</div>
+                  </div>
+                  <div className="pipeline-item-time">Thu</div>
                 </div>
               </div>
-              <div className="chart-bars">
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="32" />
-                  </div>
+              <div className="pipeline-summary">
+                <div className="pipeline-summary-item">
+                  <div className="pipeline-summary-count">12</div>
+                  <div className="pipeline-summary-label">Active</div>
                 </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="40" />
-                  </div>
+                <div className="pipeline-summary-item">
+                  <div className="pipeline-summary-count">3</div>
+                  <div className="pipeline-summary-label">Interviews</div>
                 </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="28" />
-                  </div>
+                <div className="pipeline-summary-item">
+                  <div className="pipeline-summary-count">2</div>
+                  <div className="pipeline-summary-label">Offers</div>
                 </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="48" />
-                  </div>
-                </div>
-                <div className="bar-wrap">
-                  <div className="bar-bg" style={{ height: '100%' }}>
-                    <div className="bar" style={{ height: '0%', position: 'absolute', bottom: 0 }} data-height="52" />
-                  </div>
-                </div>
-              </div>
-              <div
-                style={{
-                  marginTop: '16px',
-                  fontSize: '11px',
-                  color: 'var(--text-muted)',
-                  fontFamily: 'var(--font-sans)',
-                }}
-              >
-                Clean and simple visuals keep you focused on what matters.
               </div>
             </div>
           </div>

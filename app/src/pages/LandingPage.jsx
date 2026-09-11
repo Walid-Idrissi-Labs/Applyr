@@ -1200,7 +1200,7 @@ export default function LandingPage() {
           .hero-actions .btn-secondary { width: 100%; justify-content: center; box-sizing: border-box; }
           .faq-card .section-header { flex-direction: column; align-items: center; text-align: center; }
           footer { align-items: stretch; text-align: center; }
-          footer > div:first-child { align-self: center; }
+          footer > div:first-child { align-self: center; margin-inline: auto; }
           .footer-links { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; }
           .footer-links a { padding: 4px 0; }
           .footer-links a:last-child { grid-column: 1 / -1; }

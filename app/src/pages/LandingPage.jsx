@@ -5,7 +5,6 @@ import { useTheme } from '../context/ThemeContext';
 
 export default function LandingPage() {
   const { theme, toggleTheme } = useTheme();
-  const [scrolled, setScrolled] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
   const scrollFrame = useRef(null);
 
@@ -24,9 +23,6 @@ export default function LandingPage() {
       if (scrollFrame.current !== null) return;
 
       scrollFrame.current = window.requestAnimationFrame(() => {
-        const isScrolled = window.scrollY > 20;
-        setScrolled((previous) => (previous === isScrolled ? previous : isScrolled));
-
         const sections = document.querySelectorAll('section[id]');
         const navLinks = document.querySelectorAll('.landing-nav-links a');
         let current = '';
@@ -224,9 +220,6 @@ export default function LandingPage() {
           transition: border-color 0.3s, background-color var(--transition-smooth);
           isolation: isolate;
         }
-        nav.scrolled { border-bottom-color: var(--border); }
-        [data-theme="dark"] nav.scrolled { border-bottom-color: var(--border); }
-
         .nav-inner {
           display: flex;
           align-items: center;
@@ -1209,7 +1202,7 @@ export default function LandingPage() {
         }
       `}</style>
 
-      <nav id="navbar" className={scrolled ? 'scrolled' : ''}>
+      <nav id="navbar">
         <div className="lp-container nav-inner">
           <Link to="/" className="logo">Applyr</Link>
           <div className="landing-nav-links">

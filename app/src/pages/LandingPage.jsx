@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Moon, Sparkles, Sun } from 'lucide-react';
+import { ArrowRight, Check, Moon, Sparkles, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function LandingPage() {
@@ -138,6 +138,7 @@ export default function LandingPage() {
           --font-logo: "JetBrains Mono", "SF Mono", "Courier New", monospace;
           --shadow-offset: 8px;
           --shadow-color: rgba(0,0,0,0.08);
+          --filled-button-shadow: 0 8px 16px rgba(9, 9, 11, 0.22);
           --transition-fast: 0.15s;
           --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -162,6 +163,7 @@ export default function LandingPage() {
           --accent-blue-text: #60a5fa;
           --accent-gray-bg: rgba(255,255,255,0.06);
           --accent-gray-text: #a1a1aa;
+          --filled-button-shadow: 0 8px 18px rgba(0, 0, 0, 0.34);
         }
 
         html { scroll-behavior: smooth; }
@@ -315,8 +317,7 @@ export default function LandingPage() {
           position: relative;
           overflow: hidden;
         }
-        .nav-cta:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--border); }
-        [data-theme="dark"] .nav-cta:hover { box-shadow: 4px 4px 0 rgba(255,255,255,0.08); }
+        .nav-cta:hover { transform: translate(-2px, -2px); box-shadow: var(--filled-button-shadow); }
         .nav-cta:active { transform: translate(0, 0); box-shadow: none; transition-duration: 0.05s; }
 
         .theme-toggle {
@@ -424,8 +425,7 @@ export default function LandingPage() {
           position: relative;
           overflow: hidden;
         }
-        .btn-primary:hover { transform: translate(-3px, -3px); box-shadow: 5px 5px 0 var(--border); }
-        [data-theme="dark"] .btn-primary:hover { box-shadow: 5px 5px 0 rgba(255,255,255,0.08); }
+        .btn-primary:hover { transform: translate(-3px, -3px); box-shadow: var(--filled-button-shadow); }
         .btn-primary:active { transform: translate(0); box-shadow: none; transition-duration: 0.05s; }
         .btn-secondary {
           display: inline-flex;
@@ -769,19 +769,19 @@ export default function LandingPage() {
         .insights-left li:nth-child(2) { animation-delay: 0.1s; }
         .insights-left li:nth-child(3) { animation-delay: 0.2s; }
         .check {
-          width: 20px;
-          height: 20px;
+          width: 22px;
+          height: 22px;
           background: var(--accent-green-bg);
-          border: 2px solid var(--border);
+          border: 1.5px solid var(--accent-green);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 10px;
           color: var(--accent-green);
           flex-shrink: 0;
           transition: transform 0.3s, background-color var(--transition-smooth), border-color var(--transition-smooth);
         }
+        .check svg { width: 13px; height: 13px; stroke-width: 3; }
         .insights-left li:hover .check { transform: scale(1.2) rotate(10deg); }
         .chart-card {
           background: var(--surface);
@@ -1421,13 +1421,13 @@ export default function LandingPage() {
               </p>
               <ul>
                 <li>
-                  <div className="check">✓</div> Track outcomes by status
+                  <div className="check"><Check aria-hidden="true" /></div> Track outcomes by status
                 </li>
                 <li>
-                  <div className="check">✓</div> Measure response and success rates
+                  <div className="check"><Check aria-hidden="true" /></div> Measure response and success rates
                 </li>
                 <li>
-                  <div className="check">✓</div> See monthly growth trends
+                  <div className="check"><Check aria-hidden="true" /></div> See monthly growth trends
                 </li>
               </ul>
               <Link to="/login" className="btn-secondary" style={{ marginTop: '8px' }}>
@@ -1581,13 +1581,13 @@ export default function LandingPage() {
               </p>
               <ul className="extension-features">
                 <li>
-                  <div className="check">✓</div> Auto-fill company, role, and link
+                  <div className="check"><Check aria-hidden="true" /></div> Auto-fill company, role, and link
                 </li>
                 <li>
-                  <div className="check">✓</div> Detects job status and source site
+                  <div className="check"><Check aria-hidden="true" /></div> Detects job status and source site
                 </li>
                 <li>
-                  <div className="check">✓</div> Syncs instantly with your workspace
+                  <div className="check"><Check aria-hidden="true" /></div> Syncs instantly with your workspace
                 </li>
               </ul>
               <a href="/extension.zip" download className="btn-primary" style={{ marginTop: '8px' }}>

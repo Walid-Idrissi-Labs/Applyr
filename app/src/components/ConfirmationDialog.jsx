@@ -1,4 +1,5 @@
 import { AlertTriangle, X, Check } from 'lucide-react';
+import ModalLayer from './ModalLayer';
 
 export default function ConfirmationDialog({
   isOpen,
@@ -15,7 +16,7 @@ export default function ConfirmationDialog({
   const isDestructive = variant === 'destructive';
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <ModalLayer className="bg-black/40 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] w-full max-w-md">
         <div className="flex items-center gap-3 p-4 border-b-2 border-[#111] dark:border-gray-800">
           <div className={`p-2 rounded-lg ${isDestructive ? 'bg-red-100 dark:bg-red-900/30' : 'bg-yellow-100 dark:bg-yellow-900/30'}`}>
@@ -49,6 +50,6 @@ export default function ConfirmationDialog({
           </button>
         </div>
       </div>
-    </div>
+    </ModalLayer>
   );
 }

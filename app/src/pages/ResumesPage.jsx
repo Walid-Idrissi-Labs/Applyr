@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { resumesAPI } from '../api';
 import ReactMarkdown from 'react-markdown';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import ModalLayer from '../components/ModalLayer';
 import { ResumesSkeleton } from '../components/loading/PageSkeletons';
 import { usePageLoading } from '../context/LoadingActivityContext';
 import { FileText, Download, Eye, Upload, Briefcase, ChevronRight, Clock, Trash2, Edit2, X, Wand2, Check } from 'lucide-react';
@@ -306,7 +307,7 @@ export default function ResumesPage() {
         </>
       )}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <ModalLayer className="bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-2xl w-full max-w-4xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] overflow-hidden flex flex-col max-h-[90vh]">
             <div className="p-4 border-b-2 border-[#111] dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-[#1a1a1a]">
               <h3 className="font-bold text-[16px] dark:text-white flex items-center gap-2">
@@ -401,7 +402,7 @@ export default function ResumesPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalLayer>
       )}
 
       <ConfirmationDialog

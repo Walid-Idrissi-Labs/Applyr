@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { applicationsAPI, tasksAPI, documentsAPI, resumesAPI, tagsAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import ModalLayer from '../components/ModalLayer';
 import { ApplicationDetailSkeleton } from '../components/loading/PageSkeletons';
 import { usePageLoading } from '../context/LoadingActivityContext';
 import { ArrowLeft, Calendar, ExternalLink, FileText, Plus, Trash2, Upload, Check, Wand2, Edit2, Clock, Save, X } from 'lucide-react';
@@ -613,8 +613,8 @@ export default function ApplicationDetailPage() {
         </div>
       </div>
 
-      {showTailorModal && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      {showTailorModal && (
+        <ModalLayer className="bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-2xl w-full max-w-md shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] overflow-hidden">
             <div className="p-4 border-b-2 border-[#111] dark:border-gray-800 flex justify-between items-center bg-purple-50 dark:bg-purple-900/10">
               <h3 className="font-bold text-[16px] dark:text-white flex items-center gap-2">
@@ -697,8 +697,7 @@ export default function ApplicationDetailPage() {
               )}
             </div>
           </div>
-        </div>,
-        document.body
+        </ModalLayer>
       )}
 
       <ConfirmationDialog

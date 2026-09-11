@@ -184,7 +184,7 @@ export default function LandingPage() {
           z-index: 50;
           background: rgba(249,248,244, 0.85);
           backdrop-filter: blur(12px);
-          border-bottom: 2px solid transparent;
+          border-bottom: 2px solid var(--border);
           transition: border-color 0.3s, background-color var(--transition-smooth);
         }
         [data-theme="dark"] nav { background: rgba(10,10,10, 0.85); }

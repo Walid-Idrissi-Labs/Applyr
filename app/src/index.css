@@ -68,7 +68,7 @@
 }
 
 .dark .workspace-sidebar {
-  background-color: #111;
+  background: #111;
 }
 
 @media (min-width: 768px) {

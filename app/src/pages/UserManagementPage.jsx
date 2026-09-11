@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../api';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import ModalLayer from '../components/ModalLayer';
 import { UsersSkeleton } from '../components/loading/PageSkeletons';
 import { usePageLoading } from '../context/LoadingActivityContext';
 import { Users, Trash2, UserX, UserCheck, Crown, Search, Plus, Edit, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -229,7 +230,7 @@ export default function UserManagementPage() {
 
       {/* User Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <ModalLayer className="bg-black/50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#0a0a0a] rounded-lg shadow-xl w-full max-w-md border-2 border-[#111] dark:border-gray-700 flex flex-col max-h-[90vh]">
             <div className="p-4 border-b-2 border-[#111] dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-[#1a1a1a] rounded-t-lg">
               <h2 className="font-bold text-[16px] dark:text-white">
@@ -318,7 +319,7 @@ export default function UserManagementPage() {
               </div>
             </form>
           </div>
-        </div>
+        </ModalLayer>
       )}
 
       <ConfirmationDialog

@@ -220,7 +220,6 @@ export default function AppLayout() {
 
   return (
     <div className="app-ui relative isolate flex h-screen overflow-hidden bg-[#f9f8f4] dark:bg-[#0a0a0a] transition-colors duration-300">
-      <img className="workspace-paper-surface" src="/workspace-paper-surface-v10.webp" alt="" aria-hidden="true" />
       {loadingInitialWorkspace && (
         <WorkspaceLoader
           requestActive={isPageLoading}

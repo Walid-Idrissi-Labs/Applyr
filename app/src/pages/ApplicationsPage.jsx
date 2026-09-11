@@ -4,6 +4,7 @@ import { applicationsAPI, tagsAPI } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import ApplicationForm from '../components/ApplicationForm';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import ModalLayer from '../components/ModalLayer';
 import { ApplicationsSkeleton } from '../components/loading/PageSkeletons';
 import { usePageLoading } from '../context/LoadingActivityContext';
 import { Search, LayoutList, LayoutGrid, Plus, X, Briefcase, Eye, Edit2, Trash2, ExternalLink, Check } from 'lucide-react';
@@ -329,7 +330,7 @@ export default function ApplicationsPage() {
       />
 
       {showDetail && (
-        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 z-50 flex items-center justify-center p-4 overflow-y-auto backdrop-blur-sm transition-colors duration-300">
+        <ModalLayer className="bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 overflow-y-auto backdrop-blur-sm transition-colors duration-300">
           <div className="bg-white dark:bg-[#111] border-2 border-[#111] dark:border-gray-800 rounded-2xl w-full max-w-4xl m-auto shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.05)] flex flex-col max-h-[90vh]">
             
             <div className="p-5 border-b-2 border-[#111] dark:border-gray-800 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start bg-gray-50 dark:bg-[#1a1a1a] rounded-t-2xl shrink-0">
@@ -411,7 +412,7 @@ export default function ApplicationsPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalLayer>
       )}
     </div>
   );

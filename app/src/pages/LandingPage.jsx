@@ -1198,6 +1198,7 @@ export default function LandingPage() {
           .hero-actions { flex-direction: column; align-items: stretch; }
           .hero-actions .btn-primary,
           .hero-actions .btn-secondary { width: 100%; justify-content: center; box-sizing: border-box; }
+          .faq-card .section-header { flex-direction: column; align-items: center; text-align: center; }
           .grid-3, .testimonial-grid, .insights-grid, .workflow-grid, .faq-grid, .ai-section-inner {
             grid-template-columns: 1fr;
           }

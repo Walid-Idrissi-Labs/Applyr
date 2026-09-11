@@ -142,8 +142,6 @@ export default function LandingPage() {
           --filled-button-shadow: 0 8px 18px rgba(0, 0, 0, 0.34);
         }
 
-        html { scroll-behavior: smooth; }
-
         .landing-root {
           font-family: var(--font-mono);
           background: var(--bg);
@@ -182,12 +180,11 @@ export default function LandingPage() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(249,248,244, 0.85);
-          backdrop-filter: blur(12px);
+          background: rgba(249,248,244, 0.97);
           border-bottom: 2px solid var(--border);
           transition: border-color 0.3s, background-color var(--transition-smooth);
         }
-        [data-theme="dark"] nav { background: rgba(10,10,10, 0.85); }
+        [data-theme="dark"] nav { background: rgba(10,10,10, 0.97); }
         nav.scrolled { border-bottom-color: var(--border); }
         [data-theme="dark"] nav.scrolled { border-bottom-color: var(--border); }
 
@@ -635,17 +632,8 @@ export default function LandingPage() {
           padding: 20px 0;
           border-bottom: 1.5px solid var(--border-light);
           transition: border-color var(--transition-smooth);
-          opacity: 0;
-          transform: translateX(-10px);
-          animation: slide-in-right 0.6s forwards;
         }
-        .workflow-step:nth-child(2) { animation-delay: 0.1s; }
-        .workflow-step:nth-child(3) { animation-delay: 0.2s; }
-        .workflow-step:nth-child(4) { animation-delay: 0.3s; }
         .workflow-step:last-child { border-bottom: none; }
-        @keyframes slide-in-right {
-          to { opacity: 1; transform: translateX(0); }
-        }
         .step-num {
           width: 36px;
           height: 36px;
@@ -675,17 +663,10 @@ export default function LandingPage() {
           border-radius: var(--radius);
           padding: 28px;
           transition: transform 0.3s, box-shadow 0.3s, background-color var(--transition-smooth), border-color var(--transition-smooth);
-          opacity: 0;
-          transform: translateY(20px);
-          animation: slide-up 0.6s forwards;
         }
         [data-theme="dark"] .side-card {
           border: 1.5px solid var(--border);
           box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-        }
-        .side-card:nth-child(2) { animation-delay: 0.15s; }
-        @keyframes slide-up {
-          to { opacity: 1; transform: translateY(0); }
         }
         .side-card:hover { transform: translateX(8px); box-shadow: 6px 6px 0 var(--shadow-color); }
         [data-theme="dark"] .side-card:hover {
@@ -729,12 +710,7 @@ export default function LandingPage() {
           gap: 10px;
           font-size: 14px;
           font-weight: 500;
-          opacity: 0;
-          transform: translateX(-10px);
-          animation: slide-in-right 0.5s forwards;
         }
-        .insights-left li:nth-child(2) { animation-delay: 0.1s; }
-        .insights-left li:nth-child(3) { animation-delay: 0.2s; }
         .check {
           width: 22px;
           height: 22px;

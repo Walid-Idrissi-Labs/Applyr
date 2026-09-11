@@ -51,6 +51,42 @@ export default function LandingPage() {
     };
   }, []);
 
+  // Start section transitions before they enter view, so scrolling stays smooth.
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const revealElements = Array.from(document.querySelectorAll('.reveal'));
+    const handleTransitionEnd = (event) => {
+      if (event.propertyName === 'transform') {
+        event.currentTarget.classList.remove('is-prepared');
+      }
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) return;
+
+          const isAlreadyOnScreen = entry.boundingClientRect.top < window.innerHeight;
+          entry.target.classList.add('visible');
+          if (isAlreadyOnScreen) entry.target.classList.add('no-motion');
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: '0px 0px 280px 0px', threshold: 0 }
+    );
+
+    revealElements.forEach((element) => {
+      element.classList.add('is-prepared');
+      element.addEventListener('transitionend', handleTransitionEnd);
+      observer.observe(element);
+    });
+
+    return () => {
+      observer.disconnect();
+      revealElements.forEach((element) => element.removeEventListener('transitionend', handleTransitionEnd));
+    };
+  }, []);
+
   // Counter animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -180,11 +216,11 @@ export default function LandingPage() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(249,248,244, 0.97);
+          background: var(--bg);
           border-bottom: 2px solid var(--border);
           transition: border-color 0.3s, background-color var(--transition-smooth);
+          isolation: isolate;
         }
-        [data-theme="dark"] nav { background: rgba(10,10,10, 0.97); }
         nav.scrolled { border-bottom-color: var(--border); }
         [data-theme="dark"] nav.scrolled { border-bottom-color: var(--border); }
 
@@ -1137,6 +1173,17 @@ export default function LandingPage() {
           gap: 10px;
           font-size: 14px;
           font-weight: 500;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+          .reveal {
+            opacity: 0;
+            transform: translate3d(0, 16px, 0);
+            transition: opacity 360ms ease-out, transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+          }
+          .reveal.is-prepared { will-change: opacity, transform; }
+          .reveal.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+          .reveal.no-motion { transition: none; }
         }
 
         /* Responsive */

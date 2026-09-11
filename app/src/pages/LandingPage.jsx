@@ -1170,6 +1170,7 @@ export default function LandingPage() {
           font-size: 14px;
           font-weight: 500;
         }
+        .extension-download { display: flex; }
 
         @media (prefers-reduced-motion: no-preference) {
           .reveal {
@@ -1199,6 +1200,7 @@ export default function LandingPage() {
           }
           .landing-nav-links { display: none; }
           .cta-card { padding: 40px 24px; text-align: center; justify-content: center; }
+          .extension-download { justify-content: center; }
         }
       `}</style>
 
@@ -1562,14 +1564,16 @@ export default function LandingPage() {
                   <div className="check"><Check aria-hidden="true" /></div> Syncs instantly with your workspace
                 </li>
               </ul>
-              <a href="/extension.zip" download className="btn-primary" style={{ marginTop: '8px' }}>
-                Download Extension
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '2px' }}>
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-              </a>
+              <div className="extension-download">
+                <a href="/extension.zip" download className="btn-primary" style={{ marginTop: '8px' }}>
+                  Download Extension
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '2px' }}>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                </a>
+              </div>
             </div>
             <div className="browser-mockup">
               <div className="browser-chrome">
